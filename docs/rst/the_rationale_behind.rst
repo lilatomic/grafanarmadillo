@@ -8,7 +8,7 @@ Branch organization
 
 This repository complies with the ideas of agile development. Why? Because I found the agile strategy to fit best the kind of projects I develop. Is this the best strategy for your project? Well, you have to evaluate that.
 
-In the "python-project-skeleton" layout, there is only one production branch, the `master` branch, where both the latest and the, so called, stable versions converge. This layout contrasts with the opposite strategy where the `stable` and the `latest` branches are kept separate. For the kind of projects I develop, keeping the `stable` and the `latest` separated is just troublesome. Honestly, I believe such separation defeats the purpose of agile development with Semantic Versioning 2, which is the versioning scheme I adopted.
+In the "grafanarmadillo" layout, there is only one production branch, the `master` branch, where both the latest and the, so called, stable versions converge. This layout contrasts with the opposite strategy where the `stable` and the `latest` branches are kept separate. For the kind of projects I develop, keeping the `stable` and the `latest` separated is just troublesome. Honestly, I believe such separation defeats the purpose of agile development with Semantic Versioning 2, which is the versioning scheme I adopted.
 
 Versioning
 ----------

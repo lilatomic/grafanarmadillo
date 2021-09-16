@@ -35,52 +35,32 @@ long_description = '{}\n{}'.format(
     )
 
 setup(
-    name='jmct-sampleproject',
-    version='0.8.0',
-    description='A skeleton template for Python projects.',
+    name='grafanarmadillo',
+    version='0.0.1',
+    description='Simplifies interacting with Grafana, with a focus on templating dashboards ',
     long_description=long_description,
     long_description_content_type='text/x-rst',
     license='MIT License',
-    author='Joao Miguel Correia Teixeira',
-    author_email='joaomcteixeira@gmail.com',
-    url='https://github.com/joaomcteixeira/python-project-skeleton',
+    author='lilatomic',
+    url='https://github.com/lilatomic/grafanarmadillo',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(i))[0] for i in glob("src/*.py")],
     include_package_data=True,
     zip_safe=False,
     classifiers=[
-        # complete classifier list:
-        # http://pypi.python.org/pypi?%3Aaction=list_classifiers
-        'Development Status :: 3 - Alpha',
-        # 'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-        'License :: OSI Approved :: MIT License',
-        'Intended Audience :: Science/Research',
-        'Natural Language :: English',
-        'Operating System :: POSIX',
-        'Operating System :: MacOS',
-        'Operating System :: Microsoft',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Topic :: Scientific/Engineering :: Bio-Informatics',
         ],
     project_urls={
-        'webpage': 'https://github.com/joaomcteixeira/python-project-skeleton',
-        'Documentation': 'https://python-project-skeleton.readthedocs.io/en/latest/',
-        'Changelog': 'https://github.com/joaomcteixeira/python-project-skeleton/blob/master/docs/CHANGELOG.rst',
-        'Issue Tracker': 'https://github.com/joaomcteixeira/python-project-skeleton/issues',
-        'Discussion Forum': 'https://github.com/joaomcteixeira/python-project-skeleton/discussions',
+        'webpage': 'https://github.com/lilatomic/grafanarmadillo',
+        'Documentation': 'https://grafanarmadillo.readthedocs.io/en/latest/',
+        'Changelog': 'https://github.com/lilatomic/grafanarmadillo/blob/master/docs/CHANGELOG.rst',
+        'Issue Tracker': 'https://github.com/lilatomic/grafanarmadillo/issues',
+        'Discussion Forum': 'https://github.com/lilatomic/grafanarmadillo/discussions',
         },
     keywords=[
-        'ci', 'continuous-integration', 'project-template',
-        'project-skeleton', 'sample-project',
-        # eg: 'keyword1', 'keyword2', 'keyword3',
         ],
     python_requires='>=3.6, <3.9',
     install_requires=[
-        'matplotlib>=3',
-        # 'click',
-        # eg: 'aspectlib==1.1.1', 'six>=1.7',
         ],
     extras_require={
         # eg:
