@@ -1,7 +1,9 @@
 Authors
 =======
 
-* Joao M. C. Teixeira (`webpage`_, `github`_)
+* Lilatomic (`webpage <https://www.lilatomic.ca>`_, `lilatomic_github <https://github.com/lilatomic/>`_)
 
-.. _webpage: https://bit.ly/joaomcteixeira
-.. _github: https://github.com/joaomcteixeira
+Template
+--------
+
+* Joao M. C. Teixeira (`webpage <https://bit.ly/joaomcteixeira>`_, `github <https://github.com/joaomcteixeira>`_)
