@@ -14,10 +14,6 @@ Python Package Skeleton Template
     :target: https://codecov.io/gh/lilatomic/grafanarmadillo
     :alt: Codecov
 
-.. image:: https://img.shields.io/codacy/grade/ae042ac066554bfab398024b0beea6a5/master?label=Codacy
-    :target: https://app.codacy.com/manual/lilatomic/grafanarmadillo/dashboard
-    :alt: Codacy
-
 .. image:: https://api.codeclimate.com/v1/badges/d96cc9a1841a819cd4f5/maintainability
    :target: https://codeclimate.com/github/lilatomic/grafanarmadillo/maintainability
    :alt: Maintainability

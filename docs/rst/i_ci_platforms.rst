@@ -14,7 +14,6 @@ The following summaries the platforms adopted:
 #. Building and testing
     * GitHub actions
 #. Quality Control
-    * Codacy
     * Code Climate
 #. Test Coverage
     * Codecov
@@ -81,14 +80,6 @@ Code Quality
 
 Here, we have both ``Codacy`` and ``Code Climate`` as code quality inspectors. There are also others out there, feel free to suggested different ones in the `Discussion tab <https://github.com/lilatomic/grafanarmadillo/discussions>`_.
 
-Codacy
-``````
-
-There is not much to configure for `Codacy` as far as this template is concerned. The only setup provided is to exclude the analysis of test scripts, this configuration is provided by the :code:`.codacy.yaml` file at the root director of the repository. If you wish Codacy to perform quality analysis on your test scripts just remove the file or comment the line. Here we mirror the `.codacy.yaml`_ file:
-
-.. literalinclude:: ../../.codacy.yaml
-    :language: yaml
-
 Code Climate
 ````````````
 
@@ -103,9 +94,7 @@ Code Climate provides a **technical debt** percentage that can be retrieved nice
 .. _Appveyor-CI: https://www.appveyor.com/
 .. _tox.ini: https://github.com/lilatomic/grafanarmadillo/blob/latest/tox.ini
 .. _.appveyor.yml: https://github.com/lilatomic/grafanarmadillo/blob/latest/.appveyor.yml
-.. _.codacy.yaml: https://github.com/lilatomic/grafanarmadillo/blob/latest/.codacy.yaml
 .. _.codeclimate.yml: https://github.com/lilatomic/grafanarmadillo/blob/latest/.codeclimate.yml
-.. _Codacy: https://app.codacy.com/
 .. _Code Climate: https://codeclimate.com/
 .. _coverage: https://pypi.org/project/coverage/
 .. _.coveragerc: https://github.com/lilatomic/grafanarmadillo/blob/latest/.coveragerc

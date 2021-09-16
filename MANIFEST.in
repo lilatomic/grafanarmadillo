@@ -6,7 +6,6 @@ include LICENSE
 
 exclude .appveyor.yml
 exclude .bumpversion.cfg
-exclude .codacy.yaml
 exclude .coveragerc
 exclude .cookiecutterrc
 exclude .editorconfig
