@@ -15,7 +15,7 @@ Here we use `Sphinx`_ as the documentation builder and the `sphinx-py3doc-enhanc
 Build version
 ~~~~~~~~~~~~~
 
-By default, RtD has two main documentation versions (also called builds): the *latest* and the *stable*. The *latest* points to the ``master`` branch while the *stable* points to the `latest GitHub tag`_. However, as we have discussed in :ref:`The Rationale behind the project` section, here we keep only the *latest* version (that of the ``master`` branch) and other versions for the different releases of interest.
+By default, RtD has two main documentation versions (also called builds): the *latest* and the *stable*. The *latest* points to the ``main`` branch while the *stable* points to the `latest GitHub tag`_. However, as we have discussed in :ref:`The Rationale behind the project` section, here we keep only the *latest* version (that of the ``main`` branch) and other versions for the different releases of interest.
 
 Google Analytics
 ~~~~~~~~~~~~~~~~
@@ -36,7 +36,7 @@ To build a local version of the documentation, go to the main repository folder 
 The documentation is at ``dist/docs/index.html``. The ``tox`` run also reports on inconsistencies and errors. If there are inconsistencies or errors in the documentation build, the PR won't pass the CI tests.
 
 .. _Read the Docs platform: https://readthedocs.org/
-.. _Sphinx: http://www.sphinx-doc.org/en/master/
+.. _Sphinx: http://www.sphinx-doc.org/en/main/
 .. _Sphinx Themes: https://sphinx-themes.org/
 .. _sphinx-py3doc-enhanced-theme: https://github.com/ionelmc/sphinx-py3doc-enhanced-theme
 .. _latest Github tag: https://github.com/lilatomic/grafanarmadillo/tags

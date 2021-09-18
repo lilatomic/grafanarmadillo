@@ -27,4 +27,4 @@ The ``devtools`` folder hosts the files related to development. In this case, I 
 .. _blog post: https://blog.ionelmc.ro/2014/05/25/python-packaging/
 .. _src-nosrc example: https://github.com/ionelmc/python-packaging-blunders
 .. _Chodera lab: https://github.com/choderalab
-.. _structuring your project: https://github.com/choderalab/software-development/blob/master/STRUCTURING_YOUR_PROJECT.md
+.. _structuring your project: https://github.com/choderalab/software-development/blob/main/STRUCTURING_YOUR_PROJECT.md

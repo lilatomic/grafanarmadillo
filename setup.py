@@ -53,7 +53,7 @@ setup(
     project_urls={
         'webpage': 'https://github.com/lilatomic/grafanarmadillo',
         'Documentation': 'https://grafanarmadillo.readthedocs.io/en/latest/',
-        'Changelog': 'https://github.com/lilatomic/grafanarmadillo/blob/master/docs/CHANGELOG.rst',
+        'Changelog': 'https://github.com/lilatomic/grafanarmadillo/blob/main/docs/CHANGELOG.rst',
         'Issue Tracker': 'https://github.com/lilatomic/grafanarmadillo/issues',
         'Discussion Forum': 'https://github.com/lilatomic/grafanarmadillo/discussions',
         },

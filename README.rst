@@ -2,15 +2,15 @@
 Python Package Skeleton Template
 ================================
 
-.. image:: https://github.com/lilatomic/grafanarmadillo/workflows/Tests/badge.svg?branch=master
+.. image:: https://github.com/lilatomic/grafanarmadillo/workflows/Tests/badge.svg?branch=main
     :target: https://github.com/lilatomic/grafanarmadillo/actions?workflow=Tests
     :alt: Test Status
 
-.. image:: https://github.com/lilatomic/grafanarmadillo/workflows/Package%20Build/badge.svg?branch=master
+.. image:: https://github.com/lilatomic/grafanarmadillo/workflows/Package%20Build/badge.svg?branch=main
     :target: https://github.com/lilatomic/grafanarmadillo/actions?workflow=Package%20Build
     :alt: Package Build
 
-.. image:: https://codecov.io/gh/lilatomic/grafanarmadillo/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/lilatomic/grafanarmadillo/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/lilatomic/grafanarmadillo
     :alt: Codecov
 
@@ -95,7 +95,7 @@ v0.0.1
 .. _ionel: https://github.com/ionelmc
 .. _issue: https://github.com/lilatomic/grafanarmadillo/issues
 .. _latest branch: https://github.com/lilatomic/grafanarmadillo/tree/latest
-.. _master branch: https://github.com/lilatomic/grafanarmadillo/tree/master
+.. _main branch: https://github.com/lilatomic/grafanarmadillo/tree/main
 .. _pdb-tools: https://github.com/haddocking/pdb-tools
 .. _project's documentation: https://grafanarmadillo.readthedocs.io/en/latest/index.html
 .. _pytest: https://docs.pytest.org/en/stable/
