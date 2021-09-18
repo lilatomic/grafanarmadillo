@@ -1,4 +1,5 @@
-"""Performs general tests."""
+"""Performs integration tests for searches"""
+
 import amodule
 from sampleproject.libs import samplemodule as SM
 
