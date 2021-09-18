@@ -23,3 +23,6 @@ def test_sampleclass():
 def test_sampleclass_false():
     """Test samplemodule SampleClass false classmethod."""
     assert SM.SampleClass.false() is False
+
+def test_with_testcontainer(readonly_grafana):
+    ...
