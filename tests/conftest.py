@@ -90,6 +90,6 @@ def ro_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
 
 		create_dashboard(gfn, "0", 0)
 		f0 = create_folder(gfn, "f0")
-		create_dashboard(gfn, "f0.0", f0['id'])
+		create_dashboard(gfn, "f0-0", f0['id'])
 
 		yield gfn_ctn, gfn
