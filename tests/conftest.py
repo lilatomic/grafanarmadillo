@@ -11,16 +11,18 @@ from testcontainers.core.waiting_utils import wait_for
 
 class GrafanaContainer(DockerContainer):
 	_PORT = 3000
+	_ADMIN_USER = "admin"
 	_ADMIN_PASSWORD = ''.join(random.SystemRandom().choices(string.ascii_letters + string.digits + string.punctuation, k=32))
 
 
-	def __init__(self, image="grafana/grafana:latest", port=_PORT, admin_password: str = _ADMIN_PASSWORD, config_overrides: Dict[str, Dict[str, Any]] = None, **kwargs):
+	def __init__(self, image="grafana/grafana:latest", port=_PORT, admin_user: str = _ADMIN_USER, admin_password: str = _ADMIN_PASSWORD, config_overrides: Dict[str, Dict[str, Any]] = None, **kwargs):
 		super().__init__(image, **kwargs)
 		self.conf = defaultdict(dict)
 		# port
 		self.with_bind_ports(port, 3000)
 		self._set_grafana_conf("server", "http_port", port)
 		self._set_grafana_conf("security", "admin_password", admin_password)
+		self._set_grafana_conf("security", "admin_user", admin_user)
 
 		if config_overrides:
 			self.conf.update(config_overrides)
