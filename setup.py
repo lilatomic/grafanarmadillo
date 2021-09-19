@@ -61,6 +61,7 @@ setup(
         ],
     python_requires='>=3.6, <3.9',
     install_requires=[
+        "grafana_api~=1.0",
         ],
     extras_require={
         # eg:

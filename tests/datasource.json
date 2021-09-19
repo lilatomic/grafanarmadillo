@@ -1,0 +1,22 @@
+{
+	"id": 1,
+	"uid": "rqjvagH7z",
+	"orgId": 1,
+	"name": "Graphite",
+	"type": "graphite",
+	"typeLogoUrl": "",
+	"access": "proxy",
+	"url": "",
+	"password": "",
+	"user": "",
+	"database": "",
+	"basicAuth": false,
+	"basicAuthUser": "",
+	"basicAuthPassword": "",
+	"withCredentials": false,
+	"isDefault": true,
+	"jsonData": { "graphiteVersion": "1.1" },
+	"secureJsonFields": {},
+	"version": 2,
+	"readOnly": false
+}

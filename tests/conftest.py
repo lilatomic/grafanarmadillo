@@ -1,11 +1,14 @@
 from collections import defaultdict
+import json
+import os
 import random
 import string
-from typing import Any, Dict
-import time
+from typing import Any, Dict, Tuple
+from grafana_api.api import dashboard
 
 import pytest
 import requests
+from grafana_api.grafana_face import GrafanaFace
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.waiting_utils import wait_for
 
@@ -57,8 +60,35 @@ class GrafanaContainer(DockerContainer):
 		return ret
 
 
-@pytest.fixture
-def readonly_grafana():
+def read_json_file(filename: str):
+	with open(os.path.join("tests", filename), 'r') as f:
+		return json.load(f)
 
-	with GrafanaContainer() as gfn:
-		yield gfn
+
+def create_dashboard(gfn: GrafanaFace, name, folderId=0):
+	dashboard = read_json_file("dashboard.json")
+	dashboard["title"] = name
+	gfn.dashboard.update_dashboard(dashboard={"dashboard": dashboard, "overwrite": True, 'folderId': folderId})
+
+
+def create_folder(gfn: GrafanaFace, name, uid=None):
+	gfn.folder.create_folder(name, uid)
+
+
+@pytest.fixture
+def grafana():
+	with GrafanaContainer() as gfn_ctn:
+		yield gfn_ctn
+
+@pytest.fixture(scope="module")
+def ro_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
+	"""A grafana instance with many dashboards"""
+	with GrafanaContainer() as gfn_ctn:
+		gfn = GrafanaFace(auth=(gfn_ctn.conf["security"]["admin_user"], gfn_ctn.conf["security"]["admin_password"] ), port=3000)
+
+		gfn.datasource.create_datasource(read_json_file("datasource.json"))
+
+		create_dashboard(gfn, "0", 0)
+		create_folder(gfn, "f0")
+
+		yield gfn_ctn, gfn
