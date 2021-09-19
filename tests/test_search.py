@@ -1,6 +1,7 @@
 """Performs integration tests for searches"""
 
 from tests.conftest import ro_demo_grafana
+import pytest
 import requests
 
 from grafanarmadillo.find import Finder
@@ -45,3 +46,53 @@ def test_get_dashboards_in_folders__general(ro_demo_grafana):
 	r = f.get_dashboards_in_folders(["General"])
 	assert len(r) == 1
 	assert r[0]["title"] == "0"
+
+
+def test_get_dashboard__smoke(ro_demo_grafana):
+	f = Finder(ro_demo_grafana[1])
+	f.get_dashboard("General", "0")
+
+
+def test_get_dashboard__general_folder(ro_demo_grafana):
+	f = Finder(ro_demo_grafana[1])
+	r = f.get_dashboard("General", "0")
+
+	assert len(r) == 1
+	assert r[0]["title"] == "0"
+
+
+def test_get_dashboard__other_folder(ro_demo_grafana):
+	f = Finder(ro_demo_grafana[1])
+	r = f.get_dashboard("f0", "f0-0")
+
+	assert len(r) == 1
+	assert r[0]["title"] == "f0-0"
+
+
+def test_resolve_path__general():
+	assert Finder(None)._resolve_path("/folder/dashboard") == ("folder", "dashboard")
+
+
+def test_resolve_path__no_absolute_slash():
+	assert Finder(None)._resolve_path("folder/dashboard") == ("folder", "dashboard")
+
+
+def test_resolve_path__implicit_general():
+	assert Finder(None)._resolve_path("/dashboard") == ("General", "dashboard")
+
+
+def test_resolve_path__bare_dashboard():
+	assert Finder(None)._resolve_path("dashboard") == ("General", "dashboard")
+
+
+def test_resolve_path__too_many_parts():
+	with pytest.raises(ValueError):
+		Finder(None)._resolve_path("/folder/dashboard/invalidpart")
+
+
+def test_get_from_path__smoke(ro_demo_grafana):
+	f = Finder(ro_demo_grafana[1])
+	r = f.get_from_path("/f0/f0-0")
+
+	assert len(r) == 1
+	assert r[0]["title"] == "f0-0"
