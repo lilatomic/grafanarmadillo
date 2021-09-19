@@ -16,19 +16,27 @@ class Finder(object):
 		super().__init__()
 		self.api = api
 
-	def get_dashboards(self, name) -> List[Dashboard]:
-		return list(filter(
-			lambda x: x['title'] == name, 
-			self.api.search.search_dashboards(query=name, type_="dash-db")
-		))
+	def find_dashboards(self, name) -> List[Dashboard]:
+		return list(
+			filter(
+				lambda x: x["title"] == name,
+				self.api.search.search_dashboards(query=name, type_="dash-db"),
+			)
+		)
 
 	def _enumerate_dashboards_in_folders(self, folder_ids: List[str]):
-		folder_param = ','.join(folder_ids)
-		return self.api.search.search_dashboards(query=None, type_="dash-db", folder_ids=folder_param)
+		folder_param = ",".join(folder_ids)
+		return self.api.search.search_dashboards(
+			query=None, type_="dash-db", folder_ids=folder_param
+		)
 
 	def get_dashboards_in_folders(self, folders: List[str]) -> List[Dashboard]:
-		folder_objects = flat_map(lambda folder_name: self.get_folders(name=folder_name), folders)
-		return self._enumerate_dashboards_in_folders(list(map(lambda f: str(f['id']), folder_objects)))
+		folder_objects = flat_map(
+			lambda folder_name: self.get_folders(name=folder_name), folders
+		)
+		return self._enumerate_dashboards_in_folders(
+			list(map(lambda f: str(f["id"]), folder_objects))
+		)
 
 	def get_folders(self, name) -> List[Folder]:
 		if name == "General":
