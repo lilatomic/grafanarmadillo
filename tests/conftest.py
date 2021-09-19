@@ -68,11 +68,11 @@ def read_json_file(filename: str):
 def create_dashboard(gfn: GrafanaFace, name, folderId=0):
 	dashboard = read_json_file("dashboard.json")
 	dashboard["title"] = name
-	gfn.dashboard.update_dashboard(dashboard={"dashboard": dashboard, "overwrite": True, 'folderId': folderId})
+	return gfn.dashboard.update_dashboard(dashboard={"dashboard": dashboard, "overwrite": True, 'folderId': folderId})
 
 
 def create_folder(gfn: GrafanaFace, name, uid=None):
-	gfn.folder.create_folder(name, uid)
+	return gfn.folder.create_folder(name, uid)
 
 
 @pytest.fixture
@@ -89,6 +89,7 @@ def ro_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
 		gfn.datasource.create_datasource(read_json_file("datasource.json"))
 
 		create_dashboard(gfn, "0", 0)
-		create_folder(gfn, "f0")
+		f0 = create_folder(gfn, "f0")
+		create_dashboard(gfn, "f0.0", f0['id'])
 
 		yield gfn_ctn, gfn

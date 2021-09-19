@@ -13,7 +13,10 @@ class Finder(object):
 		self.api = api
 
 	def get_dashboards(self, name, folder_ids=None) -> List[Dashboard]:
-		return self.api.search.search_dashboards(query=name, type_="dash-db", folder_ids=folder_ids)
+		return list(filter(
+			lambda x: x['title'] == name, 
+			self.api.search.search_dashboards(query=name, type_="dash-db", folder_ids=folder_ids)
+		))
 
 	def get_folders(self, name) -> List[Folder]:
 		if name == "General":
