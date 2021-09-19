@@ -1,5 +1,7 @@
 """Performs integration tests for searches"""
 
+import requests
+
 import amodule
 from sampleproject.libs import samplemodule as SM
 
@@ -25,4 +27,4 @@ def test_sampleclass_false():
     assert SM.SampleClass.false() is False
 
 def test_with_testcontainer(readonly_grafana):
-    ...
+    requests.get(readonly_grafana.url)

@@ -2,9 +2,12 @@ from collections import defaultdict
 import random
 import string
 from typing import Any, Dict
+import time
 
 import pytest
+import requests
 from testcontainers.core.container import DockerContainer
+from testcontainers.core.waiting_utils import wait_for
 
 class GrafanaContainer(DockerContainer):
 	_PORT = 3000
@@ -16,7 +19,7 @@ class GrafanaContainer(DockerContainer):
 		super().__init__(image, **kwargs)
 		self.conf = defaultdict(dict)
 		# port
-		self.with_exposed_ports(port)
+		self.with_bind_ports(port, 3000)
 		self._set_grafana_conf("server", "http_port", port)
 		self._set_grafana_conf("security", "admin_password", admin_password)
 
@@ -31,14 +34,30 @@ class GrafanaContainer(DockerContainer):
 	def _apply_grafana_conf(self):
 		for section, items in self.conf.items():
 			for item, value in items.items():
-				print(section, item)
 				self.with_env(
 					"_".join(["GF", section.upper(), item.upper()]),
 					str(value)
 				)
 
-	
+	def _try_connecting(self)->bool:
+		requests.get(self.url)
+
+	@property
+	def url(self):
+		return f"http://localhost:{self.conf['server']['http_port']}/"
+
+	@property
+	def api(self):
+		return self.url + "api/"
+
+	def start(self):
+		ret =  super().start()
+		wait_for(self._try_connecting)
+		return ret
+
+
 @pytest.fixture
 def readonly_grafana():
+
 	with GrafanaContainer() as gfn:
 		yield gfn
