@@ -43,7 +43,12 @@ class Finder(object):
 			return [self.api.folder.get_folder_by_id(0)]
 		else:
 			search_result = self.api.search.search_dashboards(query=name, type_="dash-folder")
-			return list(map(lambda sr: self.api.folder.get_folder(sr["uid"]), search_result))
+			return list(
+				filter(
+					lambda x: x["title"] == name,
+					map(lambda sr: self.api.folder.get_folder(sr["uid"]), search_result),
+				)
+			)
 
 	def get_dashboard(self, folder_name, dashboard_name) -> Folder:
 		folder_object = exactly_one(self.get_folders(folder_name))
