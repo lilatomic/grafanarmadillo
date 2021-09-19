@@ -11,8 +11,7 @@ from testcontainers.core.waiting_utils import wait_for
 
 class GrafanaContainer(DockerContainer):
 	_PORT = 3000
-	_ADMIN = "admin"
-	_ADMIN_PASSWORD = ''.join(random.SystemRandom().choices(string.printable, k=32))
+	_ADMIN_PASSWORD = ''.join(random.SystemRandom().choices(string.ascii_letters + string.digits + string.punctuation, k=32))
 
 
 	def __init__(self, image="grafana/grafana:latest", port=_PORT, admin_password: str = _ADMIN_PASSWORD, config_overrides: Dict[str, Dict[str, Any]] = None, **kwargs):
