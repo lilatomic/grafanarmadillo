@@ -2,29 +2,16 @@
 
 import requests
 
-import amodule
-from sampleproject.libs import samplemodule as SM
+from grafanarmadillo.find import Finder
 
 
-def test_amodule():
-    """Test amodule.hello()."""
-    amodule.hello()
+def test_with_testcontainer(ro_demo_grafana):
+	requests.get(ro_demo_grafana[0].url)
 
-
-def test_true():
-    """Just asserts True."""
-    assert True
-
-
-def test_sampleclass():
-    """Test samplemodule SampleClass true method."""
-    s = SM.SampleClass()
-    assert s.true() is True
-
-
-def test_sampleclass_false():
-    """Test samplemodule SampleClass false classmethod."""
-    assert SM.SampleClass.false() is False
-
-def test_with_testcontainer(readonly_grafana):
-    requests.get(readonly_grafana.url)
+def test_find_dashboards_smoke(ro_demo_grafana):
+	f = Finder(ro_demo_grafana[1])
+	assert len(f.get_dashboards("0")) == 1
+	
+def test_find_folders_smoke(ro_demo_grafana):
+	f = Finder(ro_demo_grafana[1])
+	assert(len(f.get_folders("f0"))) == 1
