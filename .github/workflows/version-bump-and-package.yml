@@ -34,4 +34,4 @@ jobs:
           # note that here testpypi is used instead of the main pypi
           # because this is a test project
           # read more at: https://packaging.python.org/tutorials/packaging-projects/
-          twine upload --repository testpypi dist/*
+          twine upload dist/*
