@@ -13,6 +13,7 @@ exclude .readthedocs.yml
 exclude .codeclimate.yml
 exclude tox.ini
 exclude .travis.yml
+exclude pytest.ini
 
 prune devtools
 prune tests
