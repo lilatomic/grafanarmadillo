@@ -48,7 +48,7 @@ project = 'grafanarmadillo'
 year = '2021'
 author = 'lilatomic'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '0.0.2'
+version = release = '0.0.3'
 
 pygments_style = 'trac'
 templates_path = ['.']
