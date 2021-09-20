@@ -12,6 +12,7 @@ exclude .editorconfig
 exclude .readthedocs.yml
 exclude .codeclimate.yml
 exclude tox.ini
+exclude dev_requirements.txt
 exclude .travis.yml
 exclude pytest.ini
 
