@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* adds methods for finding Grafana dashboards and folders by name
+
 v0.0.2 (2021-09-18)
 ------------------------------------------------------------
 
