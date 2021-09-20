@@ -1,6 +1,5 @@
-"""Performs integration tests for searches"""
+"""Performs integration tests for searches."""
 
-from tests.conftest import ro_demo_grafana
 import pytest
 import requests
 
@@ -22,7 +21,7 @@ def test_find_folders__smoke(ro_demo_grafana):
 
 
 def test_find_folder__general_folder(ro_demo_grafana):
-	"""The 'General' folder is a special folder, so we synthesis it"""
+	"""The 'General' folder is a special folder, so we synthesis it."""
 	f = Finder(ro_demo_grafana[1])
 	assert (len(f.get_folders("General"))) == 1
 

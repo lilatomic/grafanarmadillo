@@ -1,22 +1,26 @@
-"""Find Grafana dashboards and folders"""
+"""Find Grafana dashboards and folders."""
 
-from typing import Dict, List, Tuple
-from grafana_api.api import folder
-from grafana_api.grafana_face import GrafanaFace
 from pathlib import PurePath
+from typing import List, Tuple
 
-from grafanarmadillo.util import exactly_one, flat_map
+from grafana_api.grafana_face import GrafanaFace
+
+from grafanarmadillo._util import exactly_one, flat_map
+
 
 Dashboard = type
 Folder = type
 
 
 class Finder(object):
+	"""Collection of methods for finding Grafana dashboards and folders."""
+
 	def __init__(self, api: GrafanaFace) -> None:
 		super().__init__()
 		self.api = api
 
 	def find_dashboards(self, name) -> List[Dashboard]:
+		"""Find all dashboards with a name. Returns exact matches only."""
 		return list(
 			filter(
 				lambda x: x["title"] == name,
@@ -30,15 +34,17 @@ class Finder(object):
 			query=None, type_="dash-db", folder_ids=folder_param
 		)
 
-	def get_dashboards_in_folders(self, folders: List[str]) -> List[Dashboard]:
+	def get_dashboards_in_folders(self, folder_names: List[str]) -> List[Dashboard]:
+		"""Get all dashboards in folders."""
 		folder_objects = flat_map(
-			lambda folder_name: self.get_folders(name=folder_name), folders
+			lambda folder_name: self.get_folders(name=folder_name), folder_names
 		)
 		return self._enumerate_dashboards_in_folders(
 			list(map(lambda f: str(f["id"]), folder_objects))
 		)
 
 	def get_folders(self, name) -> List[Folder]:
+		"""Get a folder by name. Folders don't nest, so this will return at most 1 folder."""
 		if name == "General":
 			return [self.api.folder.get_folder_by_id(0)]
 		else:
@@ -51,6 +57,11 @@ class Finder(object):
 			)
 
 	def get_dashboard(self, folder_name, dashboard_name) -> Folder:
+		"""
+		Get a dashboard by its parent folder and dashboard name.
+
+		Dashboards without a parent are children of the "General" folder.
+		"""
 		folder_object = exactly_one(self.get_folders(folder_name))
 		dashboards = self._enumerate_dashboards_in_folders([str(folder_object["id"])])
 		return list(filter(lambda d: d["title"] == dashboard_name, dashboards))
@@ -74,6 +85,6 @@ class Finder(object):
 		return folder, dashboard
 
 	def get_from_path(self, path) -> Folder:
-		""" Gets a dashboard from a string path like `/folder0/dashboard0` """
+		"""Get a dashboard from a string path like `/folder0/dashboard0`."""
 		folder, dashboard = self._resolve_path(path)
 		return self.get_dashboard(folder, dashboard)
