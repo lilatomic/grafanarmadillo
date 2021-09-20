@@ -6,10 +6,7 @@ How to contribute to this project.
 Fork this repository
 --------------------
 
-`Fork this repository before contributing`_. It is a better practice, possibly even enforced, that only Pull Request from forks are accepted - consider a case where there are several main maintainers. In my opinion enforcing forks creates a cleaner representation of the `contributions to the project`_.
-
-Clone your fork
-~~~~~~~~~~~~~~~
+`Fork this repository before contributing`_. 
 
 Next, clone your fork to your local machine, keep it `up to date with the upstream`_, and update the online fork with those updates.
 
@@ -17,9 +14,6 @@ Next, clone your fork to your local machine, keep it `up to date with the upstre
 
     git clone https://github.com/YOUR-USERNAME/grafanarmadillo.git
     cd grafanarmadillo
-    git remote add upstream git://github.com/lilatomic/grafanarmadillo.git
-    git fetch upstream
-    git merge upstream/main
     git pull origin main
 
 Install for developers
@@ -31,26 +25,15 @@ If you are using :code:`pip` follow the official instructions on `Installing pac
 
 ::
 
-    python3 -m venv pyprojskel
-    source pyprojskel/bin/activate
+    python3 -m venv .venv
+    source .venv/bin/activate
 
-If you are using `Anaconda`_ go for:
-
-::
-
-    conda create --name pyprojskel python=3.7
-    conda activate pyprojskel
-
-Where :code:`pyprojskel` is the name you wish to give to the environment dedicated to this project.
-
-Either under *pip* or *conda*, install the package in :code:`develop` mode, and also :ref:`tox<Uniformed Tests with tox>`. **Note**, here I assume our project has **no** dependencies.
+Install the package in :code:`develop` mode, and also :ref:`tox<Uniformed Tests with tox>`.
 
 ::
 
     python setup.py develop
-    pip install tox
-
-This configuration, together with the use of the ``src`` folder layer, guarantee that you will always run the code after installation. Also, thanks to the ``develop`` flag, any changes in the code will be automatically reflected in the installed version.
+    pip install dev_requirements.txt
 
 Make a new branch
 -----------------
@@ -72,7 +55,14 @@ Develop the feature and keep regular pushes to your fork with comprehensible com
     git commit (add a nice commit message)
     git push origin new_branch
 
-While you are developing, you can execute ``tox`` as needed to run your unittests or inspect lint, etc. See the last section of this page.
+While you are developing, you can execute ``tox`` as needed to run your unittests or inspect lint, etc. See the last section of this page. If you want things to build a bit faster, you can set the pythonpath and run pytest directly.
+
+::
+
+    export PYTHONPATH=./src
+    python3 -m pytest tests
+
+Many of the tests will rely on a test Docker container to integrate with a Grafana instance. By default this only runs on Linux, but can be forced by setting "do_containertest" to "True"
 
 Update CHANGELOG
 ~~~~~~~~~~~~~~~~
@@ -108,8 +98,6 @@ With *Tox*, the testing setup can be defined in a configuration file, the `tox.i
 ::
 
     pip install tox
-    # or
-    conda install tox -c conda-forge
 
 
 One of the greatest advantages of using Tox together with the :ref:`src layout<The src layout>` is that unittest actually perform on the installed source (our package) inside an isolated deployment environment. In order words, tests are performed in an environment simulating a post-installation state instead of a pre-deploy/development environment. Under this setup, there is no need, in general cases, to distribute test scripts along with the actual source, in my honest opinion - see `MANIFEST.in`_.
@@ -130,7 +118,7 @@ Also, you can run individual environments if you wish to test only specific func
     tox -e build  # packaging
     tox -e docs  # only builds the documentation
     tox -e prreqs  # special requirements before Pull Request
-    tox -e py37
+    tox -e py38
 
 
 .. _tox.ini: https://github.com/lilatomic/grafanarmadillo/blob/latest/tox.ini
