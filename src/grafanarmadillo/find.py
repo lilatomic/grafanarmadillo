@@ -73,7 +73,7 @@ class Finder(object):
 		if len(parts) > 3:
 			# can support maximally ("/", "folder", "dashboard")
 			raise ValueError("Dashboard path has too many parts")
-		if parts[0] == "/":
+		if PurePath(path).is_absolute() or parts[0] == "/" or parts[0] == "\\":
 			# removes optional "absolurte" signifier
 			parts = parts[1:]
 
