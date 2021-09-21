@@ -100,16 +100,34 @@ def grafana():
 
 @pytest.fixture(scope="module")
 def ro_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
-	"""Create a fixture of a grafana instance with many dashboards.
-	Readonly, please don't modify this instance"""
+	"""
+	Create a fixture of a grafana instance with many dashboards.
+
+	Readonly, please don't modify this instance
+	"""
 	__skip_container_test_if_necessary()
 	yield from mk_demo_grafana()
 
 
 @pytest.fixture()
 def rw_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
-	"""Create a fixture of a grafana instance with many dashboards.
-	Readwrite, feel free to modify this instance"""
+	"""
+	Create a fixture of a grafana instance with many dashboards.
+
+	Readwrite, feel free to modify this instance
+	"""
+	__skip_container_test_if_necessary()
+	yield from mk_demo_grafana()
+
+
+@pytest.fixture(scope="module")
+def rw_shared_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
+	"""
+	Create a fixture of a grafana instance with many dashboards.
+	
+	This readwrite instance is shared between tests, 
+	please use the `unique` fixture to not conflict with other tests
+	"""
 	__skip_container_test_if_necessary()
 	yield from mk_demo_grafana()
 
@@ -174,3 +192,10 @@ def pytest_collection_modifyitems(items):
 		fixtures = set(getattr(item, "fixturenames", ()))
 		if container_fixtures & fixtures:
 			item.add_marker("containertest")
+
+
+@pytest.fixture()
+def unique():
+	import uuid
+
+	yield str(uuid.uuid4())
