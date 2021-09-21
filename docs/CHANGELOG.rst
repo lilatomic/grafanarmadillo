@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* patch : get_dashboard returns exactly 1 (not a list)
 * patch : fix returns of methods in Finder
 
 v0.0.5 (2021-09-20)

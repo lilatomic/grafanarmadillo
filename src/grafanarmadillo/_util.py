@@ -1,4 +1,6 @@
-from typing import List
+from typing import List, TypeVar
+
+A = TypeVar("A")
 
 
 def flat_map(f, xs):
@@ -9,7 +11,7 @@ def flat_map(f, xs):
 	return ys
 
 
-def exactly_one(items: List, msg="more than one result found"):
+def exactly_one(items: List[A], msg="more than one result found") -> A:
 	"""Throws if list does not contain exactly 1 item."""
 	if len(items) != 1:
 		raise ValueError(msg)

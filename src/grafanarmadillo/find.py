@@ -61,7 +61,7 @@ class Finder(object):
 		"""
 		folder_object = exactly_one(self.get_folders(folder_name))
 		dashboards = self._enumerate_dashboards_in_folders([str(folder_object["id"])])
-		return list(filter(lambda d: d["title"] == dashboard_name, dashboards))
+		return exactly_one(list(filter(lambda d: d["title"] == dashboard_name, dashboards)))
 
 	def _resolve_path(self, path) -> Tuple[str, str]:
 		parts = PurePath(path).parts
