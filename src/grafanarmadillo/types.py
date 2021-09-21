@@ -1,5 +1,5 @@
 from typing import NewType
 
-Dashboard = NewType("Dashboard", dict)
+DashboardsearchResult = NewType("Dashboard", dict)
 DashboardContent = NewType("DashboardContent", dict)
-Folder = NewType("Folder", dict)
+FolderSearchResult = NewType("Folder", dict)
