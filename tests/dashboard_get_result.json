@@ -5,20 +5,20 @@
 		"canEdit": true,
 		"canAdmin": true,
 		"canStar": true,
-		"slug": "new-dashboard-copy",
-		"url": "/d/kx7UpSN7z/new-dashboard-copy",
+		"slug": "f0-0",
+		"url": "/d/t8r73INnk/f0-0",
 		"expires": "0001-01-01T00:00:00Z",
-		"created": "2021-09-21T17:12:11Z",
-		"updated": "2021-09-21T17:12:11Z",
+		"created": "2021-09-21T21:59:18Z",
+		"updated": "2021-09-21T22:05:21Z",
 		"updatedBy": "admin",
 		"createdBy": "admin",
-		"version": 1,
+		"version": 2,
 		"hasAcl": false,
 		"isFolder": false,
-		"folderId": 0,
-		"folderUid": "",
-		"folderTitle": "General",
-		"folderUrl": "",
+		"folderId": 1,
+		"folderUid": "U2b7qIH7k",
+		"folderTitle": "f0",
+		"folderUrl": "/dashboards/f/U2b7qIH7k/f0",
 		"provisioned": false,
 		"provisionedExternalId": ""
 	},
@@ -40,8 +40,7 @@
 		"editable": true,
 		"gnetId": null,
 		"graphTooltip": 0,
-		"hideControls": false,
-		"id": 1,
+		"id": 2,
 		"links": [],
 		"panels": [
 			{
@@ -77,7 +76,7 @@
 					},
 					"overrides": []
 				},
-				"gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 },
+				"gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
 				"id": 2,
 				"options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
 				"title": "Panel Title",
@@ -91,8 +90,8 @@
 		"time": { "from": "now-6h", "to": "now" },
 		"timepicker": {},
 		"timezone": "",
-		"title": "New dashboard Copy",
-		"uid": "kx7UpSN7z",
-		"version": 1
+		"title": "f0-0",
+		"uid": "t8r73INnk",
+		"version": 2
 	}
 }

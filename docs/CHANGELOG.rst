@@ -6,8 +6,11 @@ v0.0.6 (2021-09-21)
 ------------------------------------------------------------
 
 * feature : Dashboarder
+
   * can get or set the content of a dashboard
+
   * can export and import dashboards (like with the "json model" and "import" buttons in Grafana)
+
 * patch : get_dashboard returns exactly 1 (not a list)
 * patch : get_folder returns exactly 1 (not list)
 * patch : fix returns of methods in Finder

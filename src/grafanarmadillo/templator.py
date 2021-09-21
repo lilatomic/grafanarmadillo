@@ -1,5 +1,8 @@
 """Make and fill templates for dashboards."""
-from grafanarmadillo._util import project_dashboard_identity
+from grafanarmadillo._util import (
+	erase_dashboard_identity,
+	project_dashboard_identity,
+)
 from grafanarmadillo.types import DashboardContent, DashboardSearchResult
 
 
