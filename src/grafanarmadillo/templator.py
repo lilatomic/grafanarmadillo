@@ -17,9 +17,7 @@ class Templator(object):
 	) -> DashboardContent:
 		"""Convert a dashboard into a one ready for templating."""
 		new = dashboard.copy()
-		del new["uid"]
-		del new["id"]
-		del new["title"]
+		new = erase_dashboard_identity(new)
 
 		return new
 

@@ -76,4 +76,4 @@ def erase_dashboard_identity(
 	dashboardlike: Union[DashboardSearchResult, DashboardContent]
 ) -> Dict:
 	"""Delete the fields of a dashboard which are used for determining identity."""
-	return project_dict(dashboardlike, dashboard_meta_fields)
+	return project_dict(dashboardlike, dashboard_meta_fields, inverse=True)

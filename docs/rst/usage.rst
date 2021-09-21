@@ -68,3 +68,11 @@ Importing and Exporting
 
 	prod_dashboard_info = finder.get_dashboard("Prod", "ServiceA")
 	dashbaorder.set_dashboard_content(prod_deployment_info, content)
+
+Templating
+==========
+
+``grafanarmadillo`` makes it easier to transform dashboards into templates and templates into dashboards.
+
+.. literalinclude:: ../../tests/usage/templating.py
+	:language: python
