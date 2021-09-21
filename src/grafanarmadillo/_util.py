@@ -49,14 +49,17 @@ def exactly_one(items: List[A], msg="did not find exactly one item") -> A:
 	return items[0]
 
 
-def project_dict(d: Dict, keys: set) -> Dict:
+def project_dict(d: Dict, keys: set, inverse: bool = False) -> Dict:
 	"""
 	Select the given fields from a dictionary.
 	
 	>>> project_dict({'a': 1, 'b': 2}, set(['a']))
 	{'a': 1}
+
+	>>> project_dict({'a': 1, 'b': 2}, set(['a']), inverse=True)
+	{'b': 2}
 	"""
-	return {k: v for k, v in d.items() if k in keys}
+	return {k: v for k, v in d.items() if inverse ^ (k in keys)}
 
 
 def project_dashboard_identity(
