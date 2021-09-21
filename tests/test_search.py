@@ -17,13 +17,13 @@ def test_find_dashboards__smoke(ro_demo_grafana):
 
 def test_find_folders__smoke(ro_demo_grafana):
 	f = Finder(ro_demo_grafana[1])
-	assert (len(f.get_folders("f0"))) == 1
+	assert f.get_folder("f0")
 
 
 def test_find_folder__general_folder(ro_demo_grafana):
 	"""The 'General' folder is a special folder, so we synthesis it."""
 	f = Finder(ro_demo_grafana[1])
-	assert (len(f.get_folders("General"))) == 1
+	assert f.get_folder("General")
 
 
 def test_get_dashboards_in_folders__smoke(ro_demo_grafana):

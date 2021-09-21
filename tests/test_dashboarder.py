@@ -78,7 +78,7 @@ def test_import__no_folder(rw_shared_grafana, unique):
 def test_import__subfolder(rw_shared_grafana, unique):
 	finder, dashboarder = (Finder(rw_shared_grafana[1]), Dashboarder(rw_shared_grafana[1]))
 
-	folder = finder.get_folders("f0")[0]
+	folder = finder.get_folder("f0")
 
 	new_dashboard = read_json_file("dashboard.json")
 	new_dashboard["uid"] = unique
@@ -114,7 +114,7 @@ def test_importexport__roundtrip_subfolder(rw_shared_grafana, unique):
 	finder, dashboarder = (Finder(rw_shared_grafana[1]), Dashboarder(rw_shared_grafana[1]))
 
 	folder_name = "f0"
-	target_folder = finder.get_folders(folder_name)[0]
+	target_folder = finder.get_folder(folder_name)
 	new_dashboard = read_json_file("dashboard.json")
 	new_dashboard["uid"] = unique
 	new_dashboard["title"] = unique

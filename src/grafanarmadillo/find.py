@@ -35,23 +35,25 @@ class Finder(object):
 		self, folder_names: List[str]
 	) -> List[DashboardSearchResult]:
 		"""Get all dashboards in folders."""
-		folder_objects = flat_map(
-			lambda folder_name: self.get_folders(name=folder_name), folder_names
+		folder_objects = list(
+			map(lambda folder_name: self.get_folder(name=folder_name), folder_names)
 		)
 		return self._enumerate_dashboards_in_folders(
 			list(map(lambda f: str(f["id"]), folder_objects))
 		)
 
-	def get_folders(self, name) -> List[FolderSearchResult]:
+	def get_folder(self, name) -> FolderSearchResult:
 		"""Get a folder by name. Folders don't nest, so this will return at most 1 folder."""
 		if name == "General":
-			return [self.api.folder.get_folder_by_id(0)]
+			return self.api.folder.get_folder_by_id(0)
 		else:
 			search_result = self.api.search.search_dashboards(query=name, type_="dash-folder")
-			return list(
-				filter(
-					lambda x: x["title"] == name,
-					map(lambda sr: self.api.folder.get_folder(sr["uid"]), search_result),
+			return exactly_one(
+				list(
+					filter(
+						lambda x: x["title"] == name,
+						map(lambda sr: self.api.folder.get_folder(sr["uid"]), search_result),
+					)
 				)
 			)
 
@@ -61,7 +63,7 @@ class Finder(object):
 
 		Dashboards without a parent are children of the "General" folder.
 		"""
-		folder_object = exactly_one(self.get_folders(folder_name))
+		folder_object = self.get_folder(folder_name)
 		dashboards = self._enumerate_dashboards_in_folders([str(folder_object["id"])])
 		return exactly_one(list(filter(lambda d: d["title"] == dashboard_name, dashboards)))
 

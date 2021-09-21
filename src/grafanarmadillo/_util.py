@@ -7,7 +7,21 @@ A = TypeVar("A")
 
 
 def flat_map(f, xs):
-	"""Flatmap: Map on a list and then merge the results."""
+	"""
+	Flatmap: Map on a list and then merge the results.
+	
+	>>> and_reversed = lambda s: [s,s[::-1]]
+
+	>>> flat_map(and_reversed, [])
+	[]
+
+	>>> flat_map(and_reversed, ['hi'])
+	['hi', 'ih']
+
+	>>> flat_map(and_reversed, ['hi', 'hello'])
+	['hi', 'ih', 'hello', 'olleh']
+
+	"""
 	ys = []
 	for x in xs:
 		ys.extend(f(x))
