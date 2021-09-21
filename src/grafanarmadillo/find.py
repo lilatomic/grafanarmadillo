@@ -6,10 +6,7 @@ from typing import List, Tuple
 from grafana_api.grafana_face import GrafanaFace
 
 from grafanarmadillo._util import exactly_one, flat_map
-
-
-Dashboard = type
-Folder = type
+from grafanarmadillo.types import Dashboard, Folder
 
 
 class Finder(object):

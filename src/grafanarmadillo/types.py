@@ -1,0 +1,2 @@
+Dashboard = type
+Folder = type
