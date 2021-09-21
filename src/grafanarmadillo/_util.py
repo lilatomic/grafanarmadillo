@@ -14,8 +14,22 @@ def flat_map(f, xs):
 	return ys
 
 
-def exactly_one(items: List[A], msg="more than one result found") -> A:
-	"""Throws if list does not contain exactly 1 item."""
+def exactly_one(items: List[A], msg="did not find exactly one item") -> A:
+	"""
+	Throws if list does not contain exactly 1 item.
+	
+	>>> exactly_one([1])
+	1
+
+	>>> exactly_one([1,2])
+	Traceback (most recent call last):
+	ValueError: did not find exactly one item
+
+	>>> exactly_one([])
+	Traceback (most recent call last):
+	ValueError: did not find exactly one item
+
+	"""
 	if len(items) != 1:
 		raise ValueError(msg)
 	return items[0]

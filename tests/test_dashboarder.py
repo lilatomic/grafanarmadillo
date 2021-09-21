@@ -92,7 +92,7 @@ def test_import__subfolder(rw_shared_grafana, unique):
 	assert result["meta"]["folderUid"] == folder["uid"]
 
 
-def test_importexport__roundtrip(rw_shared_grafana, unique):
+def test_importexport__roundtrip_no_folder(rw_shared_grafana, unique):
 	finder, dashboarder = (Finder(rw_shared_grafana[1]), Dashboarder(rw_shared_grafana[1]))
 
 	new_dashboard = read_json_file("dashboard.json")
@@ -107,6 +107,7 @@ def test_importexport__roundtrip(rw_shared_grafana, unique):
 	del exported["id"]
 	del new_dashboard["id"]
 	assert exported == new_dashboard
+	assert folder is None
 
 
 def test_importexport__roundtrip_subfolder(rw_shared_grafana, unique):
