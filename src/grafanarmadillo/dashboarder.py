@@ -56,7 +56,7 @@ class Dashboarder(object):
 		"""Export a dashboard from grafana, with its folder information if applicable."""
 		result = self.api.dashboard.get_dashboard(dashboard["uid"])
 		meta, dashboard = result["meta"], result["dashboard"]
-		if "folderUid" in meta:
+		if meta["folderUid"]:
 			folder = self.api.folder.get_folder(meta["folderUid"])
 		else:
 			folder = None
