@@ -2,6 +2,7 @@ import json
 import os
 import platform
 import random
+import socket
 import string
 from collections import defaultdict
 from typing import Any, Dict, Tuple
@@ -39,7 +40,7 @@ class GrafanaContainer(DockerContainer):
 		super().__init__(image, **kwargs)
 		self.conf = defaultdict(dict)
 		# port
-		self.with_bind_ports(port, 3000)
+		self.with_bind_ports(port, port)
 		self._set_grafana_conf("server", "http_port", port)
 		self._set_grafana_conf("security", "admin_password", admin_password)
 		self._set_grafana_conf("security", "admin_user", admin_user)
@@ -123,7 +124,15 @@ def __skip_container_test_if_necessary() -> bool:
 
 
 def mk_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
-	with GrafanaContainer() as gfn_ctn:
+	def get_free_tcp_port():
+		tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		tcp.bind(("", 0))
+		tcp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		addr, port = tcp.getsockname()
+		tcp.close()
+		return port
+
+	with GrafanaContainer(port=get_free_tcp_port()) as gfn_ctn:
 		gfn = GrafanaFace(
 			auth=(
 				gfn_ctn.conf["security"]["admin_user"],
