@@ -62,9 +62,18 @@ def project_dict(d: Dict, keys: set, inverse: bool = False) -> Dict:
 	return {k: v for k, v in d.items() if inverse ^ (k in keys)}
 
 
+dashboard_meta_fields = set(["id", "uid", "title"])
+
+
 def project_dashboard_identity(
 	dashboardlike: Union[DashboardSearchResult, DashboardContent]
 ) -> Dict:
 	"""Project only the fields of a dashboard which are used for determining identity."""
-	meta_fields = set(["id", "uid", "title"])
-	return project_dict(dashboardlike, meta_fields)
+	return project_dict(dashboardlike, dashboard_meta_fields)
+
+
+def erase_dashboard_identity(
+	dashboardlike: Union[DashboardSearchResult, DashboardContent]
+) -> Dict:
+	"""Delete the fields of a dashboard which are used for determining identity."""
+	return project_dict(dashboardlike, dashboard_meta_fields)
