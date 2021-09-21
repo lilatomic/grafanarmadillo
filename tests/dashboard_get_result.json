@@ -1,0 +1,98 @@
+{
+	"meta": {
+		"type": "db",
+		"canSave": true,
+		"canEdit": true,
+		"canAdmin": true,
+		"canStar": true,
+		"slug": "new-dashboard-copy",
+		"url": "/d/kx7UpSN7z/new-dashboard-copy",
+		"expires": "0001-01-01T00:00:00Z",
+		"created": "2021-09-21T17:12:11Z",
+		"updated": "2021-09-21T17:12:11Z",
+		"updatedBy": "admin",
+		"createdBy": "admin",
+		"version": 1,
+		"hasAcl": false,
+		"isFolder": false,
+		"folderId": 0,
+		"folderUid": "",
+		"folderTitle": "General",
+		"folderUrl": "",
+		"provisioned": false,
+		"provisionedExternalId": ""
+	},
+	"dashboard": {
+		"annotations": {
+			"list": [
+				{
+					"builtIn": 1,
+					"datasource": "-- Grafana --",
+					"enable": true,
+					"hide": true,
+					"iconColor": "rgba(0, 211, 255, 1)",
+					"name": "Annotations \u0026 Alerts",
+					"target": { "limit": 100, "matchAny": false, "tags": [], "type": "dashboard" },
+					"type": "dashboard"
+				}
+			]
+		},
+		"editable": true,
+		"gnetId": null,
+		"graphTooltip": 0,
+		"hideControls": false,
+		"id": 1,
+		"links": [],
+		"panels": [
+			{
+				"datasource": null,
+				"fieldConfig": {
+					"defaults": {
+						"color": { "mode": "palette-classic" },
+						"custom": {
+							"axisLabel": "",
+							"axisPlacement": "auto",
+							"barAlignment": 0,
+							"drawStyle": "line",
+							"fillOpacity": 0,
+							"gradientMode": "none",
+							"hideFrom": { "legend": false, "tooltip": false, "viz": false },
+							"lineInterpolation": "linear",
+							"lineWidth": 1,
+							"pointSize": 5,
+							"scaleDistribution": { "type": "linear" },
+							"showPoints": "auto",
+							"spanNulls": false,
+							"stacking": { "group": "A", "mode": "none" },
+							"thresholdsStyle": { "mode": "off" }
+						},
+						"mappings": [],
+						"thresholds": {
+							"mode": "absolute",
+							"steps": [
+								{ "color": "green", "value": null },
+								{ "color": "red", "value": 80 }
+							]
+						}
+					},
+					"overrides": []
+				},
+				"gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 },
+				"id": 2,
+				"options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+				"title": "Panel Title",
+				"type": "timeseries"
+			}
+		],
+		"schemaVersion": 30,
+		"style": "dark",
+		"tags": [],
+		"templating": { "list": [] },
+		"time": { "from": "now-6h", "to": "now" },
+		"timepicker": {},
+		"timezone": "",
+		"title": "New dashboard Copy",
+		"uid": "kx7UpSN7z",
+		"version": 1
+	}
+}
