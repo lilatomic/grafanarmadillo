@@ -12,6 +12,9 @@ from grafana_api.grafana_face import GrafanaFace
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.waiting_utils import wait_for
 
+from grafanarmadillo.dashboarder import Dashboarder
+from grafanarmadillo.find import Finder
+
 
 class GrafanaContainer(DockerContainer):
 	"""Grafana Test Container."""
@@ -96,7 +99,21 @@ def grafana():
 
 @pytest.fixture(scope="module")
 def ro_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
-	"""Create a fixture of a grafana instance with many dashboards."""
+	"""Create a fixture of a grafana instance with many dashboards.
+	Readonly, please don't modify this instance"""
+	__skip_container_test_if_necessary()
+	yield from mk_demo_grafana()
+
+
+@pytest.fixture()
+def rw_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
+	"""Create a fixture of a grafana instance with many dashboards.
+	Readwrite, feel free to modify this instance"""
+	__skip_container_test_if_necessary()
+	yield from mk_demo_grafana()
+
+
+def __skip_container_test_if_necessary() -> bool:
 	if "do_containertest" in os.environ:
 		should_do_containertest = bool(os.environ.get("do_containertest"))
 	else:
@@ -104,6 +121,8 @@ def ro_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
 	if not should_do_containertest:
 		pytest.skip("Platform isn't Linux and not 'do_containertest'")
 
+
+def mk_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
 	with GrafanaContainer() as gfn_ctn:
 		gfn = GrafanaFace(
 			auth=(
@@ -124,7 +143,21 @@ def ro_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
 		yield gfn_ctn, gfn
 
 
-container_fixtures = set(map(lambda f: f.__name__, [grafana, ro_demo_grafana]))
+@pytest.fixture
+def ro_dashboarder(ro_demo_grafana) -> Dashboarder:
+	return Dashboarder(ro_demo_grafana[1])
+
+
+@pytest.fixture
+def ro_finder(ro_demo_grafana) -> Dashboarder:
+	return Finder(ro_demo_grafana[1])
+
+
+# Marks container tests
+
+container_fixtures = set(
+	map(lambda f: f.__name__, [grafana, ro_demo_grafana, ro_dashboarder, ro_finder])
+)
 
 
 def pytest_collection_modifyitems(items):
