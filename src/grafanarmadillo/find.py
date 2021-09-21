@@ -56,7 +56,7 @@ class Finder(object):
 				)
 			)
 
-	def get_dashboard(self, folder_name, dashboard_name) -> Folder:
+	def get_dashboard(self, folder_name, dashboard_name) -> Dashboard:
 		"""
 		Get a dashboard by its parent folder and dashboard name.
 
@@ -84,7 +84,7 @@ class Finder(object):
 
 		return folder, dashboard
 
-	def get_from_path(self, path) -> Folder:
+	def get_from_path(self, path) -> Dashboard:
 		"""Get a dashboard from a string path like `/folder0/dashboard0`."""
 		folder, dashboard = self._resolve_path(path)
 		return self.get_dashboard(folder, dashboard)
