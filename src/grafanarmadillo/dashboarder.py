@@ -28,3 +28,8 @@ class Dashboarder(object):
 		new_dashboard.update({"dashboard": new_content, "overwrite": True})
 
 		return self.api.dashboard.update_dashboard(new_dashboard)
+
+	def import_dashboard(self, content: DashboardContent):
+		new_dashboard = {"dashboard": content, "overwrite": True}
+
+		return self.api.dashboard.update_dashboard(new_dashboard)
