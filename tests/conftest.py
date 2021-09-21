@@ -125,7 +125,7 @@ def rw_shared_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
 	"""
 	Create a fixture of a grafana instance with many dashboards.
 	
-	This readwrite instance is shared between tests, 
+	This readwrite instance is shared between tests,
 	please use the `unique` fixture to not conflict with other tests
 	"""
 	__skip_container_test_if_necessary()

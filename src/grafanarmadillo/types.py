@@ -1,4 +1,7 @@
+"""Type hints for Grafana interaction."""
+
 from typing import NewType
+
 
 Dashboard = NewType("Dashboard", dict)
 DashboardSearchResult = NewType("DashboardSearchResult", dict)

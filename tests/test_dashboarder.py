@@ -1,10 +1,10 @@
 """Performs integration tests for dashboarder."""
 import pytest
 
-from tests.conftest import read_json_file
+from grafanarmadillo._util import project_dashboard_identity
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
-from grafanarmadillo._util import project_dashboard_identity
+from tests.conftest import read_json_file
 
 
 @pytest.mark.parametrize(
@@ -61,7 +61,7 @@ def test_dashboarder__roundtrip(rw_shared_grafana, unique):
 
 
 def test_import__no_folder(rw_shared_grafana, unique):
-	finder, dashboarder = (Finder(rw_shared_grafana[1]), Dashboarder(rw_shared_grafana[1]))
+	_, dashboarder = (Finder(rw_shared_grafana[1]), Dashboarder(rw_shared_grafana[1]))
 
 	new_dashboard = read_json_file("dashboard.json")
 	new_dashboard["uid"] = unique
