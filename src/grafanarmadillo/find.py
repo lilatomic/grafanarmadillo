@@ -6,7 +6,7 @@ from typing import List, Tuple
 from grafana_api.grafana_face import GrafanaFace
 
 from grafanarmadillo._util import exactly_one, flat_map
-from grafanarmadillo.types import DashboardsearchResult, FolderSearchResult
+from grafanarmadillo.types import DashboardSearchResult, FolderSearchResult
 
 
 class Finder(object):
@@ -16,7 +16,7 @@ class Finder(object):
 		super().__init__()
 		self.api = api
 
-	def find_dashboards(self, name) -> List[DashboardsearchResult]:
+	def find_dashboards(self, name) -> List[DashboardSearchResult]:
 		"""Find all dashboards with a name. Returns exact matches only."""
 		return list(
 			filter(
@@ -33,7 +33,7 @@ class Finder(object):
 
 	def get_dashboards_in_folders(
 		self, folder_names: List[str]
-	) -> List[DashboardsearchResult]:
+	) -> List[DashboardSearchResult]:
 		"""Get all dashboards in folders."""
 		folder_objects = flat_map(
 			lambda folder_name: self.get_folders(name=folder_name), folder_names
@@ -55,7 +55,7 @@ class Finder(object):
 				)
 			)
 
-	def get_dashboard(self, folder_name, dashboard_name) -> DashboardsearchResult:
+	def get_dashboard(self, folder_name, dashboard_name) -> DashboardSearchResult:
 		"""
 		Get a dashboard by its parent folder and dashboard name.
 
@@ -83,7 +83,7 @@ class Finder(object):
 
 		return folder, dashboard
 
-	def get_from_path(self, path) -> DashboardsearchResult:
+	def get_from_path(self, path) -> DashboardSearchResult:
 		"""Get a dashboard from a string path like `/folder0/dashboard0`."""
 		folder, dashboard = self._resolve_path(path)
 		return self.get_dashboard(folder, dashboard)

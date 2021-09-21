@@ -1,6 +1,6 @@
 from grafana_api.grafana_face import GrafanaFace
 
-from grafanarmadillo.types import DashboardsearchResult, DashboardContent
+from grafanarmadillo.types import DashboardSearchResult, DashboardContent
 from grafanarmadillo._util import project_dashboard_identity
 
 
@@ -11,11 +11,11 @@ class Dashboarder(object):
 		super().__init__()
 		self.api = api
 
-	def get_dashboard_content(self, dashboard: DashboardsearchResult):
+	def get_dashboard_content(self, dashboard: DashboardSearchResult):
 		return self.api.dashboard.get_dashboard(dashboard["uid"])["dashboard"]
 
 	def set_dashboard_content(
-		self, dashboard: DashboardsearchResult, content: DashboardContent
+		self, dashboard: DashboardSearchResult, content: DashboardContent
 	):
 		new_dashboard = dashboard.copy()
 		new_content = content.copy()

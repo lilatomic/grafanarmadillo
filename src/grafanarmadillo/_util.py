@@ -1,6 +1,6 @@
 from typing import Dict, List, TypeVar, Union
 
-from grafanarmadillo.types import DashboardContent, DashboardsearchResult
+from grafanarmadillo.types import DashboardContent, DashboardSearchResult
 
 A = TypeVar("A")
 
@@ -25,7 +25,7 @@ def project_dict(d: Dict, keys: set) -> Dict:
 
 
 def project_dashboard_identity(
-	dashboardlike: Union[DashboardsearchResult, DashboardContent]
+	dashboardlike: Union[DashboardSearchResult, DashboardContent]
 ) -> Dict:
 	meta_fields = set(["id", "uid", "title"])
 	return project_dict(dashboardlike, meta_fields)
