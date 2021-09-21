@@ -56,16 +56,14 @@ def test_get_dashboard__general_folder(ro_demo_grafana):
 	f = Finder(ro_demo_grafana[1])
 	r = f.get_dashboard("General", "0")
 
-	assert len(r) == 1
-	assert r[0]["title"] == "0"
+	assert r["title"] == "0"
 
 
 def test_get_dashboard__other_folder(ro_demo_grafana):
 	f = Finder(ro_demo_grafana[1])
 	r = f.get_dashboard("f0", "f0-0")
 
-	assert len(r) == 1
-	assert r[0]["title"] == "f0-0"
+	assert r["title"] == "f0-0"
 
 
 def test_resolve_path__general():
@@ -93,5 +91,4 @@ def test_get_from_path__smoke(ro_demo_grafana):
 	f = Finder(ro_demo_grafana[1])
 	r = f.get_from_path("/f0/f0-0")
 
-	assert len(r) == 1
-	assert r[0]["title"] == "f0-0"
+	assert r["title"] == "f0-0"
