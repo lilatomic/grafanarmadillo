@@ -63,3 +63,20 @@ def test_import(rw_shared_grafana, unique):
 		dashboarder.api.dashboard.get_dashboard(unique)["dashboard"]["panels"]
 		== new_dashboard["panels"]
 	)
+
+
+def test_importexport__roundtrip(rw_shared_grafana, unique):
+	finder, dashboarder = (Finder(rw_shared_grafana[1]), Dashboarder(rw_shared_grafana[1]))
+
+	new_dashboard = read_json_file("dashboard.json")
+	new_dashboard["uid"] = unique
+	new_dashboard["title"] = unique
+
+	dashboarder.import_dashboard(new_dashboard)
+
+	dashboard_search_result = finder.get_dashboard("General", unique)
+	exported = dashboarder.export_dashboard(dashboard_search_result)
+
+	del exported["id"]
+	del new_dashboard["id"]
+	assert exported == new_dashboard

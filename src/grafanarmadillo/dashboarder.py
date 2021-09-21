@@ -1,6 +1,6 @@
 from grafana_api.grafana_face import GrafanaFace
 
-from grafanarmadillo.types import DashboardSearchResult, DashboardContent
+from grafanarmadillo.types import Dashboard, DashboardSearchResult, DashboardContent
 from grafanarmadillo._util import project_dashboard_identity
 
 
@@ -22,9 +22,6 @@ class Dashboarder(object):
 
 		new_content.update(project_dashboard_identity(new_dashboard))
 
-		print(new_dashboard)
-		print(new_dashboard)
-
 		new_dashboard.update({"dashboard": new_content, "overwrite": True})
 
 		return self.api.dashboard.update_dashboard(new_dashboard)
@@ -33,3 +30,6 @@ class Dashboarder(object):
 		new_dashboard = {"dashboard": content, "overwrite": True}
 
 		return self.api.dashboard.update_dashboard(new_dashboard)
+
+	def export_dashboard(self, dashboard: DashboardSearchResult) -> Dashboard:
+		return self.api.dashboard.get_dashboard(dashboard["uid"])["dashboard"]
