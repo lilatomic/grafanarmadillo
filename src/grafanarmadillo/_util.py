@@ -1,4 +1,6 @@
-from typing import List, TypeVar
+from typing import Dict, List, TypeVar, Union
+
+from grafanarmadillo.types import DashboardContent, DashboardsearchResult
 
 A = TypeVar("A")
 
@@ -16,3 +18,14 @@ def exactly_one(items: List[A], msg="more than one result found") -> A:
 	if len(items) != 1:
 		raise ValueError(msg)
 	return items[0]
+
+
+def project_dict(d: Dict, keys: set) -> Dict:
+	return {k: v for k, v in d.items() if k in keys}
+
+
+def project_dashboard_identity(
+	dashboardlike: Union[DashboardsearchResult, DashboardContent]
+) -> Dict:
+	meta_fields = set(["id", "uid", "title"])
+	return project_dict(dashboardlike, meta_fields)
