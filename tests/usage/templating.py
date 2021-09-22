@@ -1,4 +1,5 @@
 from typing import List
+
 from grafana_api.grafana_face import GrafanaFace
 
 from grafanarmadillo.dashboarder import Dashboarder
