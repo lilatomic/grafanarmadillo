@@ -14,7 +14,7 @@ from usage.dashboarding import (
 	export_dashboard,
 	import_dashboard,
 )
-from usage.templating import template_for_clients
+from usage.templating import template_for_clients, dashboard_maker, template_maker
 
 
 def test_usage_dashboard_export(rw_shared_grafana):
@@ -75,3 +75,18 @@ def test_usage_templating(rw_demo_grafana):
 
 	for c in clients:
 		assert finder.get_dashboard(c, service_name)
+
+
+@pytest.mark.integration
+def test_usage_templating__findreplace():
+	content = read_json_file("usage/dashboard_content_with_templatables.json")
+
+	template = template_maker.make_template_from_dashboard(content)
+
+	print(template)
+
+	assert template["title"] == "$deployment_id - $env"
+
+	dashboard = dashboard_maker.make_dashboard_from_template({}, template)
+
+	assert dashboard["title"] == "1337 - prod"

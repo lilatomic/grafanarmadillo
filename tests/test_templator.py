@@ -1,5 +1,3 @@
-from string import printable
-
 import pytest
 
 from conftest import read_json_file
