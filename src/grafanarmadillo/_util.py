@@ -1,9 +1,10 @@
-from typing import Dict, List, TypeVar, Union
+from typing import Callable, Dict, List, TypeVar, Union
 
 from grafanarmadillo.types import DashboardContent, DashboardSearchResult
 
 
 A = TypeVar("A")
+JSON = TypeVar("JSON", bound=Union[dict, list, str, int, float])
 
 
 def flat_map(f, xs):
@@ -77,3 +78,31 @@ def erase_dashboard_identity(
 ) -> Dict:
 	"""Delete the fields of a dashboard which are used for determining identity."""
 	return project_dict(dashboardlike, dashboard_meta_fields, inverse=True)
+
+
+def map_json_strings(f: Callable[[str], str], obj: JSON) -> JSON:
+	"""
+	Transform all strings in an object made of JSON primitives.
+
+	>>> f = lambda s: s.upper()
+	>>> map_json_strings(f, 's')
+	'S'
+	>>> map_json_strings(f, 1)
+	1
+	>>> map_json_strings(f, ['s'])
+	['S']
+	>>> map_json_strings(f, ['s', 1])
+	['S', 1]
+	>>> map_json_strings(f, {'a': 's'})
+	{'a': 'S'}
+	>>> map_json_strings(f, {'a': ['s', 1]})
+	{'a': ['S', 1]}
+	"""
+	if isinstance(obj, dict):
+		return {k: map_json_strings(f, v) for k, v in obj.items()}
+	elif isinstance(obj, list):
+		return [map_json_strings(f, i) for i in obj]
+	elif isinstance(obj, str):
+		return f(obj)
+	else:
+		return obj
