@@ -1,6 +1,13 @@
 """Type hints for Grafana interaction."""
 
-from typing import NewType, Optional, TypedDict
+import sys
+
+
+if (sys.version_info[0] == 3) and (sys.version_info[1] in [6, 7]):
+	from typing import NewType, Optional
+	from typing_extensions import TypedDict
+else:
+	from typing import NewType, Optional, TypedDict
 
 
 UID = NewType("UID", str)
