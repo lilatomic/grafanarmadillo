@@ -14,7 +14,7 @@ from usage.dashboarding import (
 	export_dashboard,
 	import_dashboard,
 )
-from usage.templating import template_for_clients, dashboard_maker, template_maker
+from usage.templating import dashboard_maker, template_for_clients, template_maker
 
 
 def test_usage_dashboard_export(rw_shared_grafana):

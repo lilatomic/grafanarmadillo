@@ -2,9 +2,9 @@
 from typing import Callable, Dict
 
 from grafanarmadillo._util import (
-	project_dict,
 	map_json_strings,
 	project_dashboard_identity,
+	project_dict,
 )
 from grafanarmadillo.types import DashboardContent, DashboardSearchResult
 
