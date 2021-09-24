@@ -2,6 +2,9 @@
 Changelog
 =========
 
+v0.0.7 (2021-09-24)
+------------------------------------------------------------
+
 * feature : Templator, which makes templates from dashboards (and vice-versa) by applying arbitrary transforms
 
   * includes a helper to easily convert a dictionary into a list of terms to globally find/replace
