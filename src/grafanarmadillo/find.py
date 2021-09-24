@@ -5,7 +5,7 @@ from typing import List, Tuple
 
 from grafana_api.grafana_face import GrafanaFace
 
-from grafanarmadillo._util import exactly_one, flat_map
+from grafanarmadillo._util import exactly_one
 from grafanarmadillo.types import DashboardSearchResult, FolderSearchResult
 
 

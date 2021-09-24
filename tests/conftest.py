@@ -13,6 +13,7 @@ from grafana_api.grafana_face import GrafanaFace
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.waiting_utils import wait_for
 
+from grafanarmadillo._util import erase_dashboard_identity
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 
@@ -82,6 +83,7 @@ def read_json_file(filename: str):
 
 def create_dashboard(gfn: GrafanaFace, name, folderId=0):
 	dashboard = read_json_file("dashboard.json")
+	dashboard = erase_dashboard_identity(dashboard)
 	dashboard["title"] = name
 	return gfn.dashboard.update_dashboard(
 		dashboard={"dashboard": dashboard, "overwrite": True, "folderId": folderId}

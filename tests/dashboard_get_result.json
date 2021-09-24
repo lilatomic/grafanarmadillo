@@ -1,0 +1,97 @@
+{
+	"meta": {
+		"type": "db",
+		"canSave": true,
+		"canEdit": true,
+		"canAdmin": true,
+		"canStar": true,
+		"slug": "f0-0",
+		"url": "/d/t8r73INnk/f0-0",
+		"expires": "0001-01-01T00:00:00Z",
+		"created": "2021-09-21T21:59:18Z",
+		"updated": "2021-09-21T22:05:21Z",
+		"updatedBy": "admin",
+		"createdBy": "admin",
+		"version": 2,
+		"hasAcl": false,
+		"isFolder": false,
+		"folderId": 1,
+		"folderUid": "U2b7qIH7k",
+		"folderTitle": "f0",
+		"folderUrl": "/dashboards/f/U2b7qIH7k/f0",
+		"provisioned": false,
+		"provisionedExternalId": ""
+	},
+	"dashboard": {
+		"annotations": {
+			"list": [
+				{
+					"builtIn": 1,
+					"datasource": "-- Grafana --",
+					"enable": true,
+					"hide": true,
+					"iconColor": "rgba(0, 211, 255, 1)",
+					"name": "Annotations \u0026 Alerts",
+					"target": { "limit": 100, "matchAny": false, "tags": [], "type": "dashboard" },
+					"type": "dashboard"
+				}
+			]
+		},
+		"editable": true,
+		"gnetId": null,
+		"graphTooltip": 0,
+		"id": 2,
+		"links": [],
+		"panels": [
+			{
+				"datasource": null,
+				"fieldConfig": {
+					"defaults": {
+						"color": { "mode": "palette-classic" },
+						"custom": {
+							"axisLabel": "",
+							"axisPlacement": "auto",
+							"barAlignment": 0,
+							"drawStyle": "line",
+							"fillOpacity": 0,
+							"gradientMode": "none",
+							"hideFrom": { "legend": false, "tooltip": false, "viz": false },
+							"lineInterpolation": "linear",
+							"lineWidth": 1,
+							"pointSize": 5,
+							"scaleDistribution": { "type": "linear" },
+							"showPoints": "auto",
+							"spanNulls": false,
+							"stacking": { "group": "A", "mode": "none" },
+							"thresholdsStyle": { "mode": "off" }
+						},
+						"mappings": [],
+						"thresholds": {
+							"mode": "absolute",
+							"steps": [
+								{ "color": "green", "value": null },
+								{ "color": "red", "value": 80 }
+							]
+						}
+					},
+					"overrides": []
+				},
+				"gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+				"id": 2,
+				"options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+				"title": "Panel Title",
+				"type": "timeseries"
+			}
+		],
+		"schemaVersion": 30,
+		"style": "dark",
+		"tags": [],
+		"templating": { "list": [] },
+		"time": { "from": "now-6h", "to": "now" },
+		"timepicker": {},
+		"timezone": "",
+		"title": "f0-0",
+		"uid": "t8r73INnk",
+		"version": 2
+	}
+}

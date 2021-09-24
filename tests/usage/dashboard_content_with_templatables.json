@@ -21,11 +21,12 @@
 	"editable": true,
 	"gnetId": null,
 	"graphTooltip": 0,
-	"id": null,
+	"id": 2,
 	"links": [],
 	"panels": [
 		{
-			"datasource": null,
+			"datasource": "-- Grafana --",
+			"description": "version: 1.0.0",
 			"fieldConfig": {
 				"defaults": {
 					"color": {
@@ -93,13 +94,7 @@
 					"mode": "single"
 				}
 			},
-			"targets": [
-				{
-					"refId": "A",
-					"target": ""
-				}
-			],
-			"title": "Panel Title",
+			"title": "ThingDoer",
 			"type": "timeseries"
 		}
 	],
@@ -115,7 +110,7 @@
 	},
 	"timepicker": {},
 	"timezone": "",
-	"title": "New dashboard Copy",
-	"uid": "nErXDvCkzz",
-	"version": 1
+	"title": "0000 - test",
+	"uid": "PqTaltNnz",
+	"version": 2
 }

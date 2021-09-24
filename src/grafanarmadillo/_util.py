@@ -1,9 +1,10 @@
-from typing import Dict, List, TypeVar, Union
+from typing import Callable, Dict, List, TypeVar, Union
 
 from grafanarmadillo.types import DashboardContent, DashboardSearchResult
 
 
 A = TypeVar("A")
+JSON = TypeVar("JSON", bound=Union[dict, list, str, int, float, bool, None])
 
 
 def flat_map(f, xs):
@@ -49,19 +50,59 @@ def exactly_one(items: List[A], msg="did not find exactly one item") -> A:
 	return items[0]
 
 
-def project_dict(d: Dict, keys: set) -> Dict:
+def project_dict(d: Dict, keys: set, inverse: bool = False) -> Dict:
 	"""
 	Select the given fields from a dictionary.
 	
 	>>> project_dict({'a': 1, 'b': 2}, set(['a']))
 	{'a': 1}
+
+	>>> project_dict({'a': 1, 'b': 2}, set(['a']), inverse=True)
+	{'b': 2}
 	"""
-	return {k: v for k, v in d.items() if k in keys}
+	return {k: v for k, v in d.items() if inverse ^ (k in keys)}
+
+
+dashboard_meta_fields = set(["id", "uid", "title"])
 
 
 def project_dashboard_identity(
 	dashboardlike: Union[DashboardSearchResult, DashboardContent]
 ) -> Dict:
 	"""Project only the fields of a dashboard which are used for determining identity."""
-	meta_fields = set(["id", "uid", "title"])
-	return project_dict(dashboardlike, meta_fields)
+	return project_dict(dashboardlike, dashboard_meta_fields)
+
+
+def erase_dashboard_identity(
+	dashboardlike: Union[DashboardSearchResult, DashboardContent]
+) -> Dict:
+	"""Delete the fields of a dashboard which are used for determining identity."""
+	return project_dict(dashboardlike, dashboard_meta_fields, inverse=True)
+
+
+def map_json_strings(f: Callable[[str], str], obj: JSON) -> JSON:
+	"""
+	Transform all strings in an object made of JSON primitives.
+
+	>>> f = lambda s: s.upper()
+	>>> map_json_strings(f, 's')
+	'S'
+	>>> map_json_strings(f, 1)
+	1
+	>>> map_json_strings(f, ['s'])
+	['S']
+	>>> map_json_strings(f, ['s', 1])
+	['S', 1]
+	>>> map_json_strings(f, {'a': 's'})
+	{'a': 'S'}
+	>>> map_json_strings(f, {'a': ['s', 1]})
+	{'a': ['S', 1]}
+	"""
+	if isinstance(obj, dict):
+		return {k: map_json_strings(f, v) for k, v in obj.items()}
+	elif isinstance(obj, list):
+		return [map_json_strings(f, i) for i in obj]
+	elif isinstance(obj, str):
+		return f(obj)
+	else:
+		return obj
