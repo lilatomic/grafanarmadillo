@@ -1,6 +1,10 @@
+from string import printable
+
+import pytest
+
 from conftest import read_json_file
 from grafanarmadillo._util import project_dashboard_identity
-from grafanarmadillo.templator import Templator
+from grafanarmadillo.templator import Templator, findreplace
 from grafanarmadillo.types import DashboardContent
 
 
@@ -48,3 +52,21 @@ def test_fill_template(unique):
 	template = templator.make_dashboard_from_template({"title": "Not final"}, original)
 
 	assert template["tags"] == [unique]
+
+
+@pytest.mark.parametrize(
+	"input,output",
+	[
+		("ac", "Ac"),
+		("abc", "ABc"),
+		(["a", 1], ["A", 1]),
+		({"a": "a"}, {"a": "A"}),
+		({"a": ["a", 1]}, {"a": ["A", 1]}),
+		({"a": {"b": "a", "c": 1}}, {"a": {"b": "A", "c": 1}}),
+	],
+)
+def test_findreplace(input, output):
+	fr = findreplace({"a": "A", "b": "B"})
+
+	r = fr(input)
+	assert output == r

@@ -4,7 +4,7 @@ from grafanarmadillo.types import DashboardContent, DashboardSearchResult
 
 
 A = TypeVar("A")
-JSON = TypeVar("JSON", bound=Union[dict, list, str, int, float])
+JSON = TypeVar("JSON", bound=Union[dict, list, str, int, float, bool, None])
 
 
 def flat_map(f, xs):
