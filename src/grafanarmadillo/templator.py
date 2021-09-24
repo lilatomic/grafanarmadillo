@@ -1,8 +1,8 @@
 """Make and fill templates for dashboards."""
-from typing import Callable, Dict, NewType
+from typing import Callable, Dict
 
 from grafanarmadillo._util import (
-	erase_dashboard_identity,
+	project_dict,
 	map_json_strings,
 	project_dashboard_identity,
 )
@@ -18,7 +18,7 @@ def nop(d: DashboardContent) -> DashboardContent:
 
 
 def findreplace(context: Dict[str, str]) -> DashboardTransformer:
-	"""Make replacements in strings in dashboards"""
+	"""Make DashboardTransformer to make replacements in strings in dashboards."""
 
 	def replace_strings(s: str):
 		out = s
@@ -49,7 +49,9 @@ class Templator(object):
 	) -> DashboardContent:
 		"""Convert a dashboard into a one ready for templating."""
 		new = dashboard.copy()
-		new = erase_dashboard_identity(new)
+		new = project_dict(
+			new, set(["id", "uid"]), inverse=True
+		)  # we don't erase the title so we can template it later
 
 		return self.make_template(new)
 

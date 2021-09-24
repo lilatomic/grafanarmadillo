@@ -14,7 +14,7 @@ def test_make_template_from_dashboard__has_no_identity():
 
 	r = templator.make_template_from_dashboard(d)
 
-	assert project_dashboard_identity(r) == {}
+	assert project_dashboard_identity(r) == {"title": "f0-0"}
 
 
 def test_make_dashboard_from_template__has_correct_identity():
