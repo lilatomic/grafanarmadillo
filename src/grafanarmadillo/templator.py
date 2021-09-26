@@ -32,6 +32,18 @@ def findreplace(context: Dict[str, str]) -> DashboardTransformer:
 	return _findreplace
 
 
+def combine_transformers(*transformers: DashboardTransformer) -> DashboardTransformer:
+	"""Chain transformers together into one big transformer."""
+
+	def _chained(d: DashboardContent):
+		out = d
+		for t in transformers:
+			out = t(out)
+		return out
+
+	return _chained
+
+
 class Templator(object):
 	"""Collection of methods for filling and making templates."""
 
