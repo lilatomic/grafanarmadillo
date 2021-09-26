@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* feature : add helper DashboardTransformer to combine several DashboardTransformers
+* feature : add helper DashboardTransformer to process all panels in a dashboard
+
 v0.0.7 (2021-09-24)
 ------------------------------------------------------------
 
