@@ -35,4 +35,7 @@ class Dashboard(TypedDict):
 	dashboard: DashboardContent
 
 
+DashboardPanel = NewType("DashboardPanel", dict)
+
+
 FolderSearchResult = NewType("Folder", dict)

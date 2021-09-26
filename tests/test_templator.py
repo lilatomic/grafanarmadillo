@@ -2,7 +2,13 @@ import pytest
 
 from conftest import read_json_file
 from grafanarmadillo._util import project_dashboard_identity
-from grafanarmadillo.templator import Templator, findreplace
+from grafanarmadillo.templator import (
+	DashboardTransformer,
+	Templator,
+	combine_transformers,
+	findreplace,
+	panel_transformer,
+)
 from grafanarmadillo.types import DashboardContent
 
 
@@ -68,3 +74,49 @@ def test_findreplace(input, output):
 
 	r = fr(input)
 	assert output == r
+
+
+def make_test_transformer(k, v) -> DashboardTransformer:
+	def _transformer(dashboard: DashboardContent) -> DashboardContent:
+		d = dashboard.copy()
+		d[k] = v
+		return d
+
+	return _transformer
+
+
+def test_combine_transformers():
+	t = combine_transformers(
+		make_test_transformer("0", "0"), make_test_transformer("1", "1"),
+	)
+
+	r = t({})
+
+	assert r["0"] == "0"
+	assert r["1"] == "1"
+
+
+def test_combine_transformers__ordering():
+	"""Test that combined transformers are applied in order."""
+	k = "0"
+	t = combine_transformers(make_test_transformer(k, "0"), make_test_transformer(k, "1"),)
+
+	r = t({})
+
+	assert r[k] == "1"
+
+
+def test_panel_transformer(unique):
+	original = read_json_file("dashboard.json")
+
+	def f(panel):
+		out = panel.copy()
+		out["title"] = unique
+		return out
+
+	t = panel_transformer(f)
+
+	r = t(original)
+
+	assert r["panels"][0]["title"] == unique
+	assert all(map(lambda x: x["title"] == unique, r["panels"]))
