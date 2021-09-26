@@ -7,6 +7,7 @@ from grafanarmadillo.templator import (
 	Templator,
 	combine_transformers,
 	findreplace,
+	panel_transformer,
 )
 from grafanarmadillo.types import DashboardContent
 
@@ -103,3 +104,19 @@ def test_combine_transformers__ordering():
 	r = t({})
 
 	assert r[k] == "1"
+
+
+def test_panel_transformer(unique):
+	original = read_json_file("dashboard.json")
+
+	def f(panel):
+		out = panel.copy()
+		out["title"] = unique
+		return out
+
+	t = panel_transformer(f)
+
+	r = t(original)
+
+	assert r["panels"][0]["title"] == unique
+	assert all(map(lambda x: x["title"] == unique, r["panels"]))

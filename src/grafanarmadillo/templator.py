@@ -6,7 +6,11 @@ from grafanarmadillo._util import (
 	project_dashboard_identity,
 	project_dict,
 )
-from grafanarmadillo.types import DashboardContent, DashboardSearchResult
+from grafanarmadillo.types import (
+	DashboardContent,
+	DashboardPanel,
+	DashboardSearchResult,
+)
 
 
 DashboardTransformer = Callable[[DashboardContent], DashboardContent]
@@ -42,6 +46,26 @@ def combine_transformers(*transformers: DashboardTransformer) -> DashboardTransf
 		return out
 
 	return _chained
+
+
+def panel_transformer(
+	f: Callable[[DashboardPanel], DashboardPanel]
+) -> DashboardTransformer:
+	"""
+	Make DashboardTransformer which processes all panels in a dashboard.
+	
+	Will omit a dashboard if function returns None
+	"""
+
+	def _panel_transformer(d: DashboardContent):
+		out = d.copy()
+
+		new_panels = list(filter(lambda p: bool(p), (f(p) for p in d["panels"])))
+
+		out["panels"] = new_panels
+		return out
+
+	return _panel_transformer
 
 
 class Templator(object):
