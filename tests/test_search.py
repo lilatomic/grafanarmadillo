@@ -92,3 +92,45 @@ def test_get_from_path__smoke(ro_demo_grafana):
 	r = f.get_from_path("/f0/f0-0")
 
 	assert r["title"] == "f0-0"
+
+
+def test_create_or_get__new_folder_and_dashboard(rw_shared_grafana, unique):
+	f = Finder(rw_shared_grafana[1])
+	path = f"/f{unique}/{unique}"
+
+	r_dashboard, r_folder = f.create_or_get_dashboard(path)
+
+	assert r_dashboard is not None and r_folder is not None
+
+	r = f.get_from_path(path)
+	assert r["title"] == unique
+	assert r["folderTitle"] == "f" + unique
+
+
+def test_create_or_get__existing_folder_new_dashboard(rw_shared_grafana, unique):
+	f = Finder(rw_shared_grafana[1])
+	path = f"/f0/{unique}"
+
+	r_dashboard, r_folder = f.create_or_get_dashboard(path)
+
+	assert r_dashboard is not None and r_folder is not None
+
+	r = f.get_from_path(path)
+	assert r["title"] == unique
+	assert r["folderTitle"] == "f0"
+
+
+def test_create_or_get__existing_folder_and_dashboard(rw_shared_grafana):
+	f = Finder(rw_shared_grafana[1])
+	path = "/f0/f0-0"
+
+	r_dashboard, r_folder = f.create_or_get_dashboard(path)
+
+	assert r_dashboard is not None and r_folder is not None
+
+	r = f.get_from_path(path)
+	assert r["title"] == "f0-0"
+	assert r["folderTitle"] == "f0"
+
+	dashboard = f.api.dashboard.get_dashboard(r["uid"])
+	assert len(dashboard["dashboard"]["panels"]) == 1

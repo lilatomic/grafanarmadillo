@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* feature : add Finder.create_or_get_dashboard to help importing dashboards
 * feature : add helper DashboardTransformer to combine several DashboardTransformers
 * feature : add helper DashboardTransformer to process all panels in a dashboard
 
