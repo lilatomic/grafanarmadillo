@@ -1,7 +1,7 @@
 """Find Grafana dashboards and folders."""
 
 from pathlib import PurePath
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from grafana_api.grafana_face import GrafanaFace
 
@@ -67,7 +67,8 @@ class Finder(object):
 		dashboards = self._enumerate_dashboards_in_folders([str(folder_object["id"])])
 		return exactly_one(list(filter(lambda d: d["title"] == dashboard_name, dashboards)))
 
-	def _resolve_path(self, path) -> Tuple[str, str]:
+	@staticmethod
+	def _resolve_path(path) -> Tuple[str, str]:
 		parts = PurePath(path).parts
 
 		# validate path
@@ -89,3 +90,31 @@ class Finder(object):
 		"""Get a dashboard from a string path like `/folder0/dashboard0`."""
 		folder, dashboard = self._resolve_path(path)
 		return self.get_dashboard(folder, dashboard)
+
+	def create_or_get_dashboard(
+		self, path: str
+	) -> Tuple[DashboardSearchResult, Optional[FolderSearchResult]]:
+		"""
+		Create a new empty dashboard if it does not exist.
+		
+		Returns the search information if it does
+		"""
+		folder_name, dashboard_name = self._resolve_path(path)
+
+		try:
+			folder = self.get_folder(folder_name)
+		except ValueError:
+			folder = self.api.folder.create_folder(folder_name)
+
+		try:
+			dashboard = self.get_dashboard(folder_name, dashboard_name)
+		except ValueError:
+			dashboard = self.api.dashboard.update_dashboard(
+				{
+					"dashboard": {"title": dashboard_name},
+					"folderId": folder["id"],
+					"folderUid": folder["uid"],
+				}
+			)
+
+		return dashboard, folder
