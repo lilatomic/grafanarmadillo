@@ -35,7 +35,7 @@ long_description = "{}\n{}".format(
 
 setup(
 	name="grafanarmadillo",
-	version="0.0.7",
+	version="0.0.8",
 	description="Simplifies interacting with Grafana, with a focus on templating dashboards ",
 	long_description=long_description,
 	long_description_content_type="text/x-rst",
