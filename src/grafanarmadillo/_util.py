@@ -1,7 +1,6 @@
 from typing import Callable, Dict, List, TypeVar, Union
 
-from grafanarmadillo.types import DashboardContent, DashboardSearchResult
-
+from grafanarmadillo.types import DashboardContent, DashboardSearchResult, DatasourceInfo
 
 A = TypeVar("A")
 JSON = TypeVar("JSON", bound=Union[dict, list, str, int, float, bool, None])
@@ -10,7 +9,7 @@ JSON = TypeVar("JSON", bound=Union[dict, list, str, int, float, bool, None])
 def flat_map(f, xs):
 	"""
 	Flatmap: Map on a list and then merge the results.
-	
+
 	>>> and_reversed = lambda s: [s,s[::-1]]
 
 	>>> flat_map(and_reversed, [])
@@ -32,7 +31,7 @@ def flat_map(f, xs):
 def exactly_one(items: List[A], msg="did not find exactly one item") -> A:
 	"""
 	Throws if list does not contain exactly 1 item.
-	
+
 	>>> exactly_one([1])
 	1
 
@@ -53,7 +52,7 @@ def exactly_one(items: List[A], msg="did not find exactly one item") -> A:
 def project_dict(d: Dict, keys: set, inverse: bool = False) -> Dict:
 	"""
 	Select the given fields from a dictionary.
-	
+
 	>>> project_dict({'a': 1, 'b': 2}, set(['a']))
 	{'a': 1}
 
@@ -66,18 +65,19 @@ def project_dict(d: Dict, keys: set, inverse: bool = False) -> Dict:
 dashboard_meta_fields = set(["id", "uid", "title"])
 
 
-def project_dashboard_identity(
-	dashboardlike: Union[DashboardSearchResult, DashboardContent]
-) -> Dict:
+def project_dashboard_identity(dashboardlike: Union[DashboardSearchResult, DashboardContent]) -> Dict:
 	"""Project only the fields of a dashboard which are used for determining identity."""
 	return project_dict(dashboardlike, dashboard_meta_fields)
 
 
-def erase_dashboard_identity(
-	dashboardlike: Union[DashboardSearchResult, DashboardContent]
-) -> Dict:
+def erase_dashboard_identity(dashboardlike: Union[DashboardSearchResult, DashboardContent]) -> Dict:
 	"""Delete the fields of a dashboard which are used for determining identity."""
 	return project_dict(dashboardlike, dashboard_meta_fields, inverse=True)
+
+
+def extract_datasource_pk(datasource: DatasourceInfo):
+	"""Get the fields of a datasource used to compute its stable UID"""
+	return project_dict(datasource, {"name"})
 
 
 def map_json_strings(f: Callable[[str], str], obj: JSON) -> JSON:

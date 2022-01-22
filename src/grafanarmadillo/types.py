@@ -39,3 +39,6 @@ DashboardPanel = NewType("DashboardPanel", dict)
 
 
 FolderSearchResult = NewType("Folder", dict)
+
+
+DatasourceInfo = NewType("DatasourceInfo", dict)
