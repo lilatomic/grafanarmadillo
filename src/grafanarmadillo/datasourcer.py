@@ -1,5 +1,4 @@
 import json
-from typing import Union
 from uuid import UUID, uuid5
 
 from grafana_api import GrafanaFace

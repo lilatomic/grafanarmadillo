@@ -8,6 +8,7 @@ from grafanarmadillo.templator import (
 	combine_transformers,
 	findreplace,
 	panel_transformer,
+	DatasourceDashboardTransformer,
 )
 from grafanarmadillo.types import DashboardContent
 
@@ -87,7 +88,8 @@ def make_test_transformer(k, v) -> DashboardTransformer:
 
 def test_combine_transformers():
 	t = combine_transformers(
-		make_test_transformer("0", "0"), make_test_transformer("1", "1"),
+		make_test_transformer("0", "0"),
+		make_test_transformer("1", "1"),
 	)
 
 	r = t({})
@@ -99,7 +101,10 @@ def test_combine_transformers():
 def test_combine_transformers__ordering():
 	"""Test that combined transformers are applied in order."""
 	k = "0"
-	t = combine_transformers(make_test_transformer(k, "0"), make_test_transformer(k, "1"),)
+	t = combine_transformers(
+		make_test_transformer(k, "0"),
+		make_test_transformer(k, "1"),
+	)
 
 	r = t({})
 
@@ -120,3 +125,37 @@ def test_panel_transformer(unique):
 
 	assert r["panels"][0]["title"] == unique
 	assert all(map(lambda x: x["title"] == unique, r["panels"]))
+
+
+class TestDatasourceTransformer:
+	def test_use_name(self, unique):
+		original = read_json_file("dashboard_with_datasource.json")
+		datasource = read_json_file("datasource.json")
+
+		t = DatasourceDashboardTransformer([datasource])
+		r = t.use_name(original)
+
+		ds = r["panels"][0]["targets"][0]["datasource"]
+		assert ds["name"] == datasource["name"]
+		assert "uid" not in ds
+
+	def test_use_uid(self, unique):
+		original = read_json_file("dashboard_with_datasource.json")
+		datasource = read_json_file("datasource.json")
+
+		_d = original["panels"][0]["targets"][0]["datasource"]
+		_d["name"] = datasource["name"]
+		del _d["uid"]
+
+		t = DatasourceDashboardTransformer([datasource])
+		r = t.use_uid(original)
+
+		ds = r["panels"][0]["targets"][0]["datasource"]
+		assert ds["uid"] == datasource["uid"]
+		assert "name" not in ds
+
+	def test_uid_intermediate(self, unique):
+		...
+
+	def test_name_intermediate(self, unique):
+		...

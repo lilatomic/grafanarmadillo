@@ -1,6 +1,6 @@
 {
 	"id": 1,
-	"uid": "rqjvagH7z",
+	"uid": "f8c0b7a3-7d64-5ed8-a2fe-e6f517330dc2",
 	"orgId": 1,
 	"name": "Graphite",
 	"type": "graphite",
@@ -15,8 +15,11 @@
 	"basicAuthPassword": "",
 	"withCredentials": false,
 	"isDefault": true,
-	"jsonData": { "graphiteVersion": "1.1" },
+	"jsonData": {
+		"graphiteVersion": "1.1",
+		"timeout": 2
+	},
 	"secureJsonFields": {},
-	"version": 2,
+	"version": 3,
 	"readOnly": false
 }
