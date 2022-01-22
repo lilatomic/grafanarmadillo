@@ -56,3 +56,28 @@ Templating
 
 .. literalinclude:: ../../tests/usage/templating.py
 	:language: python
+
+Datasources
+===========
+
+Grafana recently added the datasource uid to the dashboard. This solves many problems, but does make migrating between instances a bit harder. ``grafanarmadillo`` provides 2 ways to make this easier. The first is to create your datasources with the ``Datasourcer``. This will give them a stable UID based on the name of the datasource, so the UID will match across instances.
+
+.. code:: python
+
+	from grafanarmadillo.datasourcer import Datasourcer
+	from grafanarmadillo.types import DatasourceInfo
+
+	dsinfo: DatasourceInfo = read_json_file("datasource.json")
+	datasourcer = Datasourcer(gfn)
+	datasourcer.put(dsinfo)
+
+The other way it to use a transformer built for migrating between instances. The ``DatasourceDashboardTransformer`` is built for switching between names and UIDs. This works like a standard dashboard transformer, which you can combine with other dashboard transformers
+
+.. code:: python
+
+	datasources_make_template = DatasourceDashboardTransformer([{'uid': original_uid, 'name': 'name'}]).use_name
+	datasources_make_dashboard = DatasourceDashboardTransformer([{'uid': new_uid, 'name': 'name'}]).use_uid
+
+	# with other DashboardTransformers
+	template_maker = combine_transformers(findreplace_make_template, datasources_make_template)
+	dashboard_maker = combine_transformers(findreplace_make_dashboard, datasources_make_dashboard)
