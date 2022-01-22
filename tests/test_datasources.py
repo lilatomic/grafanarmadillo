@@ -4,12 +4,14 @@ from tests.conftest import read_json_file
 
 
 class TestDatasources:
+	"""Tests for Datasourcer."""
+
 	@staticmethod
 	def config_fields(d):
 		return project_dict(d, {"id", "uid", "version"}, inverse=True)
 
 	def test_put_datasource__new(self, rw_shared_grafana, unique):
-		"""Test that Datasourcer.put can create a new datasource"""
+		"""Test that Datasourcer.put can create a new datasource."""
 		api = rw_shared_grafana[1]
 		datasourcer = Datasourcer(api)
 
@@ -19,11 +21,11 @@ class TestDatasources:
 		datasourcer.put(dsinfo)
 
 		actual = api.datasource.get_datasource_by_name(unique)
-		assert actual["uid"] == datasourcer.datsource_uuid(dsinfo)
+		assert actual["uid"] == datasourcer.datasource_uuid(dsinfo)
 		assert self.config_fields(actual) == self.config_fields(dsinfo)
 
 	def test_put_datasource__existing(self, rw_shared_grafana, unique):
-		"""Test that Datasourcer.put can update an existing datasource"""
+		"""Test that Datasourcer.put can update an existing datasource."""
 		api = rw_shared_grafana[1]
 		datasourcer = Datasourcer(api)
 
@@ -37,7 +39,7 @@ class TestDatasources:
 		datasourcer.put(changed_dsinfo)
 
 		actual = api.datasource.get_datasource_by_name(unique)
-		assert actual["uid"] == datasourcer.datsource_uuid(dsinfo)
+		assert actual["uid"] == datasourcer.datasource_uuid(dsinfo)
 		assert self.config_fields(actual) != self.config_fields(dsinfo)
 		assert self.config_fields(actual) == self.config_fields(changed_dsinfo)
 
@@ -50,10 +52,10 @@ class TestDatasources:
 		dsinfo = read_json_file("datasource.json")
 		dsinfo["name"] = name
 
-		uid = datasourcer.datsource_uuid(dsinfo)
+		uid = datasourcer.datasource_uuid(dsinfo)
 		dsinfo["uid"] = uid
 		api.datasource.create_datasource(dsinfo)
 		# ---
 		result = datasourcer.get({"name": name})
 		assert result["name"] == name
-		assert result["uid"] == datasourcer.datsource_uuid(result)
+		assert result["uid"] == datasourcer.datasource_uuid(result)

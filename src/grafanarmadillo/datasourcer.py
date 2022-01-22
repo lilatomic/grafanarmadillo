@@ -1,3 +1,4 @@
+"""Create Grafana datasources with consistent UIDs."""
 import json
 from uuid import UUID, uuid5
 
@@ -19,10 +20,8 @@ class Datasourcer(object):
 		self._uuid5_ns = _uuid5_ns
 
 	def put(self, dsinfo):
-		"""
-		Put a datasource, recomputing the uid
-		"""
-		target = self.datsource_uuid(dsinfo)
+		"""Put a datasource, recomputing the uid."""
+		target = self.datasource_uuid(dsinfo)
 		ds = dsinfo.copy()
 		ds["uid"] = target
 		if "version" in ds:
@@ -39,12 +38,13 @@ class Datasourcer(object):
 				raise
 
 	def get(self, dsinfo: DatasourceInfo):
-		"""Get a datasource"""
-		target = self.datsource_uuid(dsinfo)
+		"""Get a datasource."""
+		target = self.datasource_uuid(dsinfo)
 
 		print(target)
 		return self.api.datasource.api.GET("/datasources/uid/%s" % target)
 
-	def datsource_uuid(self, ds: DatasourceInfo) -> str:
+	def datasource_uuid(self, ds: DatasourceInfo) -> str:
+		"""Compute the uuid for a datasource."""
 		dumped = json.dumps(extract_datasource_pk(ds), sort_keys=True)
 		return str(uuid5(self._uuid5_ns, dumped))

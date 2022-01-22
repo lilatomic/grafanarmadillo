@@ -4,11 +4,11 @@ from conftest import read_json_file
 from grafanarmadillo._util import project_dashboard_identity
 from grafanarmadillo.templator import (
 	DashboardTransformer,
+	DatasourceDashboardTransformer,
 	Templator,
 	combine_transformers,
 	findreplace,
 	panel_transformer,
-	DatasourceDashboardTransformer,
 )
 from grafanarmadillo.types import DashboardContent
 
@@ -128,6 +128,8 @@ def test_panel_transformer(unique):
 
 
 class TestDatasourceTransformer:
+	"""Tests for the DatasourceDashboardTransformer."""
+
 	def test_use_name(self, unique):
 		original = read_json_file("dashboard_with_datasource.json")
 		datasource = read_json_file("datasource.json")
@@ -155,6 +157,7 @@ class TestDatasourceTransformer:
 		assert "name" not in ds
 
 	def test_name_intermediate(self, unique):
+		"""Test using the DatasourceDashboardTransformer to make a template and then to inflate that template."""
 		original = read_json_file("dashboard_with_datasource.json")
 		original_uid = original["panels"][0]["targets"][0]["datasource"]["uid"]
 

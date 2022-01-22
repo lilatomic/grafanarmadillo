@@ -1,6 +1,11 @@
 from typing import Callable, Dict, List, TypeVar, Union
 
-from grafanarmadillo.types import DashboardContent, DashboardSearchResult, DatasourceInfo
+from grafanarmadillo.types import (
+	DashboardContent,
+	DashboardSearchResult,
+	DatasourceInfo,
+)
+
 
 A = TypeVar("A")
 JSON = TypeVar("JSON", bound=Union[dict, list, str, int, float, bool, None])
@@ -76,7 +81,7 @@ def erase_dashboard_identity(dashboardlike: Union[DashboardSearchResult, Dashboa
 
 
 def extract_datasource_pk(datasource: DatasourceInfo):
-	"""Get the fields of a datasource used to compute its stable UID"""
+	"""Get the fields of a datasource used to compute its stable UID."""
 	return project_dict(datasource, {"name"})
 
 

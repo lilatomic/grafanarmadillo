@@ -1,5 +1,5 @@
 """Make and fill templates for dashboards."""
-from typing import List, Callable, Dict
+from typing import Callable, Dict, List
 
 from grafanarmadillo._util import (
 	map_json_strings,
@@ -68,6 +68,8 @@ def panel_transformer(f: Callable[[DashboardPanel], DashboardPanel]) -> Dashboar
 
 
 class DatasourceDashboardTransformer:
+	"""DashboardTransformers for moving datasources between instances."""
+
 	def __init__(self, datasources: List[DatasourceInfo]):
 		self.by_name = {d["name"]: d for d in datasources}
 		self.by_uid = {d["uid"]: d for d in datasources}
@@ -101,9 +103,11 @@ class DatasourceDashboardTransformer:
 		return self._modify_panel_datasources(_do_rebuild_uid, panel)
 
 	def use_name(self, d: DashboardContent):
+		"""Use the datasource name in the dashboard. Useful for making a template."""
 		return panel_transformer(self._use_name)(d)
 
 	def use_uid(self, d: DashboardContent):
+		"""Use the datasource uid in the dashboard. Useful for making a dashboard."""
 		return panel_transformer(self._use_uid)(d)
 
 
