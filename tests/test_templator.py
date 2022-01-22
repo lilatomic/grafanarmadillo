@@ -154,8 +154,16 @@ class TestDatasourceTransformer:
 		assert ds["uid"] == datasource["uid"]
 		assert "name" not in ds
 
-	def test_uid_intermediate(self, unique):
-		...
-
 	def test_name_intermediate(self, unique):
-		...
+		original = read_json_file("dashboard_with_datasource.json")
+		original_uid = original["panels"][0]["targets"][0]["datasource"]["uid"]
+
+		t0 = DatasourceDashboardTransformer([{'uid': original_uid, 'name': 'name'}]).use_name
+		t1 = DatasourceDashboardTransformer([{'uid': 'uid1', 'name': 'name'}]).use_uid
+
+		t = combine_transformers(t0, t1)
+
+		r = t(original)
+
+		ds = r["panels"][0]["targets"][0]["datasource"]
+		assert ds['uid'] == 'uid1'
