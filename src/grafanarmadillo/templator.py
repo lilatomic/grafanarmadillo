@@ -90,16 +90,18 @@ class DatasourceDashboardTransformer:
 
 	def _use_name(self, panel):
 		def _do_add_name(d):
-			d["name"] = self.by_uid[d["uid"]]["name"]
-			del d["uid"]
+			if d["uid"] in self.by_uid:
+				d["name"] = self.by_uid[d["uid"]]["name"]
+				del d["uid"]
 			return d
 
 		return self._modify_panel_datasources(_do_add_name, panel)
 
 	def _use_uid(self, panel):
 		def _do_rebuild_uid(d):
-			d["uid"] = self.by_name[d["name"]]["uid"]
-			del d["name"]
+			if d["name"] in self.by_name:
+				d["uid"] = self.by_name[d["name"]]["uid"]
+				del d["name"]
 			return d
 
 		return self._modify_panel_datasources(_do_rebuild_uid, panel)
