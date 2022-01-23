@@ -70,6 +70,8 @@ def panel_transformer(f: Callable[[DashboardPanel], DashboardPanel]) -> Dashboar
 class DatasourceDashboardTransformer:
 	"""DashboardTransformers for moving datasources between instances."""
 
+	expr_token = "__expr__"
+
 	def __init__(self, datasources: List[DatasourceInfo]):
 		self.by_name = {d["name"]: d for d in datasources}
 		self.by_uid = {d["uid"]: d for d in datasources}
@@ -78,7 +80,7 @@ class DatasourceDashboardTransformer:
 		targets = panel["targets"]
 		out = []
 		for t in targets:
-			if "datasource" in t:
+			if "datasource" in t and t["datasource"] != self.expr_token:
 				d = t["datasource"]
 				t["datasource"] = f(d)
 				out.append(t)
