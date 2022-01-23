@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* feature : add Datasourcer for creating datasources with stable UIDs across instances
+* feature : add DatasourceDashboardTransformer for templating datasources in dashboards across instances
+
 v0.0.8 (2021-09-26)
 ------------------------------------------------------------
 
