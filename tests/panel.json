@@ -1,0 +1,104 @@
+{
+	"fieldConfig": {
+		"defaults": {
+			"color": {
+				"mode": "palette-classic"
+			},
+			"custom": {
+				"axisLabel": "",
+				"axisPlacement": "auto",
+				"barAlignment": 0,
+				"drawStyle": "line",
+				"fillOpacity": 0,
+				"gradientMode": "none",
+				"hideFrom": {
+					"legend": false,
+					"tooltip": false,
+					"viz": false
+				},
+				"lineInterpolation": "linear",
+				"lineWidth": 1,
+				"pointSize": 5,
+				"scaleDistribution": {
+					"type": "linear"
+				},
+				"showPoints": "auto",
+				"spanNulls": false,
+				"stacking": {
+					"group": "A",
+					"mode": "none"
+				},
+				"thresholdsStyle": {
+					"mode": "off"
+				}
+			},
+			"mappings": [],
+			"thresholds": {
+				"mode": "absolute",
+				"steps": [
+					{
+						"color": "green",
+						"value": null
+					},
+					{
+						"color": "red",
+						"value": 80
+					}
+				]
+			}
+		},
+		"overrides": []
+	},
+	"gridPos": {
+		"h": 9,
+		"w": 12,
+		"x": 0,
+		"y": 0
+	},
+	"id": 2,
+	"options": {
+		"legend": {
+			"calcs": [],
+			"displayMode": "list",
+			"placement": "bottom"
+		},
+		"tooltip": {
+			"mode": "single"
+		}
+	},
+	"targets": [
+		{
+			"datasource": {
+				"type": "graphite",
+				"uid": "f8c0b7a3-7d64-5ed8-a2fe-e6f517330dc2"
+			},
+			"refCount": 0,
+			"refId": "A",
+			"target": "select this from that",
+			"textEditor": true
+		},
+		{
+			"datasource": {
+				"type": "graphite",
+				"uid": "d91fe7c1-075a-4e0e-93ff-8d4d163b95a2"
+			},
+			"hide": false,
+			"refCount": 0,
+			"refId": "B",
+			"target": "select these from those",
+			"textEditor": true
+		},
+		{
+			"datasource": {
+				"type": "__expr__",
+				"uid": "__expr__"
+			},
+			"expression": "$A + $B",
+			"hide": false,
+			"refId": "C",
+			"type": "math"
+		}
+	],
+	"title": "Panel Title",
+	"type": "timeseries"
+}
