@@ -182,9 +182,10 @@ class TestDatasourceTransformer:
 
 		r = t._modify_panel_datasources(modify, p)
 
-		for t in r["targets"]:
-			print(t["datasource"])
-			assert t["datasource"]["modified"]
+		targets = r["targets"]
+		assert targets[0]["datasource"]["modified"]
+		assert targets[1]["datasource"]["modified"]
+		assert "modified" not in targets[2]["datasource"]
 
 	def test_datasource_absent(self):
 		d = read_json_file("dashboard_with_datasource.json")

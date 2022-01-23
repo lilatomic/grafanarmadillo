@@ -80,10 +80,10 @@ class DatasourceDashboardTransformer:
 		targets = panel["targets"]
 		out = []
 		for t in targets:
-			if "datasource" in t and t["datasource"] != self.expr_token:
+			if "datasource" in t and t["datasource"].get("uid", "") != self.expr_token:
 				d = t["datasource"]
 				t["datasource"] = f(d)
-				out.append(t)
+			out.append(t)
 
 		panel["targets"] = out
 		return panel
