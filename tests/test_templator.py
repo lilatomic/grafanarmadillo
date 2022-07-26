@@ -1,6 +1,6 @@
 import pytest
 
-from conftest import read_json_file
+from tests.conftest import read_json_file
 from grafanarmadillo._util import project_dashboard_identity
 from grafanarmadillo.templator import (
 	DashboardTransformer,

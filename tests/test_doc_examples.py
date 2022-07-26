@@ -5,16 +5,16 @@ import os
 import pytest
 from grafana_api.grafana_face import GrafanaFace
 
-from conftest import read_json_file
+from tests.conftest import read_json_file
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator
-from usage.dashboarding import (
+from tests.usage.dashboarding import (
 	clone_dashboard_contents,
 	export_dashboard,
 	import_dashboard,
 )
-from usage.templating import dashboard_maker, template_for_clients, template_maker
+from tests.usage.templating import dashboard_maker, template_for_clients, template_maker
 
 
 def test_usage_dashboard_export(rw_shared_grafana):
