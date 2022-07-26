@@ -31,7 +31,7 @@ class GrafanaContainer(DockerContainer):
 
 	def __init__(
 		self,
-		image="grafana/grafana:latest",
+		image="grafana/grafana:8.5.9",
 		port=_PORT,
 		admin_user: str = _ADMIN_USER,
 		admin_password: str = _ADMIN_PASSWORD,
@@ -60,7 +60,10 @@ class GrafanaContainer(DockerContainer):
 				self.with_env("_".join(["GF", section.upper(), item.upper()]), str(value))
 
 	def _try_connecting(self) -> bool:
-		requests.get(self.url)
+		try:
+			requests.get(self.url)
+		except requests.exceptions.ConnectionError as e:
+			raise ConnectionError from e
 
 	@property
 	def url(self):
