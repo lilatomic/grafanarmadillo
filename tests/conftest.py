@@ -5,6 +5,7 @@ import random
 import socket
 import string
 from collections import defaultdict
+from time import sleep
 from typing import Any, Dict, Tuple
 
 import pytest
@@ -31,7 +32,7 @@ class GrafanaContainer(DockerContainer):
 
 	def __init__(
 		self,
-		image="grafana/grafana:latest",
+		image="grafana/grafana:8.5.9",
 		port=_PORT,
 		admin_user: str = _ADMIN_USER,
 		admin_password: str = _ADMIN_PASSWORD,
@@ -60,6 +61,7 @@ class GrafanaContainer(DockerContainer):
 				self.with_env("_".join(["GF", section.upper(), item.upper()]), str(value))
 
 	def _try_connecting(self) -> bool:
+		sleep(5)
 		requests.get(self.url)
 
 	@property
