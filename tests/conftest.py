@@ -5,7 +5,6 @@ import random
 import socket
 import string
 from collections import defaultdict
-from time import sleep
 from typing import Any, Dict, Tuple
 
 import pytest
