@@ -1,6 +1,5 @@
 import pytest
 
-from tests.conftest import read_json_file
 from grafanarmadillo._util import project_dashboard_identity
 from grafanarmadillo.templator import (
 	DashboardTransformer,
@@ -10,6 +9,7 @@ from grafanarmadillo.templator import (
 	panel_transformer,
 )
 from grafanarmadillo.types import DashboardContent
+from tests.conftest import read_json_file
 
 
 def test_make_template_from_dashboard__has_no_identity():

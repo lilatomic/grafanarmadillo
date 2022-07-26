@@ -5,10 +5,10 @@ import os
 import pytest
 from grafana_api.grafana_face import GrafanaFace
 
-from tests.conftest import read_json_file
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator
+from tests.conftest import read_json_file
 from tests.usage.dashboarding import (
 	clone_dashboard_contents,
 	export_dashboard,
