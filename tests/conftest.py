@@ -31,7 +31,7 @@ class GrafanaContainer(DockerContainer):
 
 	def __init__(
 		self,
-		image="grafana/grafana:8.5.9",
+		image,
 		port=_PORT,
 		admin_user: str = _ADMIN_USER,
 		admin_password: str = _ADMIN_PASSWORD,
@@ -97,36 +97,41 @@ def create_folder(gfn: GrafanaFace, name, uid=None):
 	return gfn.folder.create_folder(name, uid)
 
 
+@pytest.fixture(scope="module")
+def grafana_image():
+	yield "grafana/grafana:8.5.9"
+
+
 @pytest.fixture
-def grafana():
-	with GrafanaContainer() as gfn_ctn:
+def grafana(grafana_image):
+	with GrafanaContainer(grafana_image) as gfn_ctn:
 		yield gfn_ctn
 
 
 @pytest.fixture(scope="module")
-def ro_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
+def ro_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaFace]:
 	"""
 	Create a fixture of a grafana instance with many dashboards.
 
 	Readonly, please don't modify this instance
 	"""
 	__skip_container_test_if_necessary()
-	yield from mk_demo_grafana()
+	yield from mk_demo_grafana(grafana_image)
 
 
 @pytest.fixture()
-def rw_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
+def rw_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaFace]:
 	"""
 	Create a fixture of a grafana instance with many dashboards.
 
 	Readwrite, feel free to modify this instance
 	"""
 	__skip_container_test_if_necessary()
-	yield from mk_demo_grafana()
+	yield from mk_demo_grafana(grafana_image)
 
 
 @pytest.fixture(scope="module")
-def rw_shared_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
+def rw_shared_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaFace]:
 	"""
 	Create a fixture of a grafana instance with many dashboards.
 	
@@ -134,7 +139,7 @@ def rw_shared_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
 	please use the `unique` fixture to not conflict with other tests
 	"""
 	__skip_container_test_if_necessary()
-	yield from mk_demo_grafana()
+	yield from mk_demo_grafana(grafana_image)
 
 
 def __skip_container_test_if_necessary() -> bool:
@@ -146,7 +151,7 @@ def __skip_container_test_if_necessary() -> bool:
 		pytest.skip("Platform isn't Linux and not 'do_containertest'")
 
 
-def mk_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
+def mk_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaFace]:
 	def get_free_tcp_port():
 		tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		tcp.bind(("", 0))
@@ -155,7 +160,7 @@ def mk_demo_grafana() -> Tuple[GrafanaContainer, GrafanaFace]:
 		tcp.close()
 		return port
 
-	with GrafanaContainer(port=get_free_tcp_port()) as gfn_ctn:
+	with GrafanaContainer(image=grafana_image, port=get_free_tcp_port()) as gfn_ctn:
 		gfn = GrafanaFace(
 			auth=(
 				gfn_ctn.conf["security"]["admin_user"],
