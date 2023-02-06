@@ -97,9 +97,9 @@ def create_folder(gfn: GrafanaFace, name, uid=None):
 	return gfn.folder.create_folder(name, uid)
 
 
-@pytest.fixture(scope="module")
-def grafana_image():
-	yield "grafana/grafana:8.5.9"
+@pytest.fixture(scope="module", params=["8.5.9", "9.3.6"])
+def grafana_image(request):
+	yield f"grafana/grafana:{request.param}"
 
 
 @pytest.fixture
