@@ -3,7 +3,7 @@ Changelog
 =========
 
 * feature : add Python 3.11 support
-
+* feature : add Grafana 9 support
 
 v0.0.9 (2022-07-26)
 ------------------------------------------------------------
