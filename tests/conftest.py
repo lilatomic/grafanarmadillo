@@ -9,7 +9,7 @@ from typing import Any, Dict, Tuple
 
 import pytest
 import requests
-from grafana_api.grafana_face import GrafanaFace
+from grafana_client import GrafanaApi
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.waiting_utils import wait_for
 
@@ -84,7 +84,7 @@ def read_json_file(filename: str):
 		return json.load(f)
 
 
-def create_dashboard(gfn: GrafanaFace, name, folderId=0):
+def create_dashboard(gfn: GrafanaApi, name, folderId=0):
 	dashboard = read_json_file("dashboard.json")
 	dashboard = erase_dashboard_identity(dashboard)
 	dashboard["title"] = name
@@ -93,7 +93,7 @@ def create_dashboard(gfn: GrafanaFace, name, folderId=0):
 	)
 
 
-def create_folder(gfn: GrafanaFace, name, uid=None):
+def create_folder(gfn: GrafanaApi, name, uid=None):
 	return gfn.folder.create_folder(name, uid)
 
 
@@ -109,7 +109,7 @@ def grafana(grafana_image):
 
 
 @pytest.fixture(scope="module")
-def ro_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaFace]:
+def ro_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaApi]:
 	"""
 	Create a fixture of a grafana instance with many dashboards.
 
@@ -120,7 +120,7 @@ def ro_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaFace]:
 
 
 @pytest.fixture()
-def rw_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaFace]:
+def rw_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaApi]:
 	"""
 	Create a fixture of a grafana instance with many dashboards.
 
@@ -131,7 +131,7 @@ def rw_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaFace]:
 
 
 @pytest.fixture(scope="module")
-def rw_shared_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaFace]:
+def rw_shared_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaApi]:
 	"""
 	Create a fixture of a grafana instance with many dashboards.
 	
@@ -149,9 +149,10 @@ def __skip_container_test_if_necessary() -> bool:
 		should_do_containertest = platform.system() == "Linux"
 	if not should_do_containertest:
 		pytest.skip("Platform isn't Linux and not 'do_containertest'")
+	return should_do_containertest
 
 
-def mk_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaFace]:
+def mk_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaApi]:
 	def get_free_tcp_port():
 		tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		tcp.bind(("", 0))
@@ -161,7 +162,7 @@ def mk_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaFace]:
 		return port
 
 	with GrafanaContainer(image=grafana_image, port=get_free_tcp_port()) as gfn_ctn:
-		gfn = GrafanaFace(
+		gfn = GrafanaApi(
 			auth=(
 				gfn_ctn.conf["security"]["admin_user"],
 				gfn_ctn.conf["security"]["admin_password"],

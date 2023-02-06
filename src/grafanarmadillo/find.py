@@ -3,7 +3,7 @@
 from pathlib import PurePath
 from typing import List, Optional, Tuple
 
-from grafana_api.grafana_face import GrafanaFace
+from grafana_client import GrafanaApi
 
 from grafanarmadillo._util import exactly_one
 from grafanarmadillo.types import DashboardSearchResult, FolderSearchResult
@@ -12,7 +12,7 @@ from grafanarmadillo.types import DashboardSearchResult, FolderSearchResult
 class Finder(object):
 	"""Collection of methods for finding Grafana dashboards and folders."""
 
-	def __init__(self, api: GrafanaFace) -> None:
+	def __init__(self, api: GrafanaApi) -> None:
 		super().__init__()
 		self.api = api
 

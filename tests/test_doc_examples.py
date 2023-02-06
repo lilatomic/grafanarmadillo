@@ -3,7 +3,7 @@ import json
 import os
 
 import pytest
-from grafana_api.grafana_face import GrafanaFace
+from grafana_client import GrafanaApi
 
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
@@ -18,7 +18,7 @@ from tests.usage.templating import dashboard_maker, template_for_clients, templa
 
 
 def test_usage_dashboard_export(rw_shared_grafana):
-	gfn: GrafanaFace = rw_shared_grafana[1]
+	gfn: GrafanaApi = rw_shared_grafana[1]
 	out = io.StringIO()
 
 	export_dashboard(gfn, "/f0/f0-0", out)
@@ -29,7 +29,7 @@ def test_usage_dashboard_export(rw_shared_grafana):
 
 
 def test_usage_dashboard_import(rw_shared_grafana, unique):
-	gfn: GrafanaFace = rw_shared_grafana[1]
+	gfn: GrafanaApi = rw_shared_grafana[1]
 	finder = Finder(gfn)
 	gfn.folder.create_folder(unique)
 
@@ -41,7 +41,7 @@ def test_usage_dashboard_import(rw_shared_grafana, unique):
 
 
 def test_usage_dashboard_clone(rw_shared_grafana, unique):
-	gfn: GrafanaFace = rw_shared_grafana[1]
+	gfn: GrafanaApi = rw_shared_grafana[1]
 	dashboarder = Dashboarder(gfn)
 	folder = gfn.folder.create_folder(f"f{unique}")
 	dashboard = gfn.dashboard.update_dashboard(
@@ -57,7 +57,7 @@ def test_usage_dashboard_clone(rw_shared_grafana, unique):
 
 @pytest.mark.integration
 def test_usage_templating(rw_demo_grafana):
-	gfn: GrafanaFace = rw_demo_grafana[1]
+	gfn: GrafanaApi = rw_demo_grafana[1]
 	finder, dashboarder, templator = Finder(gfn), Dashboarder(gfn), Templator()
 	service_name = "Service A"
 	clients = ["Client A", "Client B"]

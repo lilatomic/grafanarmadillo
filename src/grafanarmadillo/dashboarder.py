@@ -1,7 +1,7 @@
 """Push and pull Grafana dashboards."""
 from typing import Optional, Tuple
 
-from grafana_api.grafana_face import GrafanaFace
+from grafana_client import GrafanaApi
 
 from grafanarmadillo._util import project_dashboard_identity
 from grafanarmadillo.types import (
@@ -14,7 +14,7 @@ from grafanarmadillo.types import (
 class Dashboarder(object):
 	"""Collection of methods for managing dashboards."""
 
-	def __init__(self, api: GrafanaFace) -> None:
+	def __init__(self, api: GrafanaApi) -> None:
 		super().__init__()
 		self.api = api
 

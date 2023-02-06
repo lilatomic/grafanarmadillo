@@ -3,13 +3,13 @@ Usage
 =====
 
 
-Most modules will depend on a GrafanaFace instance.
+Most modules will depend on a GrafanaApi instance.
 
 .. code:: python
 
-	from grafana_api.grafana_face import GrafanaFace
+	from grafana_client import GrafanaApi
 
-	gfn = GrafanaFace(
+	gfn = GrafanaApi(
 			auth=(
 				os.getenv("GF_SECURITY_ADMIN_USER"),
 				os.getenv("GF_SECURITY_ADMIN_PASSWORD")
@@ -26,7 +26,7 @@ Finding Things
 
 	from grafanarmadillo.find import Finder
 
-	# inject the GrafanaFace
+	# inject the GrafanaApi
 	finder = Finder(gfn)
 
 	# get all dashboards named "important_dashboard"

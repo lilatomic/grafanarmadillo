@@ -57,7 +57,7 @@ setup(
 	},
 	keywords=[],
 	python_requires=">=3.6, <4",
-	install_requires=["grafana_api~=1.0", "typing-extensions~=3.0;python_version<'3.8'"],
+	install_requires=["grafana-client~=3.0", "typing-extensions~=3.0;python_version<'3.8'"],
 	extras_require={
 		# eg:
 		#   'rst': ['docutils>=0.11'],

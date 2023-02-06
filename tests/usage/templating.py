@@ -1,13 +1,13 @@
 from typing import List
 
-from grafana_api.grafana_face import GrafanaFace
+from grafana_client import GrafanaApi
 
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator, findreplace
 
 
-def template_for_clients(gfn: GrafanaFace, service_name: str, clients: List[str]):
+def template_for_clients(gfn: GrafanaApi, service_name: str, clients: List[str]):
 	"""Pull a template for a service from the Templates folder on Grafana and fills it out for a client."""
 	finder, dashboarder, templator = Finder(gfn), Dashboarder(gfn), Templator()
 
