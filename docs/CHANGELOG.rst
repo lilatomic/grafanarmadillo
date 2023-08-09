@@ -3,7 +3,7 @@ Changelog
 =========
 
 * feature : add Python 3.11 support
-* feature : add Grafana 9 support
+* feature : add Grafana 9 and 10 support
 * task : switch backend to panodata/grafana-client
 
 v0.0.9 (2022-07-26)

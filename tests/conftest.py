@@ -97,7 +97,7 @@ def create_folder(gfn: GrafanaApi, name, uid=None):
 	return gfn.folder.create_folder(name, uid)
 
 
-@pytest.fixture(scope="module", params=["8.5.9", "9.3.6"])
+@pytest.fixture(scope="module", params=["8.5.27", "9.5.7", "10.0.3"])
 def grafana_image(request):
 	yield f"grafana/grafana:{request.param}"
 
