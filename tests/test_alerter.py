@@ -25,15 +25,12 @@ def test_import(rw_shared_grafana, unique):
 
 	result = alerter.api.alertingprovisioning.get_alertrule(unique)
 
-	print(f"{new_alert=}")
-	print(f"{result=}")
 	assert result["data"] == new_alert["data"]
 	assert result["folderUID"] == folder["uid"]
 
 
 def test_importexport__roundtrip(rw_shared_grafana, unique):
 	"""Test that we can import a dashboard and the export is the same."""
-	print(f"{rw_shared_grafana[0].major_version=}")
 	if rw_shared_grafana[0].major_version < 9:
 		pytest.skip("Grafana does not support provisioning in version 8")
 
