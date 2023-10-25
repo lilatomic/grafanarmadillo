@@ -2,6 +2,7 @@
 
 from typing import NewType, Optional, TypedDict
 
+
 UID = NewType("UID", str)
 
 
@@ -16,7 +17,19 @@ class DashboardSearchResult(TypedDict):
 	folderTitle: Optional[str]
 
 
+class AlertSearchResult(TypedDict):
+	"""Relevant keys returned for an alert."""
+
+	id: int
+	uid: UID
+	orgID: int
+	folderUID: UID
+	ruleGroup: str
+	title: str
+
+
 DashboardContent = NewType("DashboardContent", dict)
+AlertContent = NewType("AlertContent", dict)
 DashboardMeta = NewType("DashboardMeta", dict)
 
 

@@ -6,7 +6,11 @@ from typing import List, Optional, Tuple
 from grafana_client import GrafanaApi
 
 from grafanarmadillo._util import exactly_one
-from grafanarmadillo.types import DashboardSearchResult, FolderSearchResult
+from grafanarmadillo.types import (
+	AlertSearchResult,
+	DashboardSearchResult,
+	FolderSearchResult,
+)
 
 
 class Finder:
@@ -66,6 +70,15 @@ class Finder:
 		folder_object = self.get_folder(folder_name)
 		dashboards = self._enumerate_dashboards_in_folders([str(folder_object["id"])])
 		return exactly_one(list(filter(lambda d: d["title"] == dashboard_name, dashboards)))
+
+	def get_alert(self, folder_name, alert_name) -> AlertSearchResult:
+		"""Get an alert by its parent folder and alert name."""
+		folder_uid = self.get_folder(folder_name)["uid"]
+
+		return exactly_one(list(filter(
+			lambda a: a["title"] == alert_name and a["folderUID"] == folder_uid,
+			self.api.alertingprovisioning.get_alertrules_all()
+		)))
 
 	@staticmethod
 	def _resolve_path(path) -> Tuple[str, str]:
