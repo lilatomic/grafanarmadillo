@@ -6,27 +6,65 @@ from grafanarmadillo.find import Finder
 from tests.conftest import read_json_file
 
 
+def uniquify_alert(alert, unique):
+	del alert["id"]
+	alert["uid"] = unique
+	alert["ruleGroup"] = "ruleGroup " + unique
+	alert["title"] = "title " + unique
+
+	return alert
+
+
 def test_import(rw_shared_grafana, unique):
 	"""Test that we can import a dashboard."""
 	if rw_shared_grafana[0].major_version < 9:
 		pytest.skip("Grafana does not support provisioning in version 8")
 
 	finder, alerter = (Finder(rw_shared_grafana[1]), Alerter(rw_shared_grafana[1]))
-
 	folder = finder.get_folder("f0")
 
-	new_alert = read_json_file("alert_rule.json")
-	del new_alert["id"]
-	new_alert["uid"] = unique
-	new_alert["ruleGroup"] = "ruleGroup " + unique
-	new_alert["title"] = "title " + unique
+	new_alert = uniquify_alert(read_json_file("alert_rule.json"), unique)
 
 	alerter.import_alert(new_alert, folder)
 
 	result = alerter.api.alertingprovisioning.get_alertrule(unique)
-
 	assert result["data"] == new_alert["data"]
 	assert result["folderUID"] == folder["uid"]
+
+
+def test_import__just_content(rw_shared_grafana, unique):
+	"""Test that an alert with uid removed can be imported."""
+	if rw_shared_grafana[0].major_version < 9:
+		pytest.skip("Grafana does not support provisioning in version 8")
+
+	finder, alerter = (Finder(rw_shared_grafana[1]), Alerter(rw_shared_grafana[1]))
+	folder = finder.get_folder("f0")
+
+	new_alert = uniquify_alert(read_json_file("alert_rule.json"), unique)
+	del new_alert["uid"]  # The important part
+
+	alerter.import_alert(new_alert, folder)
+
+	result = finder.get_alert("f0", "title " + unique)
+	assert result["data"] == new_alert["data"]
+	assert result["folderUID"] == folder["uid"]
+
+
+def test_import__update(rw_shared_grafana, unique):
+	"""Test that importing for an existing dashboard overwrite."""
+	if rw_shared_grafana[0].major_version < 9:
+		pytest.skip("Grafana does not support provisioning in version 8")
+
+	finder, alerter = (Finder(rw_shared_grafana[1]), Alerter(rw_shared_grafana[1]))
+	folder = finder.get_folder("f0")
+	new_alert = uniquify_alert(read_json_file("alert_rule.json"), unique)
+	alerter.import_alert(new_alert, folder)
+
+	new_alert["isPaused"] = not new_alert["isPaused"]  # modify the alert
+	alerter.import_alert(new_alert, folder)
+
+	result = finder.get_alert("f0", "title " + unique)
+	assert result["isPaused"] == new_alert["isPaused"]
 
 
 def test_importexport__roundtrip(rw_shared_grafana, unique):
