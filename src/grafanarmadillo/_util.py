@@ -54,16 +54,17 @@ def project_dict(d: Dict, keys: set, inverse: bool = False) -> Dict:
 	"""
 	Select the given fields from a dictionary.
 	
-	>>> project_dict({'a': 1, 'b': 2}, set(['a']))
+	>>> project_dict({'a': 1, 'b': 2}, {'a'})
 	{'a': 1}
 
-	>>> project_dict({'a': 1, 'b': 2}, set(['a']), inverse=True)
+	>>> project_dict({'a': 1, 'b': 2}, {'a'}, inverse=True)
 	{'b': 2}
 	"""
 	return {k: v for k, v in d.items() if inverse ^ (k in keys)}
 
 
-dashboard_meta_fields = set(["id", "uid", "title"])
+dashboard_meta_fields = {"id", "uid", "title"}
+alert_rule_meta_fields = {"id", "uid", "title", "orgID", "folderUID"}
 
 
 def project_dashboard_identity(
@@ -78,6 +79,13 @@ def erase_dashboard_identity(
 ) -> Dict:
 	"""Delete the fields of a dashboard which are used for determining identity."""
 	return project_dict(dashboardlike, dashboard_meta_fields, inverse=True)
+
+
+def erase_alert_rule_identity(
+	alertlike
+) -> Dict:
+	"""Delete the fields of an alert_rule which are used for determining identity."""
+	return project_dict(alertlike, alert_rule_meta_fields, inverse=True)
 
 
 def map_json_strings(f: Callable[[str], str], obj: JSON) -> JSON:

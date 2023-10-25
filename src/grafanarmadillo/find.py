@@ -9,7 +9,7 @@ from grafanarmadillo._util import exactly_one
 from grafanarmadillo.types import DashboardSearchResult, FolderSearchResult
 
 
-class Finder(object):
+class Finder:
 	"""Collection of methods for finding Grafana dashboards and folders."""
 
 	def __init__(self, api: GrafanaApi) -> None:
@@ -76,7 +76,7 @@ class Finder(object):
 			# can support maximally ("/", "folder", "dashboard")
 			raise ValueError("Dashboard path has too many parts")
 		if PurePath(path).is_absolute() or parts[0] == "/" or parts[0] == "\\":
-			# removes optional "absolurte" signifier
+			# removes optional "absolute" signifier
 			parts = parts[1:]
 
 		if len(parts) == 2:
