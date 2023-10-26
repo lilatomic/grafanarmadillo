@@ -13,7 +13,8 @@ from grafana_client import GrafanaApi
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.waiting_utils import wait_for
 
-from grafanarmadillo._util import erase_dashboard_identity
+from grafanarmadillo._util import erase_alert_rule_identity, erase_dashboard_identity
+from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 
@@ -31,8 +32,8 @@ class GrafanaContainer(DockerContainer):
 
 	def __init__(
 		self,
-		image,
-		port=_PORT,
+		image: str,
+		port: int = _PORT,
 		admin_user: str = _ADMIN_USER,
 		admin_password: str = _ADMIN_PASSWORD,
 		config_overrides: Dict[str, Dict[str, Any]] = None,
@@ -73,6 +74,12 @@ class GrafanaContainer(DockerContainer):
 	def api(self):
 		return self.url + "api/"
 
+	@property
+	def major_version(self):
+		tag = self.image.split(':')[1]
+		major = tag.split('.')[0]
+		return int(major)
+
 	def start(self):
 		ret = super().start()
 		wait_for(self._try_connecting)
@@ -93,11 +100,18 @@ def create_dashboard(gfn: GrafanaApi, name, folderId=0):
 	)
 
 
+def create_alert(gfn: GrafanaApi, name, folderId=0):
+	alert_rule = read_json_file("alert_rule.json")
+	alert_rule = erase_alert_rule_identity(alert_rule)
+	alert_rule["title"] = name
+	return gfn.alertingprovisioning.create_alertrule(alert_rule)
+
+
 def create_folder(gfn: GrafanaApi, name, uid=None):
 	return gfn.folder.create_folder(name, uid)
 
 
-@pytest.fixture(scope="module", params=["8.5.27", "9.5.7", "10.0.3"])
+@pytest.fixture(scope="module", params=["8.5.27", "9.5.13", "10.1.5"])
 def grafana_image(request):
 	yield f"grafana/grafana:{request.param}"
 
@@ -178,6 +192,13 @@ def mk_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaApi]:
 
 		create_folder(gfn, "f0_similar")
 
+		if gfn_ctn.major_version >= 9:
+			# alert provisioning was introduced only with Grafana 9
+			assert f0["title"] == "f0"
+			alert = read_json_file("alert_rule.json")
+			alert["folderUID"] = f0["uid"]
+			gfn.alertingprovisioning.create_alertrule(alert)
+
 		yield gfn_ctn, gfn
 
 
@@ -187,8 +208,13 @@ def ro_dashboarder(ro_demo_grafana) -> Dashboarder:
 
 
 @pytest.fixture
-def ro_finder(ro_demo_grafana) -> Dashboarder:
+def ro_finder(ro_demo_grafana) -> Finder:
 	return Finder(ro_demo_grafana[1])
+
+
+@pytest.fixture
+def ro_alerter(ro_demo_grafana) -> Alerter:
+	return Alerter(ro_demo_grafana[1])
 
 
 # Marks container tests
@@ -205,7 +231,7 @@ def pytest_collection_modifyitems(items):
 			item.add_marker("containertest")
 
 
-@pytest.fixture()
+@pytest.fixture(scope="function")
 def unique():
 	import uuid
 

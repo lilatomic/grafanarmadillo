@@ -1,13 +1,6 @@
 """Type hints for Grafana interaction."""
 
-import sys
-
-
-if (sys.version_info[0] == 3) and (sys.version_info[1] in [6, 7]):
-	from typing import NewType, Optional
-	from typing_extensions import TypedDict
-else:
-	from typing import NewType, Optional, TypedDict
+from typing import NewType, Optional, TypedDict
 
 
 UID = NewType("UID", str)
@@ -24,7 +17,19 @@ class DashboardSearchResult(TypedDict):
 	folderTitle: Optional[str]
 
 
+class AlertSearchResult(TypedDict):
+	"""Relevant keys returned for an alert."""
+
+	id: int
+	uid: UID
+	orgID: int
+	folderUID: UID
+	ruleGroup: str
+	title: str
+
+
 DashboardContent = NewType("DashboardContent", dict)
+AlertContent = NewType("AlertContent", dict)
 DashboardMeta = NewType("DashboardMeta", dict)
 
 
@@ -36,6 +41,5 @@ class Dashboard(TypedDict):
 
 
 DashboardPanel = NewType("DashboardPanel", dict)
-
 
 FolderSearchResult = NewType("Folder", dict)

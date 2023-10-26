@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* feature : add Python 3.12 support
+* deprecated : drop Python 3.7 support
+
 v0.1.0 (2023-08-09)
 ------------------------------------------------------------
 

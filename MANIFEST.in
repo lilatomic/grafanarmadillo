@@ -7,6 +7,7 @@ include LICENSE
 exclude .appveyor.yml
 exclude .bumpversion.cfg
 exclude .coveragerc
+exclude codecov.yml
 exclude .cookiecutterrc
 exclude .editorconfig
 exclude .readthedocs.yml

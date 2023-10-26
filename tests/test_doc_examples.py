@@ -9,6 +9,7 @@ from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator
 from tests.conftest import read_json_file
+from tests.usage.alerting import export_alert, import_alert
 from tests.usage.dashboarding import (
 	clone_dashboard_contents,
 	export_dashboard,
@@ -43,13 +44,13 @@ def test_usage_dashboard_import(rw_shared_grafana, unique):
 def test_usage_dashboard_clone(rw_shared_grafana, unique):
 	gfn: GrafanaApi = rw_shared_grafana[1]
 	dashboarder = Dashboarder(gfn)
-	folder = gfn.folder.create_folder(f"f{unique}")
+	folder = gfn.folder.create_folder(f"f {unique}")
 	dashboard = gfn.dashboard.update_dashboard(
 		{"dashboard": {"title": unique, "panels": []}, "folderUid": folder["uid"]}
 	)
 	assert len(dashboarder.get_dashboard_content(dashboard)["panels"]) == 0
 
-	clone_dashboard_contents(gfn, "/General/0", f"/f{unique}/{unique}")
+	clone_dashboard_contents(gfn, "/General/0", f"/f {unique}/{unique}")
 
 	result = dashboarder.get_dashboard_content(dashboard)
 	assert len(result["panels"]) == 1
@@ -83,10 +84,41 @@ def test_usage_templating__findreplace():
 
 	template = template_maker.make_template_from_dashboard(content)
 
-	print(template)
-
 	assert template["title"] == "$deployment_id - $env"
 
 	dashboard = dashboard_maker.make_dashboard_from_template({}, template)
 
 	assert dashboard["title"] == "1337 - prod"
+
+
+def test_usage_alerting__import(rw_shared_grafana, unique):
+	if rw_shared_grafana[0].major_version < 9:
+		pytest.skip("Grafana does not support provisioning in version 8")
+
+	gfn: GrafanaApi = rw_shared_grafana[1]
+	finder = Finder(gfn)
+	gfn.folder.create_folder(unique)
+
+	folder = finder.get_folder(unique)
+	with open(os.path.join("tests", "alert_rule.json"), "r") as template:
+		template = json.loads(template.read())
+		template["uid"] = unique
+		del template["id"]
+
+	import_alert(gfn, folder, template)
+
+	assert finder.get_alert(folder_name=unique, alert_name=template["title"])
+
+
+def test_usage_alerting__export(rw_shared_grafana, unique):
+	if rw_shared_grafana[0].major_version < 9:
+		pytest.skip("Grafana does not support provisioning in version 8")
+
+	gfn: GrafanaApi = rw_shared_grafana[1]
+	out = io.StringIO()
+
+	export_alert(gfn, "f0", "a0", out)
+
+	out.seek(0)
+	exported = json.loads(out.read())
+	assert exported["title"] == "a0"
