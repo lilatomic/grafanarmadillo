@@ -194,7 +194,10 @@ def mk_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaApi]:
 
 		if gfn_ctn.major_version >= 9:
 			# alert provisioning was introduced only with Grafana 9
-			gfn.alertingprovisioning.create_alertrule(read_json_file("alert_rule.json"))
+			assert f0["title"] == "f0"
+			alert = read_json_file("alert_rule.json")
+			alert["folderUID"] = f0["uid"]
+			gfn.alertingprovisioning.create_alertrule(alert)
 
 		yield gfn_ctn, gfn
 

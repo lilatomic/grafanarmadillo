@@ -20,7 +20,7 @@ Most modules will depend on a GrafanaApi instance.
 Finding Things
 ==============
 
-``grafanarmadillo`` can be used to find your things in Grafana, such as dashboards and folders.
+``grafanarmadillo`` can be used to find your things in Grafana, such as alerts and dashboards and folders.
 
 .. code:: python
 
@@ -36,7 +36,10 @@ Finding Things
 	finder.get_dashboard("Folder", "Dashboard")
 
 	# get a dashboard by its path
-	finder.get_dashboard("/Folder/Dashboard")
+	finder.get_from_path("/Folder/Dashboard")
+
+	# get an alert by its folder and name
+	finder.get_alert("Folder", "Alert")
 
 
 Importing and Exporting
@@ -47,7 +50,10 @@ Importing and Exporting
 .. literalinclude:: ../../tests/usage/dashboarding.py
 	:language: python
 
+``grafanarmadillo`` can similarly be used to import and export Grafana alerts.
 
+.. literalinclude:: ../../tests/usage/alerting.py
+	:language: python
 
 Templating
 ==========
