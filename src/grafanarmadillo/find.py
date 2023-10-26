@@ -104,6 +104,11 @@ class Finder:
 		folder, dashboard = self._resolve_path(path)
 		return self.get_dashboard(folder, dashboard)
 
+	def get_alert_from_path(self, path) -> AlertSearchResult:
+		"""Get an alert from a string path like `/folder0/alert0`."""
+		folder, alert = self._resolve_path(path)
+		return self.get_alert(folder, alert)
+
 	def create_or_get_dashboard(
 		self, path: str
 	) -> Tuple[DashboardSearchResult, Optional[FolderSearchResult]]:
@@ -131,3 +136,29 @@ class Finder:
 			)
 
 		return dashboard, folder
+
+	def create_or_get_alert(self, path: str) -> Tuple[AlertSearchResult, FolderSearchResult]:
+		"""
+		Get the information about an alert, or fake the metadata if it does not.
+
+		Creating an "empty" alert in Grafana requires filling in much more data than an empty dashboard,
+		including at least 1 rule.
+		We can fake that with a `math` rule that always returns 0,
+		but that's a lot of garbage data to inject.
+		"""
+		folder_name, alert_name = self._resolve_path(path)
+
+		try:
+			folder = self.get_folder(folder_name)
+		except ValueError:
+			folder = self.api.folder.create_folder(folder_name)
+
+		try:
+			alert = self.get_alert(folder_name, alert_name)
+		except ValueError:
+			alert = {
+				"folderUID": folder["uid"],
+				"title": alert_name
+			}
+
+		return alert, folder
