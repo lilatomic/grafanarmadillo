@@ -28,7 +28,7 @@ def test_cli__import_dashboard(cli_config, rw_shared_grafana):
 	runner = CliRunner()
 	dashboard_path = "/f-c0/d-c0"
 	result = runner.invoke(grafanarmadillo, ["--cfg", json.dumps(cli_config), "dashboard", "import", "--src", "tests/dashboard.json", "--dst",
-											 dashboard_path, "--src-env", "template", "--dst-env", "prd", "--mapping", "file://tests/cli/mapping.json"])
+											 dashboard_path, "--env-template", "template", "--env-grafana", "prd", "--mapping", "file://tests/cli/mapping.json"])
 	assert result.exit_code == 0
 
 	gfn = rw_shared_grafana[1]
@@ -41,7 +41,7 @@ def test_cli__import_dashboard(cli_config, rw_shared_grafana):
 def test_cli__export_dashboard(cli_config, rw_shared_grafana, tmp_path):
 	runner = CliRunner()
 	template_path = tmp_path / "dashboard.json"
-	result = runner.invoke(grafanarmadillo, ["--cfg", json.dumps(cli_config), "dashboard", "export", "--src", "/f0/f0-0", "--dst", template_path, "--src-env", "stg", "--dst-env", "template", "--mapping", "file://tests/cli/mapping.json"])
+	result = runner.invoke(grafanarmadillo, ["--cfg", json.dumps(cli_config), "dashboard", "export", "--src", "/f0/f0-0", "--dst", template_path, "--env-grafana", "stg", "--env-template", "template", "--mapping", "file://tests/cli/mapping.json"])
 	assert result.exit_code == 0
 
 	with template_path.open(mode="r") as template_file:
@@ -54,7 +54,7 @@ def test_cli__import_alert(cli_config, rw_shared_grafana):
 
 	runner = CliRunner()
 	alert_path = "/f-c0/a-c0"
-	result = runner.invoke(grafanarmadillo, ["--cfg", json.dumps(cli_config), "alert", "import", "--src", "tests/alert_rule.json", "--dst", alert_path, "--src-env", "template", "--dst-env", "prd", "--mapping", "file://tests/cli/mapping.json"])
+	result = runner.invoke(grafanarmadillo, ["--cfg", json.dumps(cli_config), "alert", "import", "--src", "tests/alert_rule.json", "--dst", alert_path, "--env-template", "template", "--env-grafana", "prd", "--mapping", "file://tests/cli/mapping.json"])
 	assert result.exit_code == 0
 
 	gfn = rw_shared_grafana[1]
@@ -69,10 +69,8 @@ def test_cli__export_alert(cli_config, rw_shared_grafana, tmp_path):
 
 	runner = CliRunner()
 	template_path = tmp_path / "alert.json"
-	result = runner.invoke(grafanarmadillo, ["--cfg", json.dumps(cli_config), "alert", "export", "--src", "/f0/a0", "--dst", template_path, "--src-env", "stg", "--dst-env", "template", "--mapping", "file://tests/cli/mapping.json"])
-	print(rw_shared_grafana[1].alertingprovisioning.get_alertrules_all())
+	result = runner.invoke(grafanarmadillo, ["--cfg", json.dumps(cli_config), "alert", "export", "--src", "/f0/a0", "--dst", template_path, "--env-grafana", "stg", "--env-template", "template", "--mapping", "file://tests/cli/mapping.json"])
 	if result.exit_code != 0:
-		print(f">>>{result.stdout}")
 		pytest.fail(result.output)
 
 	with template_path.open(mode="r") as template_file:

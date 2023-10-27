@@ -1,5 +1,4 @@
 """Ready-to-run commands for common Grafana templating scenarios"""
-# TODO: rename src_env and dst_env to grafana_env and template_env
 import json
 from pathlib import Path
 from typing import NewType, Dict, Union, Literal
@@ -66,20 +65,25 @@ def dashboard():
 	"""Manage Grafana dashboards"""
 
 
+mapping_help = """Mapping of values to findreplace in the template. The type should be a mapping of environment names (like 'template' or 'production') to dicts of replacements (for example, `{"region": "SouthWest"}`). Should be encoded as json. You can pass this in as a string; or as file using 'file://path/to/file'"""
+env_grafana_help = "Name of the environment in the mapping file for Grafana, found in the `--mapping` argument"
+env_template_help = "Name of the environment in the mapping file for the template, found in the `--mapping` argument"
+
+
 @dashboard.command(name="export")
 @click.option("--src", help="Path to the dashboard to capture")
 @click.option("--dst", help="Path to write the dashboard to", type=click.File('w'))
-@click.option("--mapping", help="Mapping of values to findreplace in the template")
-@click.option("--src-env", help="Name of the environment for the source")
-@click.option("--dst-env", help="Name of the environment for the destination")
+@click.option("--mapping", help=mapping_help)
+@click.option("--env-grafana", help=env_grafana_help)
+@click.option("--env-template", help=env_template_help)
 @click.pass_context
-def export_dashboard(ctx, src, dst, mapping, src_env, dst_env):
+def export_dashboard(ctx, src, dst, mapping, env_grafana, env_template):
 	"""Capture a dashboard from Grafana"""
 	gfn = make_grafana(ctx.obj["cfg"])
 	finder, dashboarder = Finder(gfn), Dashboarder(gfn)
 
 	mapping = load_data(mapping)
-	templator = make_mapping_templator(mapping, src_env, dst_env)
+	templator = make_mapping_templator(mapping, env_grafana, env_template)
 
 	dashboard_info = finder.get_from_path(src)
 	dashboard_content, _ = dashboarder.export_dashboard(dashboard_info)
@@ -91,21 +95,20 @@ def export_dashboard(ctx, src, dst, mapping, src_env, dst_env):
 @dashboard.command(name="import")
 @click.option("--src", help="Path of the template", type=click.File('r'))
 @click.option("--dst", help="Path to write the dashboard to")
-@click.option("--mapping", help="Mapping of values to findreplace in the template")
-@click.option("--src-env", help="Name of the environment for the source")
-@click.option("--dst-env", help="Name of the environment for the destination")
+@click.option("--mapping", help=mapping_help)
+@click.option("--env-grafana", help=env_grafana_help)
+@click.option("--env-template", help=env_template_help)
 @click.pass_context
-def import_dashboard(ctx, src, dst, mapping, src_env, dst_env):
+def import_dashboard(ctx, src, dst, mapping, env_grafana, env_template):
 	"""Deploy a template to Grafana"""
 	gfn = make_grafana(ctx.obj["cfg"])
 	finder, dashboarder = Finder(gfn), Dashboarder(gfn)
 
 	mapping = load_data(mapping)
-	templator = make_mapping_templator(mapping, dst_env, src_env)
+	templator = make_mapping_templator(mapping, env_grafana, env_template)
 	template = load_data(src.read())
 
 	dashboard_info, folder = finder.create_or_get_dashboard(dst)
-	print(f"{dashboard_info=}")
 	dashboard = templator.make_dashboard_from_template(dashboard_info, template)
 	dashboarder.import_dashboard(dashboard, folder)
 
@@ -118,17 +121,17 @@ def alert():
 @alert.command(name="export")
 @click.option("--src", help="Path to the alert to capture")
 @click.option("--dst", help="Path to write the alert to", type=click.File('w'))
-@click.option("--mapping", help="Mapping of values to findreplace in the template")
-@click.option("--src-env", help="Name of the environment for the source")
-@click.option("--dst-env", help="Name of the environment for the destination")
+@click.option("--mapping", help=mapping_help)
+@click.option("--env-grafana", help=env_grafana_help)
+@click.option("--env-template", help=env_template_help)
 @click.pass_context
-def export_alert(ctx, src, dst, mapping, src_env, dst_env):
+def export_alert(ctx, src, dst, mapping, env_grafana, env_template):
 	"""Capture an alert from Grafana"""
 	gfn = make_grafana(ctx.obj["cfg"])
 	finder, alerter = Finder(gfn), Alerter(gfn)
 
 	mapping = load_data(mapping)
-	templator = make_mapping_templator(mapping, src_env, dst_env)
+	templator = make_mapping_templator(mapping, env_grafana, env_template)
 
 	alert_info = finder.get_alert_from_path(src)
 	alert, _ = alerter.export_alert(alert_info)
@@ -140,17 +143,17 @@ def export_alert(ctx, src, dst, mapping, src_env, dst_env):
 @alert.command(name="import")
 @click.option("--src", help="Path of the template", type=click.File('r'))
 @click.option("--dst", help="Path to write the dashboard to")
-@click.option("--mapping", help="Mapping of values to findreplace in the template")
-@click.option("--src-env", help="Name of the environment for the source")
-@click.option("--dst-env", help="Name of the environment for the destination")
+@click.option("--mapping", help=mapping_help)
+@click.option("--env-grafana", help=env_grafana_help)
+@click.option("--env-template", help=env_template_help)
 @click.pass_context
-def import_alert(ctx, src, dst, mapping, src_env, dst_env):
+def import_alert(ctx, src, dst, mapping, env_grafana, env_template):
 	"""Deploy an alert from a template"""
 	gfn = make_grafana(ctx.obj["cfg"])
 	finder, alerter = Finder(gfn), Alerter(gfn)
 
 	mapping = load_data(mapping)
-	templator = make_mapping_templator(mapping, dst_env, src_env)
+	templator = make_mapping_templator(mapping, env_grafana, env_template)
 	template = load_data(src.read())
 
 	alert_info, folder_info = finder.create_or_get_alert(dst)
