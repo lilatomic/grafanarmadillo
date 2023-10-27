@@ -14,7 +14,7 @@ from grafanarmadillo.types import (
 
 
 def _query_message(query_type: str, query: str) -> str:
-	"""Format a message detailing the query"""
+	"""Format a message detailing the query."""
 	return f"type={query_type}, query={query}"
 
 
@@ -59,8 +59,8 @@ class Finder:
 			search_result = self.api.search.search_dashboards(query=name, type_="dash-folder")
 			return exactly_one(
 				list(filter(
-						lambda x: x["title"] == name,
-						map(lambda sr: self.api.folder.get_folder(sr["uid"]), search_result),
+					lambda x: x["title"] == name,
+					map(lambda sr: self.api.folder.get_folder(sr["uid"]), search_result),
 				)),
 				_query_message("folder", name),
 			)
@@ -84,8 +84,8 @@ class Finder:
 
 		return exactly_one(
 			list(filter(
-			lambda a: a["title"] == alert_name and a["folderUID"] == folder_uid,
-			self.api.alertingprovisioning.get_alertrules_all()
+				lambda a: a["title"] == alert_name and a["folderUID"] == folder_uid,
+				self.api.alertingprovisioning.get_alertrules_all()
 			)),
 			_query_message("alert", f"/{folder_name}/{alert_name}")
 		)

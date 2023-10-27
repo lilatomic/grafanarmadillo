@@ -203,7 +203,7 @@ def mk_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaApi]:
 			assert f0["title"] == "f0"
 			alert = read_json_file("alert_rule.json")
 			alert["folderUID"] = f0["uid"]
-			alert["uid"] = str(uuid.uuid4()) # make this instance of the dashboard unique
+			alert["uid"] = str(uuid.uuid4())  # make this instance of the dashboard unique
 			gfn.alertingprovisioning.create_alertrule(alert)
 
 		yield gfn_ctn, gfn

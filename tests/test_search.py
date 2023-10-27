@@ -164,15 +164,16 @@ def test_create_or_get__existing_folder_new_alert(rw_shared_grafana, unique):
 	assert r_alert is not None and r_folder is not None
 	assert r_alert["folderUID"] == r_folder["uid"], "alert did not have parent folder's UID"
 
-	r = f.get_folder(f"f0")
+	r = f.get_folder("f0")
 	assert r["uid"] == r_folder["uid"]
+
 
 def test_create_or_get__existing_folder_and_alert(rw_shared_grafana, unique):
 	if rw_shared_grafana[0].major_version < 9:
 		pytest.skip("Grafana does not support provisioning in version 8")
 
 	f = Finder(rw_shared_grafana[1])
-	path = f"/f0/a0"
+	path = "/f0/a0"
 
 	r_alert, r_folder = f.create_or_get_alert(path)
 
