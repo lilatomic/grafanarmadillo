@@ -103,7 +103,7 @@ def test_usage_alerting__import(rw_shared_grafana, unique):
 	with open(os.path.join("tests", "alert_rule.json"), "r") as template:
 		template = json.loads(template.read())
 		template["uid"] = unique
-		del template["id"]
+		template.pop("id", None)
 
 	import_alert(gfn, folder, template)
 

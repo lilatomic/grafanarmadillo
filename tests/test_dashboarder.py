@@ -104,8 +104,8 @@ def test_importexport__roundtrip_no_folder(rw_shared_grafana, unique):
 	dashboard_search_result = finder.get_dashboard("General", unique)
 	exported, folder = dashboarder.export_dashboard(dashboard_search_result)
 
-	del exported["id"]
-	del new_dashboard["id"]
+	exported.pop("id", None)
+	new_dashboard.pop("id", None)
 	assert exported == new_dashboard
 	assert folder is None
 
@@ -126,8 +126,8 @@ def test_importexport__roundtrip_subfolder(rw_shared_grafana, unique):
 		dashboard_search_result
 	)
 
-	del exported_dashboard["id"]
-	del new_dashboard["id"]
+	exported_dashboard.pop("id", None)
+	new_dashboard.pop("id", None)
 	assert exported_dashboard == new_dashboard
 
 	assert target_folder["uid"] == exported_folder["uid"]

@@ -4,6 +4,7 @@ import platform
 import random
 import socket
 import string
+import uuid
 from collections import defaultdict
 from typing import Any, Dict, Tuple
 
@@ -89,6 +90,11 @@ class GrafanaContainer(DockerContainer):
 def read_json_file(filename: str):
 	with open(os.path.join("tests", filename), "r") as f:
 		return json.load(f)
+
+
+def requires_alerting(rw_shared_grafana):
+	if rw_shared_grafana[0].major_version < 9:
+		pytest.skip("Grafana does not support provisioning in version 8")
 
 
 def create_dashboard(gfn: GrafanaApi, name, folderId=0):
@@ -197,6 +203,7 @@ def mk_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaApi]:
 			assert f0["title"] == "f0"
 			alert = read_json_file("alert_rule.json")
 			alert["folderUID"] = f0["uid"]
+			alert["uid"] = str(uuid.uuid4()) # make this instance of the dashboard unique
 			gfn.alertingprovisioning.create_alertrule(alert)
 
 		yield gfn_ctn, gfn
@@ -233,6 +240,4 @@ def pytest_collection_modifyitems(items):
 
 @pytest.fixture(scope="function")
 def unique():
-	import uuid
-
 	yield str(uuid.uuid4())
