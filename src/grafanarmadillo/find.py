@@ -127,13 +127,14 @@ class Finder:
 		try:
 			dashboard = self.get_dashboard(folder_name, dashboard_name)
 		except ValueError:
-			dashboard = self.api.dashboard.update_dashboard(
+			self.api.dashboard.update_dashboard(
 				{
 					"dashboard": {"title": dashboard_name},
 					"folderId": folder["id"],
 					"folderUid": folder["uid"],
 				}
 			)
+			dashboard = self.get_dashboard(folder_name, dashboard_name)
 
 		return dashboard, folder
 
