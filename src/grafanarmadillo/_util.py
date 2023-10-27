@@ -29,7 +29,7 @@ def flat_map(f, xs):
 	return ys
 
 
-def exactly_one(items: List[A]) -> A:
+def exactly_one(items: List[A], message: str = None) -> A:
 	"""
 	Throws if list does not contain exactly 1 item.
 	
@@ -38,17 +38,17 @@ def exactly_one(items: List[A]) -> A:
 
 	>>> exactly_one([1,2])
 	Traceback (most recent call last):
-	ValueError: expected exactly 1 item, found=2
+	ValueError: expected exactly 1 item, found=2 message=None
 
 	>>> exactly_one([])
 	Traceback (most recent call last):
-	ValueError: expected exactly 1 item, found=0
+	ValueError: expected exactly 1 item, found=0 message=None
 
 	"""
 	if len(items) == 1:
 		return items[0]
 	else:
-		raise ValueError(f"expected exactly 1 item, found={len(items)}")
+		raise ValueError(f"expected exactly 1 item, found={len(items)} {message=}")
 
 
 def project_dict(d: Dict, keys: set, inverse: bool = False) -> Dict:

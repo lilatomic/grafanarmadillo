@@ -13,6 +13,11 @@ from grafanarmadillo.types import (
 )
 
 
+def _query_message(query_type: str, query: str) -> str:
+	"""Format a message detailing the query"""
+	return f"type={query_type}, query={query}"
+
+
 class Finder:
 	"""Collection of methods for finding Grafana dashboards and folders."""
 
@@ -53,12 +58,11 @@ class Finder:
 		else:
 			search_result = self.api.search.search_dashboards(query=name, type_="dash-folder")
 			return exactly_one(
-				list(
-					filter(
+				list(filter(
 						lambda x: x["title"] == name,
 						map(lambda sr: self.api.folder.get_folder(sr["uid"]), search_result),
-					)
-				)
+				)),
+				_query_message("folder", name),
 			)
 
 	def get_dashboard(self, folder_name, dashboard_name) -> DashboardSearchResult:
@@ -69,16 +73,22 @@ class Finder:
 		"""
 		folder_object = self.get_folder(folder_name)
 		dashboards = self._enumerate_dashboards_in_folders([str(folder_object["id"])])
-		return exactly_one(list(filter(lambda d: d["title"] == dashboard_name, dashboards)))
+		return exactly_one(
+			list(filter(lambda d: d["title"] == dashboard_name, dashboards)),
+			_query_message("dashboard", f"/{folder_name}/{dashboard_name}"),
+		)
 
 	def get_alert(self, folder_name, alert_name) -> AlertSearchResult:
 		"""Get an alert by its parent folder and alert name."""
 		folder_uid = self.get_folder(folder_name)["uid"]
 
-		return exactly_one(list(filter(
+		return exactly_one(
+			list(filter(
 			lambda a: a["title"] == alert_name and a["folderUID"] == folder_uid,
 			self.api.alertingprovisioning.get_alertrules_all()
-		)))
+			)),
+			_query_message("alert", f"/{folder_name}/{alert_name}")
+		)
 
 	@staticmethod
 	def _resolve_path(path) -> Tuple[str, str]:
