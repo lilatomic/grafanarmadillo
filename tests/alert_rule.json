@@ -55,5 +55,9 @@
 	"noDataState": "NoData",
 	"execErrState": "Error",
 	"for": "5m",
+	"labels": {
+		"l0": "$tag0",
+		"l1": "Deployed"
+	},
 	"isPaused": false
 }
