@@ -5,7 +5,7 @@ from click.testing import CliRunner
 
 from grafanarmadillo.cmd import grafanarmadillo
 from grafanarmadillo.find import Finder
-from tests.conftest import requires_alerting
+from tests.conftest import requires_alerting, read_json_file
 
 
 @pytest.fixture
@@ -80,8 +80,7 @@ def test_cli__export_dashboard(cli_config, rw_shared_grafana, tmp_path):
 	)
 	assert result.exit_code == 0
 
-	with template_path.open(mode="r") as template_file:
-		template = json.loads(template_file.read())
+	template = read_json_file(template_path)
 	assert "$tag1" in template["tags"], "templating didn't replace the tag"
 
 
@@ -145,6 +144,5 @@ def test_cli__export_alert(cli_config, rw_shared_grafana, tmp_path):
 	if result.exit_code != 0:
 		pytest.fail(result.output)
 
-	with template_path.open(mode="r") as template_file:
-		template = json.loads(template_file.read())
+	template = read_json_file(template_path)
 	assert "$tag1" in template["labels"].values()

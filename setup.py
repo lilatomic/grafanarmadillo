@@ -44,7 +44,7 @@ setup(
 		"Discussion Forum": "https://github.com/lilatomic/grafanarmadillo/discussions",
 	},
 	keywords=[],
-	python_requires=">=3.6, <4",
+	python_requires=">=3.8, <4",
 	install_requires=["grafana-client~=3.0", "typing-extensions~=3.0;python_version<'3.8'"],
 	extras_require={'cli': ["click>8"]},
 	setup_requires=[

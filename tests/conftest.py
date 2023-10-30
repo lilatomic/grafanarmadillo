@@ -6,7 +6,8 @@ import socket
 import string
 import uuid
 from collections import defaultdict
-from typing import Any, Dict, Tuple
+from pathlib import Path
+from typing import Any, Dict, Tuple, Union
 
 import pytest
 import requests
@@ -87,8 +88,13 @@ class GrafanaContainer(DockerContainer):
 		return ret
 
 
-def read_json_file(filename: str):
-	with open(os.path.join("tests", filename), "r") as f:
+def read_json_file(filename: Union[str, Path]):
+	if isinstance(filename, str):
+		filename = Path(filename)
+
+	if not filename.is_absolute():
+		filename = Path.cwd() / "tests" / filename
+	with filename.open("r") as f:
 		return json.load(f)
 
 
