@@ -1,7 +1,7 @@
 Authors
 =======
 
-* Lilatomic (`webpage <https://www.lilatomic.ca>`_, `lilatomic_github <https://github.com/lilatomic/>`_)
+* Lilatomic (`lilatomic_webpage <https://www.lilatomic.ca>`_, `lilatomic_github <https://github.com/lilatomic/>`_)
 
 Template
 --------

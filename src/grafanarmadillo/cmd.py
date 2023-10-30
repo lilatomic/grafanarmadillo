@@ -1,6 +1,5 @@
 """Ready-to-run commands for common Grafana templating scenarios."""
 import json
-import urllib.parse
 from pathlib import Path
 from typing import Dict, Literal, NewType, Union
 
@@ -47,7 +46,7 @@ def make_mapping_templator(mapping: EnvMapping, env_grafana: str, env_template: 
 	if missing:
 		raise ValueError(f"Some keys in the source mapping are not present in the destination mapping. {missing=}")
 
-	grafana_to_template = {v:  mapping_template[k] for k, v in mapping_grafana.items()}
+	grafana_to_template = {v: mapping_template[k] for k, v in mapping_grafana.items()}
 	template_to_grafana = {v: k for k, v in grafana_to_template.items()}
 
 	return Templator(make_template=findreplace(grafana_to_template), fill_template=findreplace(template_to_grafana))

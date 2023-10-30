@@ -5,7 +5,7 @@ from click.testing import CliRunner
 
 from grafanarmadillo.cmd import grafanarmadillo
 from grafanarmadillo.find import Finder
-from tests.conftest import requires_alerting, read_json_file
+from tests.conftest import read_json_file, requires_alerting
 
 
 @pytest.fixture

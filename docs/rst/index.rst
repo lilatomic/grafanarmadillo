@@ -8,6 +8,7 @@ Contents
    readme
    installation
    usage
+   cli
    contributing
    reference/index
    changelog
