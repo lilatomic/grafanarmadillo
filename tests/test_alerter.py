@@ -7,7 +7,7 @@ from tests.conftest import read_json_file
 
 
 def uniquify_alert(alert, unique):
-	del alert["id"]
+	alert.pop("id", None)
 	alert["uid"] = unique
 	alert["ruleGroup"] = "ruleGroup " + unique
 	alert["title"] = "title " + unique
@@ -78,10 +78,7 @@ def test_importexport__roundtrip(rw_shared_grafana, unique):
 	target_folder = finder.get_folder(folder_name)
 
 	new_alert = read_json_file("alert_rule.json")
-	del new_alert["id"]
-	new_alert["uid"] = unique
-	new_alert["ruleGroup"] = "ruleGroup " + unique
-	new_alert["title"] = "title " + unique
+	new_alert = uniquify_alert(new_alert, unique)
 
 	alerter.import_alert(new_alert, target_folder)
 

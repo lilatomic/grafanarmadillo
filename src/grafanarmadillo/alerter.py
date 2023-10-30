@@ -21,6 +21,7 @@ class Alerter:
 		content = content.copy()
 		# set the folder in case it isn't, which would happen if the metadata was scrubbed from the alert content
 		content["folderUID"] = folder["uid"]
+		content.pop("id", None)
 
 		try:
 			if "uid" in content:

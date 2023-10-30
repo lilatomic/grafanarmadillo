@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* feature : find, template, import, and export alerts
+* feature : helpful CLI to do the most common task
 * feature : add Python 3.12 support
 * deprecated : drop Python 3.7 support
 

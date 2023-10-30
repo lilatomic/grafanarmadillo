@@ -1,0 +1,17 @@
+{
+	"template": {
+		"v0": "$v0",
+		"my_tag": "$tag0",
+		"other_tag": "$tag1"
+	},
+	"stg": {
+		"v0": "v0",
+		"my_tag": "STG",
+		"other_tag": "Deployed"
+	},
+	"prd": {
+		"v0": "v0-prd",
+		"my_tag": "PRD",
+		"other_tag": "Deployed"
+	}
+}

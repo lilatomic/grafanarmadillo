@@ -44,6 +44,7 @@ class Dashboarder(object):
 		self, content: DashboardContent, folder: Optional[FolderSearchResult] = None
 	):
 		"""Import a dashboard into Grafana, optionally into a folder."""
+		content.pop("id", None)
 		new_dashboard = {"dashboard": content, "overwrite": True}
 		if folder:
 			new_dashboard.update({"folderUid": folder["uid"], "folderId": folder["id"]})

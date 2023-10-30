@@ -1,6 +1,7 @@
 import io
 import json
 import os
+import subprocess
 
 import pytest
 from grafana_client import GrafanaApi
@@ -103,7 +104,7 @@ def test_usage_alerting__import(rw_shared_grafana, unique):
 	with open(os.path.join("tests", "alert_rule.json"), "r") as template:
 		template = json.loads(template.read())
 		template["uid"] = unique
-		del template["id"]
+		template.pop("id", None)
 
 	import_alert(gfn, folder, template)
 
@@ -122,3 +123,26 @@ def test_usage_alerting__export(rw_shared_grafana, unique):
 	out.seek(0)
 	exported = json.loads(out.read())
 	assert exported["title"] == "a0"
+
+
+def test_usage_cli(rw_shared_grafana, unique):
+	finder = Finder(rw_shared_grafana[1])
+	finder.create_or_get_dashboard("/dev/MySystem TEST")
+
+	grafanarmadillo_cfg = read_json_file("usage/grafana_cfg.json")
+	# change to settings from our ephemeral container
+	grafana_container_config = rw_shared_grafana[0].conf
+	grafanarmadillo_cfg["port"] = grafana_container_config["server"]["http_port"]
+	grafanarmadillo_cfg["auth"] = [
+		grafana_container_config["security"]["admin_user"],
+		grafana_container_config["security"]["admin_password"],
+	]
+	env_cfg = os.environ.copy()
+	env_cfg["grafanarmadillo_cfg"] = json.dumps(grafanarmadillo_cfg)
+
+	subprocess.run(["bash", "cli_export.bash"], cwd="tests/usage/", check=True, env=env_cfg, capture_output=True)
+	subprocess.run(["bash", "cli_import.bash"], cwd="tests/usage/", check=True, env=env_cfg, capture_output=True)
+
+	for deployment in ["east", "west", "north"]:
+		dashboard = finder.get_dashboard(deployment, "my_system")
+		assert dashboard

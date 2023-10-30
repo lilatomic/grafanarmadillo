@@ -1,0 +1,22 @@
+{
+	"template": {
+		"deployment_name": "$deployment_name",
+		"deployment_id": "$deployment_id"
+	},
+	"dev": {
+		"deployment_name": "TEST",
+		"deployment_id": "dev"
+	},
+	"east": {
+		"deployment_name": "East Deployment",
+		"deployment_id": "0"
+	},
+	"west": {
+		"deployment_name": "West Deployment",
+		"deployment_id": "1"
+	},
+	"north": {
+		"deployment_name": "North Deployment",
+		"deployment_id": "2"
+	}
+}

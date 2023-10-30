@@ -99,9 +99,6 @@ With *Tox*, the testing setup can be defined in a configuration file, the `tox.i
 
     pip install tox
 
-
-One of the greatest advantages of using Tox together with the :ref:`src layout<The src layout>` is that unittest actually perform on the installed source (our package) inside an isolated deployment environment. In order words, tests are performed in an environment simulating a post-installation state instead of a pre-deploy/development environment. Under this setup, there is no need, in general cases, to distribute test scripts along with the actual source, in my honest opinion - see `MANIFEST.in`_.
-
 Before creating a Pull Request from your branch, certify that all the tests pass correctly by running:
 
 ::
