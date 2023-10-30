@@ -3,6 +3,7 @@
 """Setup dot py."""
 from __future__ import absolute_import, print_function
 
+import re
 # import re
 from glob import glob
 from os.path import basename, dirname, join, splitext
@@ -20,6 +21,7 @@ def read(*names, **kwargs):
 long_description = "{}\n{}".format(
 	read("README.rst"), read(join("docs", "CHANGELOG.rst")),
 )
+long_description = re.sub(r":doc:`(.*)`", r"https://github.com/lilatomic/grafanarmadillo/tree/main/docs/rst/\1.rst", long_description)
 
 setup(
 	name="grafanarmadillo",

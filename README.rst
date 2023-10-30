@@ -23,13 +23,11 @@ Summary
 
 Grafanarmadillo simplifies interacting with Grafana, with a focus on templating dashboards.
 
--------
 Library
 -------
 
 Grafanarmadillo is a library that navigates the Grafana API. It has helpers to find dashboards and alerts; make and fill templates; and provision those filled templates. See :doc:`usage` for samples.
 
------
 Tools
 -----
 
