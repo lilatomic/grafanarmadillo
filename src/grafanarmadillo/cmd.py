@@ -15,6 +15,8 @@ from grafanarmadillo.templator import Templator, findreplace
 EnvMapping = NewType("EnvMapping", Dict[str, Dict[str, str]])
 Direction = NewType("Direction", Union[Literal["import"], Literal["export"]])
 
+TOK_AUTO_MAPPING = "$auto"
+
 load_file_help = """Should be encoded as json. You can pass this in as a string; or as file using 'file://path/to/file'"""
 mapping_help = \
 	"Mapping of values to findreplace in the template. " + \
@@ -22,7 +24,8 @@ mapping_help = \
 	"to dicts of replacements (for example, `{\"region\": \"SouthWest\"}`). " + \
 	load_file_help
 env_grafana_help = "Name of the environment in the mapping file for Grafana, found in the `--mapping` argument"
-env_template_help = "Name of the environment in the mapping file for the template, found in the `--mapping` argument"
+env_template_help = "Name of the environment in the mapping file for the template, found in the `--mapping` argument. " + \
+	"The special value '$auto' will automatically provide a value by prepending a '$' to the keys of the grafana mapping"
 
 
 def load_data(data_str: str):
@@ -39,7 +42,10 @@ def load_data(data_str: str):
 def make_mapping_templator(mapping: EnvMapping, env_grafana: str, env_template: str) -> Templator:
 	"""Assemble the templator from the environment mapping."""
 	mapping_grafana = mapping[env_grafana]
-	mapping_template = mapping[env_template]
+	if env_template == TOK_AUTO_MAPPING:
+		mapping_template = {k: "${%s}" % k for k in mapping_grafana.keys()}
+	else:
+		mapping_template = mapping[env_template]
 
 	# if some keys in the src mapping are not in the dst mapping
 	missing = mapping_grafana.keys() - mapping_template.keys()

@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* feature : option to automatically generate template replacers in cli
+
 v0.2.0 (2023-10-30)
 ------------------------------------------------------------
 
