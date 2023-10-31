@@ -9,3 +9,4 @@ At the command line::
 If you want the CLI apps, use::
 
     pip install grafanarmadillo[cli]
+

@@ -21,7 +21,7 @@ def test_find_folders__smoke(ro_demo_grafana):
 
 
 def test_find_folder__general_folder(ro_demo_grafana):
-	"""The 'General' folder is a special folder, so we synthesis it."""
+	"""The 'General' folder is a special folder, so we synthesise it."""
 	f = Finder(ro_demo_grafana[1])
 	assert f.get_folder("General")
 
@@ -67,24 +67,24 @@ def test_get_dashboard__other_folder(ro_demo_grafana):
 
 
 def test_resolve_path__general():
-	assert Finder(None)._resolve_path("/folder/dashboard") == ("folder", "dashboard")
+	assert Finder._resolve_path("/folder/dashboard") == ("folder", "dashboard")
 
 
 def test_resolve_path__no_absolute_slash():
-	assert Finder(None)._resolve_path("folder/dashboard") == ("folder", "dashboard")
+	assert Finder._resolve_path("folder/dashboard") == ("folder", "dashboard")
 
 
 def test_resolve_path__implicit_general():
-	assert Finder(None)._resolve_path("/dashboard") == ("General", "dashboard")
+	assert Finder._resolve_path("/dashboard") == ("General", "dashboard")
 
 
 def test_resolve_path__bare_dashboard():
-	assert Finder(None)._resolve_path("dashboard") == ("General", "dashboard")
+	assert Finder._resolve_path("dashboard") == ("General", "dashboard")
 
 
 def test_resolve_path__too_many_parts():
 	with pytest.raises(ValueError):
-		Finder(None)._resolve_path("/folder/dashboard/invalidpart")
+		Finder._resolve_path("/folder/dashboard/invalidpart")
 
 
 def test_get_from_path__smoke(ro_demo_grafana):

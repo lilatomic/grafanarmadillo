@@ -57,13 +57,13 @@ def panel_transformer(
 	Will omit a dashboard if function returns None
 	"""
 
-	def _panel_transformer(d: DashboardContent):
+	def _panel_transformer(d: DashboardContent) -> DashboardContent:
 		out = d.copy()
 
 		new_panels = list(filter(lambda p: bool(p), (f(p) for p in d["panels"])))
 
 		out["panels"] = new_panels
-		return out
+		return DashboardContent(out)
 
 	return _panel_transformer
 
@@ -86,10 +86,10 @@ class Templator(object):
 		"""Convert a dashboard into a one ready for templating."""
 		new = dashboard.copy()
 		new = project_dict(
-			new, set(["id", "uid"]), inverse=True
-		)  # we don't erase the title so we can template it later
+			new, {"id", "uid"}, inverse=True
+		)  # we don't erase the title so that we can template it later
 
-		return self.make_template(new)
+		return self.make_template(DashboardContent(new))
 
 	def make_dashboard_from_template(
 		self, dashboard_info: DashboardSearchResult, template: DashboardContent
@@ -98,4 +98,4 @@ class Templator(object):
 		new = template.copy()
 		new.update(project_dashboard_identity(dashboard_info))
 
-		return self.fill_template(new)
+		return self.fill_template(DashboardContent(new))

@@ -59,7 +59,7 @@ def test_fill_template(unique):
 
 
 @pytest.mark.parametrize(
-	"input,output",
+	"in_,out_",
 	[
 		("ac", "Ac"),
 		("abc", "ABc"),
@@ -69,18 +69,18 @@ def test_fill_template(unique):
 		({"a": {"b": "a", "c": 1}}, {"a": {"b": "A", "c": 1}}),
 	],
 )
-def test_findreplace(input, output):
+def test_findreplace(in_, out_):
 	fr = findreplace({"a": "A", "b": "B"})
 
-	r = fr(input)
-	assert output == r
+	r = fr(DashboardContent(in_))
+	assert out_ == r
 
 
 def make_test_transformer(k, v) -> DashboardTransformer:
 	def _transformer(dashboard: DashboardContent) -> DashboardContent:
 		d = dashboard.copy()
 		d[k] = v
-		return d
+		return DashboardContent(d)
 
 	return _transformer
 
@@ -90,7 +90,7 @@ def test_combine_transformers():
 		make_test_transformer("0", "0"), make_test_transformer("1", "1"),
 	)
 
-	r = t({})
+	r = t(DashboardContent({}))
 
 	assert r["0"] == "0"
 	assert r["1"] == "1"
@@ -101,7 +101,7 @@ def test_combine_transformers__ordering():
 	k = "0"
 	t = combine_transformers(make_test_transformer(k, "0"), make_test_transformer(k, "1"),)
 
-	r = t({})
+	r = t(DashboardContent({}))
 
 	assert r[k] == "1"
 

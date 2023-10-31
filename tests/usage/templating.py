@@ -5,6 +5,7 @@ from grafana_client import GrafanaApi
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator, findreplace
+from grafanarmadillo.types import DashboardContent
 
 
 def template_for_clients(gfn: GrafanaApi, service_name: str, clients: List[str]):
@@ -18,7 +19,7 @@ def template_for_clients(gfn: GrafanaApi, service_name: str, clients: List[str])
 
 	for client in clients:
 		folder = dashboarder.api.folder.create_folder(client)
-		info = {"title": f"{service_name}"}
+		info = DashboardContent({"title": f"{service_name}"})
 
 		dashboard = templator.make_dashboard_from_template(info, template)
 

@@ -3,7 +3,7 @@ import pytest
 from grafanarmadillo._util import project_dict
 from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.find import Finder
-from tests.conftest import read_json_file
+from tests.conftest import read_json_file, requires_alerting
 
 
 def uniquify_alert(alert, unique):
@@ -17,8 +17,7 @@ def uniquify_alert(alert, unique):
 
 def test_import(rw_shared_grafana, unique):
 	"""Test that we can import a dashboard."""
-	if rw_shared_grafana[0].major_version < 9:
-		pytest.skip("Grafana does not support provisioning in version 8")
+	requires_alerting(rw_shared_grafana)
 
 	finder, alerter = (Finder(rw_shared_grafana[1]), Alerter(rw_shared_grafana[1]))
 	folder = finder.get_folder("f0")
@@ -34,8 +33,7 @@ def test_import(rw_shared_grafana, unique):
 
 def test_import__just_content(rw_shared_grafana, unique):
 	"""Test that an alert with uid removed can be imported."""
-	if rw_shared_grafana[0].major_version < 9:
-		pytest.skip("Grafana does not support provisioning in version 8")
+	requires_alerting(rw_shared_grafana)
 
 	finder, alerter = (Finder(rw_shared_grafana[1]), Alerter(rw_shared_grafana[1]))
 	folder = finder.get_folder("f0")
@@ -52,8 +50,7 @@ def test_import__just_content(rw_shared_grafana, unique):
 
 def test_import__update(rw_shared_grafana, unique):
 	"""Test that importing for an existing dashboard overwrite."""
-	if rw_shared_grafana[0].major_version < 9:
-		pytest.skip("Grafana does not support provisioning in version 8")
+	requires_alerting(rw_shared_grafana)
 
 	finder, alerter = (Finder(rw_shared_grafana[1]), Alerter(rw_shared_grafana[1]))
 	folder = finder.get_folder("f0")
