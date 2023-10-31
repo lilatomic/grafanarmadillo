@@ -2,6 +2,9 @@
 Changelog
 =========
 
+v0.2.1 (2023-10-31)
+------------------------------------------------------------
+
 * feature : option to automatically generate template replacers in cli
 * feature : expose cli functions as library functions
 

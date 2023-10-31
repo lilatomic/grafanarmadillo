@@ -25,7 +25,7 @@ long_description = re.sub(r":doc:`(.*)`", r"https://github.com/lilatomic/grafana
 
 setup(
 	name="grafanarmadillo",
-	version="0.2.0",
+	version="0.2.1",
 	description="Simplifies interacting with Grafana, with a focus on templating dashboards ",
 	long_description=long_description,
 	long_description_content_type="text/x-rst",
