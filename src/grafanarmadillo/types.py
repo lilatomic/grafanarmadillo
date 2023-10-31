@@ -1,9 +1,17 @@
 """Type hints for Grafana interaction."""
 
-from typing import NewType, Optional, TypedDict
+from typing import NewType, Optional, TypedDict, Union
 
 
 UID = NewType("UID", str)
+
+
+class AnySearchResult(TypedDict):
+	"""Metadata for both Grafana dashboards and alerts."""
+
+	uid: UID
+	title: str
+	folderUid: Optional[UID]
 
 
 class DashboardSearchResult(TypedDict):
@@ -30,6 +38,7 @@ class AlertSearchResult(TypedDict):
 
 DashboardContent = NewType("DashboardContent", dict)
 AlertContent = NewType("AlertContent", dict)
+AnyContent = Union[DashboardContent, AlertContent]
 DashboardMeta = NewType("DashboardMeta", dict)
 
 

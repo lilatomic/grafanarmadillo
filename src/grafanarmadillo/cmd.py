@@ -1,7 +1,7 @@
 """Ready-to-run commands for common Grafana templating scenarios."""
 import json
 from pathlib import Path
-from typing import Dict, Literal, NewType, Union
+from typing import IO, Dict, Literal, NewType, Union
 
 import click
 from grafana_client import GrafanaApi
@@ -15,6 +15,8 @@ from grafanarmadillo.templator import Templator, findreplace
 EnvMapping = NewType("EnvMapping", Dict[str, Dict[str, str]])
 Direction = NewType("Direction", Union[Literal["import"], Literal["export"]])
 
+TOK_AUTO_MAPPING = "$auto"
+
 load_file_help = """Should be encoded as json. You can pass this in as a string; or as file using 'file://path/to/file'"""
 mapping_help = \
 	"Mapping of values to findreplace in the template. " + \
@@ -22,7 +24,8 @@ mapping_help = \
 	"to dicts of replacements (for example, `{\"region\": \"SouthWest\"}`). " + \
 	load_file_help
 env_grafana_help = "Name of the environment in the mapping file for Grafana, found in the `--mapping` argument"
-env_template_help = "Name of the environment in the mapping file for the template, found in the `--mapping` argument"
+env_template_help = "Name of the environment in the mapping file for the template, found in the `--mapping` argument. " + \
+	"The special value '$auto' will automatically provide a value by prepending a '$' to the keys of the grafana mapping"
 
 
 def load_data(data_str: str):
@@ -39,7 +42,10 @@ def load_data(data_str: str):
 def make_mapping_templator(mapping: EnvMapping, env_grafana: str, env_template: str) -> Templator:
 	"""Assemble the templator from the environment mapping."""
 	mapping_grafana = mapping[env_grafana]
-	mapping_template = mapping[env_template]
+	if env_template == TOK_AUTO_MAPPING:
+		mapping_template = {k: "${%s}" % k for k in mapping_grafana.keys()}
+	else:
+		mapping_template = mapping[env_template]
 
 	# if some keys in the src mapping are not in the dst mapping
 	missing = mapping_grafana.keys() - mapping_template.keys()
@@ -82,13 +88,18 @@ def dashboard():
 @click.option("--env-grafana", help=env_grafana_help)
 @click.option("--env-template", help=env_template_help)
 @click.pass_context
-def export_dashboard(ctx, src, dst, mapping, env_grafana, env_template):
+def _export_dashboard(ctx, src, dst, mapping, env_grafana, env_template):
 	"""Capture a dashboard from Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
-	finder, dashboarder = Finder(gfn), Dashboarder(gfn)
 
 	mapping = load_data(mapping)
 	templator = make_mapping_templator(mapping, env_grafana, env_template)
+	return export_dashboard(gfn, src, dst, templator)
+
+
+def export_dashboard(gfn: GrafanaApi, src: str, dst: IO, templator: Templator):
+	"""Capture a dashboard from Grafana."""
+	finder, dashboarder = Finder(gfn), Dashboarder(gfn)
 
 	dashboard_info = finder.get_from_path(src)
 	dashboard_content, _ = dashboarder.export_dashboard(dashboard_info)
@@ -104,13 +115,19 @@ def export_dashboard(ctx, src, dst, mapping, env_grafana, env_template):
 @click.option("--env-grafana", help=env_grafana_help)
 @click.option("--env-template", help=env_template_help)
 @click.pass_context
-def import_dashboard(ctx, src, dst, mapping, env_grafana, env_template):
+def _import_dashboard(ctx, src, dst, mapping, env_grafana, env_template):
 	"""Deploy a template to Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
-	finder, dashboarder = Finder(gfn), Dashboarder(gfn)
 
 	mapping = load_data(mapping)
 	templator = make_mapping_templator(mapping, env_grafana, env_template)
+	return import_dashboard(gfn, src, dst, templator)
+
+
+def import_dashboard(gfn: GrafanaApi, src: IO, dst: str, templator: Templator):
+	"""Deploy a template to Grafana."""
+	finder, dashboarder = Finder(gfn), Dashboarder(gfn)
+
 	template = load_data(src.read())
 
 	dashboard_info, folder = finder.create_or_get_dashboard(dst)
@@ -130,13 +147,18 @@ def alert():
 @click.option("--env-grafana", help=env_grafana_help)
 @click.option("--env-template", help=env_template_help)
 @click.pass_context
-def export_alert(ctx, src, dst, mapping, env_grafana, env_template):
+def _export_alert(ctx, src, dst, mapping, env_grafana, env_template):
 	"""Capture an alert from Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
-	finder, alerter = Finder(gfn), Alerter(gfn)
 
 	mapping = load_data(mapping)
 	templator = make_mapping_templator(mapping, env_grafana, env_template)
+	return export_alert(gfn, src, dst, templator)
+
+
+def export_alert(gfn: GrafanaApi, src: str, dst: IO, templator: Templator):
+	"""Capture an alert from Grafana."""
+	finder, alerter = Finder(gfn), Alerter(gfn)
 
 	alert_info = finder.get_alert_from_path(src)
 	alert, _ = alerter.export_alert(alert_info)
@@ -152,18 +174,23 @@ def export_alert(ctx, src, dst, mapping, env_grafana, env_template):
 @click.option("--env-grafana", help=env_grafana_help)
 @click.option("--env-template", help=env_template_help)
 @click.pass_context
-def import_alert(ctx, src, dst, mapping, env_grafana, env_template):
+def _import_alert(ctx, src, dst, mapping, env_grafana, env_template):
 	"""Deploy an alert from a template."""
 	gfn = make_grafana(ctx.obj["cfg"])
-	finder, alerter = Finder(gfn), Alerter(gfn)
 
 	mapping = load_data(mapping)
 	templator = make_mapping_templator(mapping, env_grafana, env_template)
+	return import_alert(gfn, src, dst, templator)
+
+
+def import_alert(gfn: GrafanaApi, src: IO, dst: str, templator: Templator):
+	"""Deploy an alert from a template."""
+	finder, alerter = Finder(gfn), Alerter(gfn)
+
 	template = load_data(src.read())
 
 	alert_info, folder_info = finder.create_or_get_alert(dst)
 	alert = templator.make_dashboard_from_template(alert_info, template)
-
 	alerter.import_alert(alert, folder_info)
 
 

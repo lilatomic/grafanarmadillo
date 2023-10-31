@@ -65,6 +65,7 @@ class GrafanaContainer(DockerContainer):
 	def _try_connecting(self) -> bool:
 		try:
 			requests.get(self.url)
+			return True
 		except requests.exceptions.ConnectionError as e:
 			raise ConnectionError from e
 
@@ -103,23 +104,23 @@ def requires_alerting(rw_shared_grafana):
 		pytest.skip("Grafana does not support provisioning in version 8")
 
 
-def create_dashboard(gfn: GrafanaApi, name, folderId=0):
+def create_dashboard(gfn: GrafanaApi, name: str, folder_id: int = 0):
 	dashboard = read_json_file("dashboard.json")
 	dashboard = erase_dashboard_identity(dashboard)
 	dashboard["title"] = name
 	return gfn.dashboard.update_dashboard(
-		dashboard={"dashboard": dashboard, "overwrite": True, "folderId": folderId}
+		dashboard={"dashboard": dashboard, "overwrite": True, "folderId": folder_id}
 	)
 
 
-def create_alert(gfn: GrafanaApi, name, folderId=0):
+def create_alert(gfn: GrafanaApi, name: str):
 	alert_rule = read_json_file("alert_rule.json")
 	alert_rule = erase_alert_rule_identity(alert_rule)
 	alert_rule["title"] = name
 	return gfn.alertingprovisioning.create_alertrule(alert_rule)
 
 
-def create_folder(gfn: GrafanaApi, name, uid=None):
+def create_folder(gfn: GrafanaApi, name: str, uid=None):
 	return gfn.folder.create_folder(name, uid)
 
 

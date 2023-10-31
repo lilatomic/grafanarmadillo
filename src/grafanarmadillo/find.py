@@ -1,7 +1,7 @@
 """Find Grafana dashboards and folders."""
 
 from pathlib import PurePath
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 from grafana_client import GrafanaApi
 
@@ -25,7 +25,7 @@ class Finder:
 		super().__init__()
 		self.api = api
 
-	def find_dashboards(self, name) -> List[DashboardSearchResult]:
+	def find_dashboards(self, name: str) -> List[DashboardSearchResult]:
 		"""Find all dashboards with a name. Returns exact matches only."""
 		return list(
 			filter(
@@ -65,7 +65,7 @@ class Finder:
 				_query_message("folder", name),
 			)
 
-	def get_dashboard(self, folder_name, dashboard_name) -> DashboardSearchResult:
+	def get_dashboard(self, folder_name: str, dashboard_name: str) -> DashboardSearchResult:
 		"""
 		Get a dashboard by its parent folder and dashboard name.
 
@@ -109,7 +109,7 @@ class Finder:
 
 		return folder, dashboard
 
-	def get_from_path(self, path) -> DashboardSearchResult:
+	def get_from_path(self, path) -> Union[DashboardSearchResult, AlertSearchResult]:
 		"""Get a dashboard from a string path like `/folder0/dashboard0`."""
 		folder, dashboard = self._resolve_path(path)
 		return self.get_dashboard(folder, dashboard)
