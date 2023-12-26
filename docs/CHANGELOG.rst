@@ -2,6 +2,9 @@
 Changelog
 =========
 
+v0.3.0 (2023-12-26)
+------------------------------------------------------------
+
 * feature : Finder.create_or_get_alert will create a placeholder alert instead of faking one
 * feature : helpful Flow for performing multiple templating operations
 * feature : can set provenance of provisioned alerts (defaults to disabled)
