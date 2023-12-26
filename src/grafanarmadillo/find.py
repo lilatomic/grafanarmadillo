@@ -161,7 +161,7 @@ class Finder:
 		try:
 			alert = self.get_alert(folder_name, alert_name)
 		except ValueError:
-			self.api.alertingprovisioning.create_alertrule(self._mk_null_alert(folder["uid"], alert_name))
+			self.api.alertingprovisioning.create_alertrule(self._mk_null_alert(folder["uid"], alert_name), disable_provenance=True)
 			alert = self.get_alert(folder_name, alert_name)
 
 		return alert, folder

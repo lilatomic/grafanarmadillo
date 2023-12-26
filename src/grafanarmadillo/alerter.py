@@ -10,9 +10,10 @@ from grafanarmadillo.types import AlertContent, AlertSearchResult, FolderSearchR
 class Alerter:
 	"""Collection of methods for managing alert rules."""
 
-	def __init__(self, api: GrafanaApi) -> None:
+	def __init__(self, api: GrafanaApi, disable_provenance=True) -> None:
 		super().__init__()
 		self.api = api
+		self.disable_provenance = disable_provenance
 
 	def import_alert(
 		self, content: AlertContent, folder: FolderSearchResult
@@ -35,9 +36,9 @@ class Alerter:
 				raise
 
 		if exists:
-			self.api.alertingprovisioning.update_alertrule(content["uid"], content)
+			self.api.alertingprovisioning.update_alertrule(content["uid"], content, disable_provenance=self.disable_provenance)
 		else:
-			self.api.alertingprovisioning.create_alertrule(content)
+			self.api.alertingprovisioning.create_alertrule(content, disable_provenance=self.disable_provenance)
 
 	def export_alert(
 		self, alert: AlertSearchResult

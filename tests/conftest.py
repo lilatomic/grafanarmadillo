@@ -117,7 +117,7 @@ def create_alert(gfn: GrafanaApi, name: str):
 	alert_rule = read_json_file("alert_rule.json")
 	alert_rule = erase_alert_rule_identity(alert_rule)
 	alert_rule["title"] = name
-	return gfn.alertingprovisioning.create_alertrule(alert_rule)
+	return gfn.alertingprovisioning.create_alertrule(alert_rule, disable_provenance=True)
 
 
 def create_folder(gfn: GrafanaApi, name: str, uid=None):
@@ -211,7 +211,7 @@ def mk_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaApi]:
 			alert = read_json_file("alert_rule.json")
 			alert["folderUID"] = f0["uid"]
 			alert["uid"] = str(uuid.uuid4())  # make this instance of the dashboard unique
-			gfn.alertingprovisioning.create_alertrule(alert)
+			gfn.alertingprovisioning.create_alertrule(alert, True)
 
 		yield gfn_ctn, gfn
 
