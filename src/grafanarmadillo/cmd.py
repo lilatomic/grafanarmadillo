@@ -1,7 +1,7 @@
 """Ready-to-run commands for common Grafana templating scenarios."""
 import json
 from pathlib import Path
-from typing import IO, Dict, Literal, NewType, Union
+from typing import IO, Dict, NewType
 
 import click
 from grafana_client import GrafanaApi
@@ -13,11 +13,12 @@ from grafanarmadillo.templator import Templator, findreplace
 
 
 EnvMapping = NewType("EnvMapping", Dict[str, Dict[str, str]])
-Direction = NewType("Direction", Union[Literal["import"], Literal["export"]])
 
 TOK_AUTO_MAPPING = "$auto"
 
 load_file_help = """Should be encoded as json. You can pass this in as a string; or as file using 'file://path/to/file'"""
+auto_template_env_help = "The special value '$auto' will automatically provide a value by prepending a '$' to the keys of the grafana mapping"
+
 mapping_help = \
 	"Mapping of values to findreplace in the template. " + \
 	"The type should be a mapping of environment names (like 'template' or 'production') " + \
@@ -25,7 +26,7 @@ mapping_help = \
 	load_file_help
 env_grafana_help = "Name of the environment in the mapping file for Grafana, found in the `--mapping` argument"
 env_template_help = "Name of the environment in the mapping file for the template, found in the `--mapping` argument. " + \
-	"The special value '$auto' will automatically provide a value by prepending a '$' to the keys of the grafana mapping"
+	auto_template_env_help
 
 
 def load_data(data_str: str):
@@ -192,6 +193,15 @@ def import_alert(gfn: GrafanaApi, src: IO, dst: str, templator: Templator):
 	alert_info, folder_info = finder.create_or_get_alert(dst)
 	alert = templator.make_dashboard_from_template(alert_info, template)
 	alerter.import_alert(alert, folder_info)
+
+
+def resolve_object_to_filepath(base_path: Path, name: str):
+	"""Transform the "/folder/object" format to the path on disk that contains the template."""
+	path = Path(name)
+	if path.is_absolute():
+		path = path.relative_to("/")
+	template_path = (base_path / path).with_suffix(".json")
+	return template_path
 
 
 if __name__ == "__main__":

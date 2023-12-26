@@ -1,5 +1,5 @@
 {
-	"auth": ["username", "password"],
+	"auth": ["admin", "admin"],
 	"port": 3000,
 	"protocol": "http"
 }

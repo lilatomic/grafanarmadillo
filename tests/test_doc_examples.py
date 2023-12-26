@@ -9,7 +9,7 @@ from grafana_client import GrafanaApi
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator
-from tests.conftest import read_json_file
+from tests.conftest import read_json_file, requires_alerting
 from tests.usage.alerting import export_alert, import_alert
 from tests.usage.dashboarding import (
 	clone_dashboard_contents,
@@ -93,8 +93,7 @@ def test_usage_templating__findreplace():
 
 
 def test_usage_alerting__import(rw_shared_grafana, unique):
-	if rw_shared_grafana[0].major_version < 9:
-		pytest.skip("Grafana does not support provisioning in version 8")
+	requires_alerting(rw_shared_grafana)
 
 	gfn: GrafanaApi = rw_shared_grafana[1]
 	finder = Finder(gfn)
@@ -112,8 +111,7 @@ def test_usage_alerting__import(rw_shared_grafana, unique):
 
 
 def test_usage_alerting__export(rw_shared_grafana, unique):
-	if rw_shared_grafana[0].major_version < 9:
-		pytest.skip("Grafana does not support provisioning in version 8")
+	requires_alerting(rw_shared_grafana)
 
 	gfn: GrafanaApi = rw_shared_grafana[1]
 	out = io.StringIO()
