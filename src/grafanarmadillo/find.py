@@ -41,7 +41,7 @@ class Finder:
 		)
 
 	def get_dashboards_in_folders(
-		self, folder_names: List[str]
+			self, folder_names: List[str]
 	) -> List[DashboardSearchResult]:
 		"""Get all dashboards in folders."""
 		folder_objects = list(
@@ -120,7 +120,7 @@ class Finder:
 		return self.get_alert(folder, alert)
 
 	def create_or_get_dashboard(
-		self, path: str
+			self, path: str
 	) -> Tuple[DashboardSearchResult, Optional[FolderSearchResult]]:
 		"""
 		Create a new empty dashboard if it does not exist.
@@ -150,12 +150,10 @@ class Finder:
 
 	def create_or_get_alert(self, path: str) -> Tuple[AlertSearchResult, FolderSearchResult]:
 		"""
-		Get the information about an alert, or fake the metadata if it does not.
+		Get the information about an alert or create a new "empty" alert if it does not exist
 
-		Creating an "empty" alert in Grafana requires filling in much more data than an empty dashboard,
-		including at least 1 rule.
-		We can fake that with a `math` rule that always returns 0,
-		but that's a lot of garbage data to inject.
+		Creating an "empty" alert in Grafana requires filling in a rule.
+		We can fake that with a `math` rule that always returns 0.
 		"""
 		folder_name, alert_name = self._resolve_path(path)
 
@@ -167,9 +165,64 @@ class Finder:
 		try:
 			alert = self.get_alert(folder_name, alert_name)
 		except ValueError:
-			alert = {
-				"folderUID": folder["uid"],
-				"title": alert_name
-			}
+			self.api.alertingprovisioning.create_alertrule(self._mk_null_alert(folder["uid"], alert_name))
+			alert = self.get_alert(folder_name, alert_name)
 
 		return alert, folder
+
+	def _mk_null_alert(self, folder_uid: str, title: str) -> dict:
+		"""Fill in the minimum boilerplate for Grafana to let us create an alert"""
+		return {
+			"title": title,
+			"folderUID": folder_uid,
+			"condition": "A",
+			"ruleGroup": "grafanarmadillo_tmp",
+			"data": [
+				{
+					"refId": "A",
+					"relativeTimeRange": {
+						"from": 0,
+						"to": 0
+					},
+					"datasourceUid": "__expr__",
+					"model": {
+						"conditions": [
+							{
+								"evaluator": {
+									"params": [
+										0,
+										0
+									],
+									"type": "gt"
+								},
+								"operator": {
+									"type": "and"
+								},
+								"query": {
+									"params": []
+								},
+								"reducer": {
+									"params": [],
+									"type": "avg"
+								},
+								"type": "query"
+							}
+						],
+						"datasource": {
+							"name": "Expression",
+							"type": "__expr__",
+							"uid": "__expr__"
+						},
+						"expression": "0",
+						"intervalMs": 1000000,
+						"maxDataPoints": 43200,
+						"refId": "A",
+						"type": "math"
+					}
+				}
+			],
+			"noDataState": "NoData",
+			"execErrState": "Error",
+			"for": "5m",
+			"isPaused": False
+		}

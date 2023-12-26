@@ -11,7 +11,7 @@ from grafanarmadillo.types import (
 )
 
 
-class Dashboarder(object):
+class Dashboarder:
 	"""Collection of methods for managing dashboards."""
 
 	def __init__(self, api: GrafanaApi) -> None:
