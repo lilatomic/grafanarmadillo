@@ -3,15 +3,15 @@ from typing import Optional, Tuple
 
 from grafana_client import GrafanaApi
 
-from grafanarmadillo._util import project_dashboard_identity
 from grafanarmadillo.types import (
 	DashboardContent,
 	DashboardSearchResult,
 	FolderSearchResult,
 )
+from grafanarmadillo.util import project_dashboard_identity
 
 
-class Dashboarder(object):
+class Dashboarder:
 	"""Collection of methods for managing dashboards."""
 
 	def __init__(self, api: GrafanaApi) -> None:

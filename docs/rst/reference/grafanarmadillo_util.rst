@@ -1,5 +1,5 @@
-grafanarmadillo._util
+grafanarmadillo.util
 =====================
 
-.. automodule:: grafanarmadillo._util
+.. automodule:: grafanarmadillo.util
     :members:

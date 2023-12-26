@@ -1,7 +1,6 @@
 """Ready-to-run commands for common Grafana templating scenarios."""
 import json
-from pathlib import Path
-from typing import IO, Dict, Literal, NewType, Union
+from typing import IO
 
 import click
 from grafana_client import GrafanaApi
@@ -9,15 +8,13 @@ from grafana_client import GrafanaApi
 from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
-from grafanarmadillo.templator import Templator, findreplace
+from grafanarmadillo.templator import Templator, make_mapping_templator
+from grafanarmadillo.util import load_data
 
-
-EnvMapping = NewType("EnvMapping", Dict[str, Dict[str, str]])
-Direction = NewType("Direction", Union[Literal["import"], Literal["export"]])
-
-TOK_AUTO_MAPPING = "$auto"
 
 load_file_help = """Should be encoded as json. You can pass this in as a string; or as file using 'file://path/to/file'"""
+auto_template_env_help = "The special value '$auto' will automatically provide a value by prepending a '$' to the keys of the grafana mapping"
+
 mapping_help = \
 	"Mapping of values to findreplace in the template. " + \
 	"The type should be a mapping of environment names (like 'template' or 'production') " + \
@@ -25,37 +22,7 @@ mapping_help = \
 	load_file_help
 env_grafana_help = "Name of the environment in the mapping file for Grafana, found in the `--mapping` argument"
 env_template_help = "Name of the environment in the mapping file for the template, found in the `--mapping` argument. " + \
-	"The special value '$auto' will automatically provide a value by prepending a '$' to the keys of the grafana mapping"
-
-
-def load_data(data_str: str):
-	"""Attempt to load data."""
-	_file_uri_prefix = "file://"
-	if data_str.startswith(_file_uri_prefix):
-		filename = Path(data_str.split(_file_uri_prefix)[1])
-		with filename.open(mode="r", encoding="utf-8") as data_file:
-			return json.load(data_file)
-	else:
-		return json.loads(data_str)
-
-
-def make_mapping_templator(mapping: EnvMapping, env_grafana: str, env_template: str) -> Templator:
-	"""Assemble the templator from the environment mapping."""
-	mapping_grafana = mapping[env_grafana]
-	if env_template == TOK_AUTO_MAPPING:
-		mapping_template = {k: "${%s}" % k for k in mapping_grafana.keys()}
-	else:
-		mapping_template = mapping[env_template]
-
-	# if some keys in the src mapping are not in the dst mapping
-	missing = mapping_grafana.keys() - mapping_template.keys()
-	if missing:
-		raise ValueError(f"Some keys in the source mapping are not present in the destination mapping. {missing=}")
-
-	grafana_to_template = {v: mapping_template[k] for k, v in mapping_grafana.items()}
-	template_to_grafana = {v: k for k, v in grafana_to_template.items()}
-
-	return Templator(make_template=findreplace(grafana_to_template), fill_template=findreplace(template_to_grafana))
+	auto_template_env_help
 
 
 def make_grafana(config) -> GrafanaApi:

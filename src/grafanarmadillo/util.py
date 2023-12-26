@@ -1,3 +1,7 @@
+"""Helpers and generic functions."""
+
+import json
+from pathlib import Path
 from typing import Callable, Dict, List, TypeVar, Union
 
 from grafanarmadillo.types import DashboardContent, DashboardSearchResult
@@ -115,3 +119,23 @@ def map_json_strings(f: Callable[[str], str], obj: JSON) -> JSON:
 		return f(obj)
 	else:
 		return obj
+
+
+def resolve_object_to_filepath(base_path: Path, name: str):
+	"""Transform the "/folder/object" format to the path on disk that contains the template."""
+	path = Path(name)
+	if path.is_absolute():
+		path = path.relative_to("/")
+	template_path = (base_path / path).with_suffix(".json")
+	return template_path
+
+
+def load_data(data_str: str):
+	"""Attempt to load data."""
+	_file_uri_prefix = "file://"
+	if data_str.startswith(_file_uri_prefix):
+		filename = Path(data_str.split(_file_uri_prefix)[1])
+		with filename.open(mode="r", encoding="utf-8") as data_file:
+			return json.load(data_file)
+	else:
+		return json.loads(data_str)

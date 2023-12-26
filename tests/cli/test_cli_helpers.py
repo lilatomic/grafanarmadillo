@@ -1,7 +1,14 @@
 """Tests for helpers of the CLI which can be tested in isolation."""
+from pathlib import Path
+
 import pytest
 
-from grafanarmadillo.cmd import TOK_AUTO_MAPPING, EnvMapping, make_mapping_templator
+from grafanarmadillo.templator import (
+	TOK_AUTO_MAPPING,
+	EnvMapping,
+	make_mapping_templator,
+)
+from grafanarmadillo.util import resolve_object_to_filepath
 
 
 class TestMakeMappingTemplator:
@@ -49,3 +56,21 @@ class TestMakeMappingTemplator:
 		})
 
 		make_mapping_templator(mapping, "g", "t")
+
+
+class TestResolveObjectToFilepath:
+	"""Test resolving object paths to their files on disk."""
+
+	base = Path("/p0/p1/p2")
+
+	def test_absolute_name(self):
+		r = resolve_object_to_filepath(self.base, "/f0/a0")
+		assert r == Path("/p0/p1/p2/f0/a0.json")
+
+	def test_relative_name(self):
+		r = resolve_object_to_filepath(self.base, "f0/a0")
+		assert r == Path("/p0/p1/p2/f0/a0.json")
+
+	def test_cwd_base(self):
+		r = resolve_object_to_filepath(Path("."), "f0/a0")
+		assert r == Path("f0/a0.json")
