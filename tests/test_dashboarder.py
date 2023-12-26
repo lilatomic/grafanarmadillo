@@ -1,9 +1,9 @@
 """Performs integration tests for dashboarder."""
 import pytest
 
-from grafanarmadillo._util import project_dashboard_identity
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
+from grafanarmadillo.util import project_dashboard_identity
 from tests.conftest import read_json_file
 
 

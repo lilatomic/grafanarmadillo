@@ -3,12 +3,12 @@ from typing import Optional, Tuple
 
 from grafana_client import GrafanaApi
 
-from grafanarmadillo._util import project_dashboard_identity
 from grafanarmadillo.types import (
 	DashboardContent,
 	DashboardSearchResult,
 	FolderSearchResult,
 )
+from grafanarmadillo.util import project_dashboard_identity
 
 
 class Dashboarder:

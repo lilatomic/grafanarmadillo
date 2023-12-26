@@ -15,10 +15,10 @@ from grafana_client import GrafanaApi
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.waiting_utils import wait_for
 
-from grafanarmadillo._util import erase_alert_rule_identity, erase_dashboard_identity
 from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
+from grafanarmadillo.util import erase_alert_rule_identity, erase_dashboard_identity
 
 
 class GrafanaContainer(DockerContainer):

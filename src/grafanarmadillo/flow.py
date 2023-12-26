@@ -8,10 +8,10 @@ from typing import List, Optional, Union
 from grafana_client import GrafanaApi
 
 from grafanarmadillo.alerter import Alerter
-from grafanarmadillo.cmd import resolve_object_to_filepath
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator
+from grafanarmadillo.util import resolve_object_to_filepath
 
 
 class Store(ABC):

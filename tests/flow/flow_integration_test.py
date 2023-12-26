@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 
-from grafanarmadillo.cmd import load_data, make_mapping_templator
 from grafanarmadillo.flow import (
 	Alert,
 	Dashboard,
@@ -13,6 +12,8 @@ from grafanarmadillo.flow import (
 	FlowException,
 	GrafanaStore,
 )
+from grafanarmadillo.templator import make_mapping_templator
+from grafanarmadillo.util import load_data
 from tests.conftest import requires_alerting
 
 

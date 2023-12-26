@@ -5,12 +5,12 @@ from typing import List, Optional, Tuple, Union
 
 from grafana_client import GrafanaApi
 
-from grafanarmadillo._util import exactly_one
 from grafanarmadillo.types import (
 	AlertSearchResult,
 	DashboardSearchResult,
 	FolderSearchResult,
 )
+from grafanarmadillo.util import exactly_one
 
 
 def _query_message(query_type: str, query: str) -> str:

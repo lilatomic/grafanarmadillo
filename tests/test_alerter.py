@@ -1,8 +1,8 @@
 import pytest
 
-from grafanarmadillo._util import project_dict
 from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.find import Finder
+from grafanarmadillo.util import project_dict
 from tests.conftest import read_json_file, requires_alerting
 
 

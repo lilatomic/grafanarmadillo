@@ -1,15 +1,15 @@
 """Make and fill templates for dashboards."""
-from typing import Callable, Dict
+from typing import Callable, Dict, NewType
 
-from grafanarmadillo._util import (
-	map_json_strings,
-	project_dashboard_identity,
-	project_dict,
-)
 from grafanarmadillo.types import (
 	DashboardContent,
 	DashboardPanel,
 	DashboardSearchResult,
+)
+from grafanarmadillo.util import (
+	map_json_strings,
+	project_dashboard_identity,
+	project_dict,
 )
 
 
@@ -48,9 +48,7 @@ def combine_transformers(*transformers: DashboardTransformer) -> DashboardTransf
 	return _chained
 
 
-def panel_transformer(
-	f: Callable[[DashboardPanel], DashboardPanel]
-) -> DashboardTransformer:
+def panel_transformer(f: Callable[[DashboardPanel], DashboardPanel]) -> DashboardTransformer:
 	"""
 	Make DashboardTransformer which processes all panels in a dashboard.
 	
@@ -99,3 +97,26 @@ class Templator(object):
 		new.update(project_dashboard_identity(dashboard_info))
 
 		return self.fill_template(DashboardContent(new))
+
+
+EnvMapping = NewType("EnvMapping", Dict[str, Dict[str, str]])
+TOK_AUTO_MAPPING = "$auto"
+
+
+def make_mapping_templator(mapping: EnvMapping, env_grafana: str, env_template: str) -> Templator:
+	"""Assemble the templator from the environment mapping."""
+	mapping_grafana = mapping[env_grafana]
+	if env_template == TOK_AUTO_MAPPING:
+		mapping_template = {k: "${%s}" % k for k in mapping_grafana.keys()}
+	else:
+		mapping_template = mapping[env_template]
+
+	# if some keys in the src mapping are not in the dst mapping
+	missing = mapping_grafana.keys() - mapping_template.keys()
+	if missing:
+		raise ValueError(f"Some keys in the source mapping are not present in the destination mapping. {missing=}")
+
+	grafana_to_template = {v: mapping_template[k] for k, v in mapping_grafana.items()}
+	template_to_grafana = {v: k for k, v in grafana_to_template.items()}
+
+	return Templator(make_template=findreplace(grafana_to_template), fill_template=findreplace(template_to_grafana))

@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from grafanarmadillo.cmd import load_data, make_mapping_templator
 from grafanarmadillo.flow import Dashboard, FileStore, Flow, GrafanaStore
+from grafanarmadillo.templator import make_mapping_templator
+from grafanarmadillo.util import load_data
 
 
 def export_templates(grafana):

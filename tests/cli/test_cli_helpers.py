@@ -3,12 +3,12 @@ from pathlib import Path
 
 import pytest
 
-from grafanarmadillo.cmd import (
+from grafanarmadillo.templator import (
 	TOK_AUTO_MAPPING,
 	EnvMapping,
 	make_mapping_templator,
-	resolve_object_to_filepath,
 )
+from grafanarmadillo.util import resolve_object_to_filepath
 
 
 class TestMakeMappingTemplator:
