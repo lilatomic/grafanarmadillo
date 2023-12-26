@@ -53,6 +53,7 @@ class FileStore(Store):
 
 	@staticmethod
 	def _write(file: Path, content: dict):
+		file.parent.mkdir(exist_ok=True)
 		with file.with_suffix(".json").open(mode="w", encoding="utf-8") as f:
 			json.dump(content, f)
 
