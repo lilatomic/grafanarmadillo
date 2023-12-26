@@ -92,18 +92,14 @@ class GrafanaStore(Store):
 @dataclass
 class Alert:
 	name: str
-	obj: Store
 	templator: Templator
-	tmpl: Store
 
 
 
 @dataclass
 class Dashboard:
 	name: str
-	obj: Store
 	templator: Templator
-	tmpl: Store
 
 
 Flowable = Union[Alert, Dashboard]
@@ -131,6 +127,8 @@ class FlowResult:
 @dataclass
 class Flow:
 	"""A collection of templating actions to do"""
+	obj: Store
+	tmpl: Store
 	flows: List[Flowable] = field(default=list)
 
 	def append(self, flow: Flowable):
@@ -153,24 +151,24 @@ class Flow:
 			try:
 				if isinstance(item, Alert):
 					if obj_to_tmpl:
-						obj = item.obj.read_alert(item.name)
+						obj = self.obj.read_alert(item.name)
 						tmpl = item.templator.make_template_from_dashboard(obj)
-						item.tmpl.write_alert(item.name, tmpl)
+						self.tmpl.write_alert(item.name, tmpl)
 					else:
-						tmpl = item.tmpl.read_alert(item.name)
-						info = item.obj.read_alert(item.name)
+						tmpl = self.tmpl.read_alert(item.name)
+						info = self.obj.read_alert(item.name)
 						obj = item.templator.make_dashboard_from_template(info, tmpl)
-						item.obj.write_alert(item.name, obj)
+						self.obj.write_alert(item.name, obj)
 				elif isinstance(item, Dashboard):
 					if obj_to_tmpl:
-						obj = item.obj.read_dashboard(item.name)
+						obj = self.obj.read_dashboard(item.name)
 						tmpl = item.templator.make_template_from_dashboard(obj)
-						item.tmpl.write_dashbaord(item.name, tmpl)
+						self.tmpl.write_dashbaord(item.name, tmpl)
 					else:
-						tmpl = item.tmpl.read_dashboard(item.name)
-						info = item.obj.read_dashboard(item.name)
+						tmpl = self.tmpl.read_dashboard(item.name)
+						info = self.obj.read_dashboard(item.name)
 						obj = item.templator.make_dashboard_from_template(info, tmpl)
-						item.obj.write_dashbaord(item.name, obj)
+						self.obj.write_dashbaord(item.name, obj)
 				else:
 					raise TypeError(f"Invalid flow, expected one of {Alert.__name__}, {Dashboard.__name__}, received {item.__class__.__name__}")
 

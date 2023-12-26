@@ -18,30 +18,33 @@ def test_flow__dashboard(rw_shared_grafana, mapping, tmpdir):
 	tmpdir = Path(tmpdir)
 
 	def mk_flow(filestore, grafanastore, templator):
-		return Flow([
-			Dashboard(
-				name="/flow/fi-d0",
-				tmpl=filestore,
-				templator=templator,
-				obj=grafanastore
-			)
-		])
+		return Flow(
+			obj=grafanastore,
+			tmpl=filestore,
+			flows=[
+				Dashboard(
+					name="/flow/fi-d0",
+					templator=templator,
+				)
+			])
 
 	_do_flow_test(mapping, mk_flow, rw_shared_grafana, tmpdir)
 
 	assert (tmpdir / "flow" / "fi-d0.json").exists()
+
 
 def test_flow__alert(rw_shared_grafana, mapping, tmpdir):
 	tmpdir = Path(tmpdir)
 	requires_alerting(rw_shared_grafana)
 
 	def mk_flow(filestore, grafanastore, templator):
-		return Flow([
+		return Flow(
+			obj=grafanastore,
+			tmpl=filestore,
+			flows=[
 			Alert(
 				name="/flow/fi-a0",
-				tmpl=filestore,
 				templator=templator,
-				obj=grafanastore
 			)
 		])
 
@@ -55,18 +58,17 @@ def test_flow__mixed(rw_shared_grafana, mapping, tmpdir):
 	requires_alerting(rw_shared_grafana)
 
 	def mk_flow(filestore, grafanastore, templator):
-		return Flow([
+		return Flow(
+			obj=grafanastore,
+			tmpl=filestore,
+			flows=[
 			Dashboard(
 				name="/flow/fi-d0",
-				tmpl=filestore,
 				templator=templator,
-				obj=grafanastore
 			),
 			Alert(
 				name="/flow/fi-a0",
-				tmpl=filestore,
 				templator=templator,
-				obj=grafanastore
 			)
 		])
 
