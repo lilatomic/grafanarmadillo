@@ -158,9 +158,7 @@ def test_usage_flow_cli(rw_shared_grafana, tmpdir):
 
 	env_cfg = set_cli_cfg(rw_shared_grafana)
 
-	subprocess.run(["python3", "flow/example.py", "my-system", "export", f"--basedir={tmpdir}" ], cwd="tests/",
-						check=True,
-						env=env_cfg, capture_output=True)
+	subprocess.run(["python3", "flow/example.py", "my-system", "export", f"--basedir={tmpdir}"], cwd="tests/", check=True, env=env_cfg, capture_output=True)
 	subprocess.run(["python3", "flow/example.py", "my-system", "import", f"--basedir={tmpdir}"], cwd="tests/", check=True, env=env_cfg, capture_output=True)
 
 	for deployment in ["east", "west", "north"]:

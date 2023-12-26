@@ -3,13 +3,15 @@ from pathlib import Path
 
 import click
 
+from grafanarmadillo.cmd import grafanarmadillo as gcmd
+from grafanarmadillo.cmd import make_grafana
 from grafanarmadillo.flow import Dashboard, FileStore, Flow, GrafanaStore
 from grafanarmadillo.templator import make_mapping_templator
 from grafanarmadillo.util import load_data
-from grafanarmadillo.cmd import grafanarmadillo as gcmd, make_grafana
 
 
 def export_templates(grafana, basedir: Path):
+	"""Export templates from the dev instance."""
 	filestore = FileStore(basedir)
 	grafanastore = GrafanaStore(grafana)
 
@@ -33,6 +35,7 @@ def export_templates(grafana, basedir: Path):
 
 
 def import_templates(grafana, basedir: Path):
+	"""Import your templates to the prod instance."""
 	filestore = FileStore(basedir)
 	grafanastore = GrafanaStore(grafana)
 
@@ -56,12 +59,14 @@ def import_templates(grafana, basedir: Path):
 
 @gcmd.group()
 def my_system():
-	"""Wire your commands into the main grafanarmadillo command"""
+	"""Wire your commands into the main grafanarmadillo command."""
+
 
 @my_system.command(name="export")
 @click.option("--basedir")
 @click.pass_context
 def _export_templates(ctx, basedir):
+	"""Export templates from the dev instance."""
 	gfn = make_grafana(ctx.obj["cfg"])
 	export_templates(gfn, Path(basedir))
 
@@ -70,6 +75,7 @@ def _export_templates(ctx, basedir):
 @click.option("--basedir")
 @click.pass_context
 def _import_templates(ctx, basedir):
+	"""Import your templates to the prod instance."""
 	gfn = make_grafana(ctx.obj["cfg"])
 	import_templates(gfn, Path(basedir))
 
