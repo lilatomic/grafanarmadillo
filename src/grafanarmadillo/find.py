@@ -40,9 +40,7 @@ class Finder:
 			query=None, type_="dash-db", folder_ids=folder_param
 		)
 
-	def get_dashboards_in_folders(
-			self, folder_names: List[str]
-	) -> List[DashboardSearchResult]:
+	def get_dashboards_in_folders(self, folder_names: List[str]) -> List[DashboardSearchResult]:
 		"""Get all dashboards in folders."""
 		folder_objects = list(
 			map(lambda folder_name: self.get_folder(name=folder_name), folder_names)
@@ -119,9 +117,7 @@ class Finder:
 		folder, alert = self._resolve_path(path)
 		return self.get_alert(folder, alert)
 
-	def create_or_get_dashboard(
-			self, path: str
-	) -> Tuple[DashboardSearchResult, Optional[FolderSearchResult]]:
+	def create_or_get_dashboard(self, path: str) -> Tuple[DashboardSearchResult, Optional[FolderSearchResult]]:
 		"""
 		Create a new empty dashboard if it does not exist.
 		
@@ -150,7 +146,7 @@ class Finder:
 
 	def create_or_get_alert(self, path: str) -> Tuple[AlertSearchResult, FolderSearchResult]:
 		"""
-		Get the information about an alert or create a new "empty" alert if it does not exist
+		Get the information about an alert or create a new "empty" alert if it does not exist.
 
 		Creating an "empty" alert in Grafana requires filling in a rule.
 		We can fake that with a `math` rule that always returns 0.
@@ -171,7 +167,7 @@ class Finder:
 		return alert, folder
 
 	def _mk_null_alert(self, folder_uid: str, title: str) -> dict:
-		"""Fill in the minimum boilerplate for Grafana to let us create an alert"""
+		"""Fill in the minimum boilerplate for Grafana to let us create an alert."""
 		return {
 			"title": title,
 			"folderUID": folder_uid,

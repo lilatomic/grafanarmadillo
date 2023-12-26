@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from grafanarmadillo.cmd import load_data, make_mapping_templator
-from grafanarmadillo.flow import Dashboard, FileStore, GrafanaStore, Flow, Alert
+from grafanarmadillo.flow import Alert, Dashboard, FileStore, Flow, GrafanaStore
 from tests.conftest import requires_alerting
 
 
@@ -19,11 +19,12 @@ def test_flow__dashboard(rw_shared_grafana, mapping, tmpdir):
 
 	def mk_flow(filestore, grafanastore, templator):
 		return Flow(
-			obj=grafanastore,
-			tmpl=filestore,
+			store_obj=grafanastore,
+			store_tmpl=filestore,
 			flows=[
 				Dashboard(
-					name="/flow/fi-d0",
+					name_obj="/flow/fi-d0",
+					name_tmpl="/flow/fi-d0",
 					templator=templator,
 				)
 			])
@@ -39,14 +40,15 @@ def test_flow__alert(rw_shared_grafana, mapping, tmpdir):
 
 	def mk_flow(filestore, grafanastore, templator):
 		return Flow(
-			obj=grafanastore,
-			tmpl=filestore,
+			store_obj=grafanastore,
+			store_tmpl=filestore,
 			flows=[
-			Alert(
-				name="/flow/fi-a0",
-				templator=templator,
-			)
-		])
+				Alert(
+					name_obj="/flow/fi-a0",
+					name_tmpl="/flow/fi-a0",
+					templator=templator,
+				)
+			])
 
 	_do_flow_test(mapping, mk_flow, rw_shared_grafana, tmpdir)
 
@@ -59,18 +61,20 @@ def test_flow__mixed(rw_shared_grafana, mapping, tmpdir):
 
 	def mk_flow(filestore, grafanastore, templator):
 		return Flow(
-			obj=grafanastore,
-			tmpl=filestore,
+			store_obj=grafanastore,
+			store_tmpl=filestore,
 			flows=[
-			Dashboard(
-				name="/flow/fi-d0",
-				templator=templator,
-			),
-			Alert(
-				name="/flow/fi-a0",
-				templator=templator,
-			)
-		])
+				Dashboard(
+					name_obj="/flow/fi-d0",
+					name_tmpl="/flow/fi-d0",
+					templator=templator,
+				),
+				Alert(
+					name_obj="/flow/fi-a0",
+					name_tmpl="/flow/fi-a0",
+					templator=templator,
+				)
+			])
 
 	_do_flow_test(mapping, mk_flow, rw_shared_grafana, tmpdir)
 
