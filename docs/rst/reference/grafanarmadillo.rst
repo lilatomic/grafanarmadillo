@@ -17,6 +17,13 @@ Dashboarder
 .. automodule:: grafanarmadillo.dashboarder
     :members:
 
+Alerter
+-------
+
+.. automodule:: grafanarmadillo.alerter
+    :members:
+
+
 Templator
 ---------
 

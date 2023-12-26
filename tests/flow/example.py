@@ -18,6 +18,7 @@ def export_templates(grafana, basedir: Path):
 	mapping = load_data("file://usage/mapping.json")
 	templator = make_mapping_templator(mapping, "dev", "template")
 
+	# define flows
 	flow = Flow(
 		store_obj=grafanastore,
 		store_tmpl=filestore,
@@ -29,7 +30,9 @@ def export_templates(grafana, basedir: Path):
 			)
 		]
 	)
+	# run flows
 	result = flow.obj_to_tmpl()
+	# react to flows
 	if result.failures:
 		result.raise_first()
 
@@ -41,6 +44,8 @@ def import_templates(grafana, basedir: Path):
 
 	mapping = load_data("file://usage/mapping.json")
 	deployments = {"east", "west", "north"}
+
+	# define flows
 	flow = Flow(
 		store_obj=grafanastore,
 		store_tmpl=filestore,
@@ -52,11 +57,14 @@ def import_templates(grafana, basedir: Path):
 			) for deployment in deployments
 		]
 	)
+	# run flows
 	result = flow.tmpl_to_obj()
+	# react to flows
 	if result.failures:
 		result.raise_first()
 
 
+# Add a custom command as an extension of the provided cli by creating a click group or command
 @gcmd.group()
 def my_system():
 	"""Wire your commands into the main grafanarmadillo command."""
