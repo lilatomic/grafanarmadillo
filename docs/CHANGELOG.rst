@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* feature : Finder.create_or_get_alert will create a placeholder alert instead of faking one
+* feature : helpful Flow for performing multiple templating operations
+
 v0.2.1 (2023-10-31)
 ------------------------------------------------------------
 

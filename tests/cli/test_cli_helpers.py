@@ -73,4 +73,4 @@ class TestResolveObjectToFilepath:
 
 	def test_cwd_base(self):
 		r = resolve_object_to_filepath(Path("."), "f0/a0")
-		assert r == Path("/p0/p1/p2/f0/a0.json")
+		assert r == Path("f0/a0.json")

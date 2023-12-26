@@ -9,6 +9,7 @@ Contents
    installation
    usage
    cli
+   flow
    contributing
    reference/index
    changelog
