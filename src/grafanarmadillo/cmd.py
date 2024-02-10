@@ -1,5 +1,6 @@
 """Ready-to-run commands for common Grafana templating scenarios."""
 import json
+from pathlib import Path
 from typing import IO
 
 import click
@@ -159,6 +160,15 @@ def import_alert(gfn: GrafanaApi, src: IO, dst: str, templator: Templator):
 	alert_info, folder_info = finder.create_or_get_alert(dst)
 	alert = templator.make_dashboard_from_template(alert_info, template)
 	alerter.import_alert(alert, folder_info)
+
+
+@grafanarmadillo.command()
+@click.option("--grafana-db-path", help="Path to the Grafana DB", type=click.Path(exists=True, path_type=Path))
+@click.option("--grafana-container-image", help="Grafana image to upgrade to", default="grafana/grafana:latest")
+def migrate(grafana_db_path, grafana_container_image):
+	"""Migrate from Classic to Unified alerting"""
+	from grafanarmadillo.migrate import migrate
+	migrate(grafana_container_image, grafana_db_path, {})
 
 
 if __name__ == "__main__":

@@ -25,6 +25,10 @@ class Finder:
 		super().__init__()
 		self.api = api
 
+	def list_dashboards(self) -> List[DashboardSearchResult]:
+		"""List all dashboards."""
+		return self.api.search.search_dashboards(type_="dash-db")
+
 	def find_dashboards(self, name: str) -> List[DashboardSearchResult]:
 		"""Find all dashboards with a name. Returns exact matches only."""
 		return list(
