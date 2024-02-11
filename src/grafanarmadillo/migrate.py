@@ -1,4 +1,5 @@
 """Migrate from Classic to Unified alerting."""
+import contextlib
 import json
 import shutil
 from dataclasses import dataclass
@@ -53,6 +54,16 @@ def read_container_logs(container: DockerContainer):
 def stop_container(container: DockerContainer):
 	"""Stop container."""
 	container.container.stop()
+
+
+@contextlib.contextmanager
+def with_container(image_name, volume_path: Path, environment_vars: Dict[str, str]):
+	"""Context manager for Grafana docker container."""
+	container = start_container(image_name, volume_path, environment_vars)
+	try:
+		yield container
+	finally:
+		stop_container(container)
 
 
 def _wait_until_ready(container: DockerContainer):
@@ -116,18 +127,15 @@ def migrate(grafana_image, grafana_db: Path, extra_env_vars: Dict[str, str]) -> 
 	new_grafana_db = grafana_db.with_name("migrated.sqlite3").absolute()
 	shutil.copyfile(grafana_db, new_grafana_db)
 
-	container = start_container(grafana_image, new_grafana_db, extra_env_vars)
+	with with_container(grafana_image, new_grafana_db, extra_env_vars) as container:
+		if container.status != "running":
+			raise RuntimeError(f"Could not start Grafana container {container=}")
 
-	if container.status != "running":
-		raise RuntimeError(f"Could not start Grafana container {container=}")
+		_wait_until_ready(container)
 
-	_wait_until_ready(container)
-
-	root_path = Path("/tmp/o")
-	for org, gfn in all_orgs(container):
-		for out_path, dashboard_content in get_all_dashboards(org, gfn):
-			write_to_file(root_path / out_path, dashboard_content)
-		for out_path, alert_content in get_all_alerts(org, gfn):
-			write_to_file(root_path / out_path, alert_content)
-
-	stop_container(container)
+		root_path = Path("/tmp/o")
+		for org, gfn in all_orgs(container):
+			for out_path, dashboard_content in get_all_dashboards(org, gfn):
+				write_to_file(root_path / out_path, dashboard_content)
+			for out_path, alert_content in get_all_alerts(org, gfn):
+				write_to_file(root_path / out_path, alert_content)
