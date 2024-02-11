@@ -166,7 +166,7 @@ def import_alert(gfn: GrafanaApi, src: IO, dst: str, templator: Templator):
 @click.option("--grafana-db-path", help="Path to the Grafana DB", type=click.Path(exists=True, path_type=Path))
 @click.option("--grafana-container-image", help="Grafana image to upgrade to", default="grafana/grafana:latest")
 def migrate(grafana_db_path, grafana_container_image):
-	"""Migrate from Classic to Unified alerting"""
+	"""Migrate from Classic to Unified alerting."""
 	from grafanarmadillo.migrate import migrate
 	migrate(grafana_container_image, grafana_db_path, {})
 

@@ -29,6 +29,10 @@ class Finder:
 		"""List all dashboards."""
 		return self.api.search.search_dashboards(type_="dash-db")
 
+	def list_alerts(self) -> List[AlertSearchResult]:
+		"""List all alerts."""
+		return self.api.alertingprovisioning.get_alertrules_all()
+
 	def find_dashboards(self, name: str) -> List[DashboardSearchResult]:
 		"""Find all dashboards with a name. Returns exact matches only."""
 		return list(
