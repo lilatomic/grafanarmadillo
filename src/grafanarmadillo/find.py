@@ -71,6 +71,18 @@ class Finder:
 				_query_message("folder", name),
 			)
 
+	def create_or_get_folder(self, name: str) -> FolderSearchResult:
+		"""
+		Create a new folder if it does not exist.
+
+		Returns the search information if it does.
+		"""
+		try:
+			folder = self.get_folder(name)
+		except ValueError:
+			folder = self.api.folder.create_folder(name)
+		return folder
+
 	def get_dashboard(self, folder_name: str, dashboard_name: str) -> DashboardSearchResult:
 		"""
 		Get a dashboard by its parent folder and dashboard name.
@@ -133,10 +145,7 @@ class Finder:
 		"""
 		folder_name, dashboard_name = self._resolve_path(path)
 
-		try:
-			folder = self.get_folder(folder_name)
-		except ValueError:
-			folder = self.api.folder.create_folder(folder_name)
+		folder = self.create_or_get_folder(folder_name)
 
 		try:
 			dashboard = self.get_dashboard(folder_name, dashboard_name)
@@ -161,10 +170,7 @@ class Finder:
 		"""
 		folder_name, alert_name = self._resolve_path(path)
 
-		try:
-			folder = self.get_folder(folder_name)
-		except ValueError:
-			folder = self.api.folder.create_folder(folder_name)
+		folder = self.create_or_get_folder(folder_name)
 
 		try:
 			alert = self.get_alert(folder_name, alert_name)
