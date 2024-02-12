@@ -13,7 +13,7 @@ For example:
 from abc import ABC, abstractmethod
 from functools import lru_cache
 from pathlib import Path
-from typing import Generator, Tuple
+from typing import Generator, List, Tuple
 
 from grafana_client import GrafanaApi
 
@@ -25,7 +25,7 @@ from grafanarmadillo.util import exactly_one, read_from_file, write_to_file
 
 
 @lru_cache
-def get_all_orgs(gfn_multiorg) -> list[OrgMeta]:
+def get_all_orgs(gfn_multiorg) -> List[OrgMeta]:
 	"""Get a list of all orgs."""
 	return gfn_multiorg.organizations.list_organization()
 
