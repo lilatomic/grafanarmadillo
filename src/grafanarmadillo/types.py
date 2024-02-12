@@ -42,6 +42,9 @@ AnyContent = Union[DashboardContent, AlertContent]
 DashboardMeta = NewType("DashboardMeta", dict)
 
 
+OrgMeta = NewType("OrgMeta", dict)
+
+
 class Dashboard(TypedDict):
 	"""Relevant keys returned by GET of a Grafana dashboard."""
 

@@ -1,19 +1,15 @@
 """Migrate from Classic to Unified alerting."""
 import contextlib
-import json
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Generator, Tuple
+from typing import Dict
 
 import docker
 import requests
 from docker.models.containers import Container
-from grafana_client import GrafanaApi
 
-from grafanarmadillo.alerter import Alerter
-from grafanarmadillo.dashboarder import Dashboarder
-from grafanarmadillo.find import Finder
+from grafanarmadillo.bulk import BulkExporter
 
 
 @dataclass
@@ -76,53 +72,7 @@ def _wait_until_ready(container: DockerContainer):
 			pass
 
 
-def get_all_dashboards(org, gfn: GrafanaApi):
-	"""Get all dashboards."""
-	finder, dashboarder = Finder(gfn), Dashboarder(gfn)
-	dashboards = finder.list_dashboards()
-	for dashboard in dashboards:
-		dashboard_content, folder = dashboarder.export_dashboard(dashboard)
-
-		if folder is None:
-			folder_name = "General"
-		else:
-			folder_name = folder["name"]
-
-		out_path = Path(str(org["id"]), folder_name, dashboard_content["title"])
-
-		yield out_path, dashboard_content
-
-
-def get_all_alerts(org, gfn: GrafanaApi):
-	"""Get all alerts."""
-	finder, alerter = Finder(gfn), Alerter(gfn)
-	alerts = finder.list_alerts()
-	for alert in alerts:
-		alert_content, folder = alerter.export_alert(alert)
-
-		folder_name = folder["title"]
-		out_path = Path(str(org["id"]), folder_name, alert_content["title"])
-
-		yield out_path, alert_content
-
-
-def all_orgs(container) -> Generator[Tuple[dict, GrafanaApi], None, None]:
-	"""Iterate over all organisations in Grafana."""
-	gfn_multiorg = GrafanaApi(host="localhost", port=container.host_port, auth=("admin", "admin"))
-	orgs = gfn_multiorg.organizations.list_organization()
-	for org in orgs:
-		gfn = GrafanaApi(host="localhost", port=container.host_port, organization_id=org["id"], auth=("admin", "admin"))
-		yield org, gfn
-
-
-def write_to_file(out_path: Path, obj: dict):
-	"""Write an object to file."""
-	out_path.parent.mkdir(parents=True, exist_ok=True)
-	with out_path.open(mode="w+", encoding="utf-8") as f:
-		json.dump(obj, f, ensure_ascii=False, indent="\t")
-
-
-def migrate(grafana_image, grafana_db: Path, output_directory: Path, extra_env_vars: Dict[str, str]=None) -> None:
+def migrate(grafana_image, grafana_db: Path, output_directory: Path, extra_env_vars: Dict[str, str] = None) -> None:
 	"""Migrate from classic to Unified alerting."""
 	extra_env_vars = extra_env_vars or None
 
@@ -135,8 +85,6 @@ def migrate(grafana_image, grafana_db: Path, output_directory: Path, extra_env_v
 
 		_wait_until_ready(container)
 
-		for org, gfn in all_orgs(container):
-			for out_path, dashboard_content in get_all_dashboards(org, gfn):
-				write_to_file(output_directory / out_path, dashboard_content)
-			for out_path, alert_content in get_all_alerts(org, gfn):
-				write_to_file(output_directory / out_path, alert_content)
+		exporter = BulkExporter({'host': "localhost", 'port': container.host_port, 'auth': ("admin", "admin")}, output_directory)
+
+		exporter.run()

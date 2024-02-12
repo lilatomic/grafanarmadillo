@@ -7,6 +7,7 @@ import click
 from grafana_client import GrafanaApi
 
 from grafanarmadillo.alerter import Alerter
+from grafanarmadillo.bulk import BulkExporter, BulkImporter
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator, make_mapping_templator
@@ -162,14 +163,42 @@ def import_alert(gfn: GrafanaApi, src: IO, dst: str, templator: Templator):
 	alerter.import_alert(alert, folder_info)
 
 
-@grafanarmadillo.command()
+@grafanarmadillo.group()
+def migrate():
+	"""Migrate between Grafana instances."""
+
+
+@migrate.command()
 @click.option("--grafana-db-path", help="Path to the Grafana DB", type=click.Path(exists=True, path_type=Path))
 @click.option("--grafana-container-image", help="Grafana image to upgrade to", default="grafana/grafana:latest")
 @click.option("--output-directory", "-o", help="Path to write output files", type=click.Path(exists=True, path_type=Path), default=".")
-def migrate(grafana_db_path, grafana_container_image, output_directory):
+def upgrade_alerting(grafana_db_path, grafana_container_image, output_directory):
 	"""Migrate from Classic to Unified alerting."""
 	from grafanarmadillo.migrate import migrate
-	migrate(grafana_container_image, grafana_db_path, output_directory,{})
+	migrate(grafana_container_image, grafana_db_path, output_directory, {})
+
+
+@grafanarmadillo.group()
+def resources():
+	"""Move many resources to a Grafana."""
+
+
+@resources.command("import")
+@click.option("--root-directory", help="Root directory for all resources", type=click.Path(exists=True, path_type=Path))
+@click.pass_context
+def _import_resources(ctx, root_directory: Path):
+	"""Load exported dashboards and alerts."""
+	operator = BulkImporter(ctx.obj["cfg"], root_directory)
+	operator.run()
+
+
+@resources.command("export")
+@click.option("--root-directory", help="Root directory for all resources", type=click.Path(exists=True, path_type=Path))
+@click.pass_context
+def _export_resources(ctx, root_directory: Path):
+	"""Export dashboards and alerts from a Grafana instance."""
+	operator = BulkExporter(ctx.obj["cfg"], root_directory)
+	operator.run()
 
 
 if __name__ == "__main__":
