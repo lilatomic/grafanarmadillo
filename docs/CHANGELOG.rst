@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* feature : migrator to upgrade alerts from Legacy to Unified
+* feature : bulk migrator to move all alerts and dashboards
+
 v0.3.0 (2023-12-26)
 ------------------------------------------------------------
 
