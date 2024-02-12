@@ -122,8 +122,10 @@ def write_to_file(out_path: Path, obj: dict):
 		json.dump(obj, f, ensure_ascii=False, indent="\t")
 
 
-def migrate(grafana_image, grafana_db: Path, extra_env_vars: Dict[str, str]) -> None:
+def migrate(grafana_image, grafana_db: Path, output_directory: Path, extra_env_vars: Dict[str, str]=None) -> None:
 	"""Migrate from classic to Unified alerting."""
+	extra_env_vars = extra_env_vars or None
+
 	new_grafana_db = grafana_db.with_name("migrated.sqlite3").absolute()
 	shutil.copyfile(grafana_db, new_grafana_db)
 
@@ -133,9 +135,8 @@ def migrate(grafana_image, grafana_db: Path, extra_env_vars: Dict[str, str]) -> 
 
 		_wait_until_ready(container)
 
-		root_path = Path("/tmp/o")
 		for org, gfn in all_orgs(container):
 			for out_path, dashboard_content in get_all_dashboards(org, gfn):
-				write_to_file(root_path / out_path, dashboard_content)
+				write_to_file(output_directory / out_path, dashboard_content)
 			for out_path, alert_content in get_all_alerts(org, gfn):
-				write_to_file(root_path / out_path, alert_content)
+				write_to_file(output_directory / out_path, alert_content)

@@ -165,10 +165,11 @@ def import_alert(gfn: GrafanaApi, src: IO, dst: str, templator: Templator):
 @grafanarmadillo.command()
 @click.option("--grafana-db-path", help="Path to the Grafana DB", type=click.Path(exists=True, path_type=Path))
 @click.option("--grafana-container-image", help="Grafana image to upgrade to", default="grafana/grafana:latest")
-def migrate(grafana_db_path, grafana_container_image):
+@click.option("--output-directory", "-o", help="Path to write output files", type=click.Path(exists=True, path_type=Path), default=".")
+def migrate(grafana_db_path, grafana_container_image, output_directory):
 	"""Migrate from Classic to Unified alerting."""
 	from grafanarmadillo.migrate import migrate
-	migrate(grafana_container_image, grafana_db_path, {})
+	migrate(grafana_container_image, grafana_db_path, output_directory,{})
 
 
 if __name__ == "__main__":
