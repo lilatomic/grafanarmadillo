@@ -74,7 +74,7 @@ def _wait_until_ready(
 	end = datetime.datetime.now() + timeout
 	while True:
 		if datetime.datetime.now() > end:
-			raise RuntimeError(f"Could not connect to container in {timeout}")
+			raise RuntimeError(f"Could not connect to container in {timeout} logs={read_container_logs(container)}")
 		try:
 			if requests.get(f"http://localhost:{container.host_port}/api/health").ok:
 				break
