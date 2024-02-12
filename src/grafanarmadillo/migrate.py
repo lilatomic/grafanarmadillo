@@ -74,7 +74,7 @@ def _wait_until_ready(container: DockerContainer):
 
 def migrate(grafana_image, grafana_db: Path, output_directory: Path, extra_env_vars: Dict[str, str] = None) -> None:
 	"""Migrate from classic to Unified alerting."""
-	extra_env_vars = extra_env_vars or None
+	extra_env_vars = extra_env_vars or {}
 
 	new_grafana_db = grafana_db.with_name("migrated.sqlite3").absolute()
 	shutil.copyfile(grafana_db, new_grafana_db)
