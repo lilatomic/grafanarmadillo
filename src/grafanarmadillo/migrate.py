@@ -100,7 +100,7 @@ def get_all_alerts(org, gfn: GrafanaApi):
 	for alert in alerts:
 		alert_content, folder = alerter.export_alert(alert)
 
-		folder_name = folder["name"]
+		folder_name = folder["title"]
 		out_path = Path(str(org["id"]), folder_name, alert_content["title"])
 
 		yield out_path, alert_content
