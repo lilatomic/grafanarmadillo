@@ -53,6 +53,12 @@ def stop_container(container: DockerContainer):
 	container.container.stop()
 
 
+def exec_in_container(container: DockerContainer, command: str):
+	"""Execute a command in a running docker container."""
+	result = container.container.exec_run(command)
+	return result.output.decode("utf-8").strip()
+
+
 @contextlib.contextmanager
 def with_container(image_name, volume_path: Path, environment_vars: Dict[str, str]):
 	"""Context manager for Grafana docker container."""
@@ -74,11 +80,17 @@ def _wait_until_ready(
 	end = datetime.datetime.now() + timeout
 	while True:
 		if datetime.datetime.now() > end:
-			raise RuntimeError(f"Could not connect to container in {timeout} logs={read_container_logs(container)}")
+			raise RuntimeError(
+				f"Could not connect to container in {timeout} logs={read_container_logs(container)}"
+			)
 		try:
 			if requests.get(f"http://localhost:{container.host_port}/api/health").ok:
 				break
-		except (ConnectionError, requests.exceptions.ConnectionError):
+		except (
+			ConnectionError,
+			requests.exceptions.ConnectionError,
+			requests.exceptions.HTTPError,
+		):
 			pass
 
 
@@ -91,10 +103,10 @@ def migrate(
 	"""Migrate from classic to Unified alerting."""
 	extra_env_vars = extra_env_vars or {}
 
-	new_grafana_db = grafana_db.with_name("migrated.sqlite3").absolute()
-	shutil.copyfile(grafana_db, new_grafana_db)
+	backup_db = grafana_db.with_name("backup.sqlite3").absolute()
+	shutil.copyfile(grafana_db, backup_db)
 
-	with with_container(grafana_image, new_grafana_db, extra_env_vars) as container:
+	with with_container(grafana_image, grafana_db, extra_env_vars) as container:
 		if container.status != "running":
 			raise RuntimeError(f"Could not start Grafana container {container=}")
 

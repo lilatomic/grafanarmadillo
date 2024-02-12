@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 from click.testing import CliRunner
@@ -12,19 +13,24 @@ from tests.conftest import read_json_file
 
 
 def test_cli__migrator(tmp_path: Path):
+	def init_db_file(path: Path) -> None:
+		path.parent.mkdir(parents=True, exist_ok=True)
+		path.touch(exist_ok=True)
+		os.chmod(path, 0o666)
+		if os.getenv("GITHUB_ACTIONS"):
+			import subprocess
+
+			subprocess.run(["sudo", "chown", "472", path.as_posix()])
+
 	legacy_db_path = tmp_path / "legacy" / "grafana_legacy.db"
-	legacy_db_path.parent.mkdir(parents=True, exist_ok=True)
-	legacy_db_path.touch(exist_ok=True)
+	init_db_file(legacy_db_path)
 	unified_db_path = tmp_path / "unified" / "grafana_unified.db"
-	unified_db_path.parent.mkdir(parents=True, exist_ok=True)
-	unified_db_path.touch(exist_ok=True)
+	init_db_file(unified_db_path)
 	with with_container(
 		"grafana/grafana:8.5.27",
 		legacy_db_path,
 		{"GF_UNIFIED_ALERTING_ENABLED": "false", "GF_ALERTING_ENABLED": "true"},
-	) as grafana_legacy, with_container(
-		"grafana/grafana:10.3.1", unified_db_path, {}
-	) as grafana_unified:
+	) as grafana_legacy:
 		(tmp_path / "unified").parent.mkdir(parents=True, exist_ok=True)
 
 		# Add dashboard with legacy alert to legacy Grafana
@@ -49,29 +55,32 @@ def test_cli__migrator(tmp_path: Path):
 
 		dashboarder_legacy.import_dashboard(legacy_dashboard, folder)
 
-		# Run migration
-		runner = CliRunner()
-		output_path = tmp_path / "output"
-		output_path.mkdir(parents=True, exist_ok=True)
-		result = runner.invoke(
-			grafanarmadillo,
-			[
-				"--cfg",
-				"{}",
-				"migrate",
-				"upgrade-alerting",
-				"--grafana-db-path",
-				legacy_db_path,
-				"-o",
-				output_path,
-			],
-		)
+	# Run migration
+	runner = CliRunner()
+	output_path = tmp_path / "output"
+	output_path.mkdir(parents=True, exist_ok=True)
+	result = runner.invoke(
+		grafanarmadillo,
+		[
+			"--cfg",
+			"{}",
+			"migrate",
+			"upgrade-alerting",
+			"--grafana-db-path",
+			legacy_db_path,
+			"-o",
+			output_path,
+		],
+	)
 
-		# Check migrate exported things
-		assert result.exit_code == 0
-		assert len(list((output_path / "dashboards").rglob("*.json"))) == 1
-		assert len(list((output_path / "alerts").rglob("*.json"))) == 1
+	# Check migrate exported things
+	assert result.exit_code == 0
+	assert len(list((output_path / "dashboards").rglob("*.json"))) == 1
+	assert len(list((output_path / "alerts").rglob("*.json"))) == 1
 
+	with with_container(
+		"grafana/grafana:10.3.1", unified_db_path, {}
+	) as grafana_unified:
 		# Import into new Grafana
 		_wait_until_ready(grafana_unified)
 
