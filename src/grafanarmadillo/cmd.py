@@ -172,10 +172,15 @@ def migrate():
 @click.option("--grafana-db-path", help="Path to the Grafana DB", type=click.Path(exists=True, path_type=Path))
 @click.option("--grafana-container-image", help="Grafana image to upgrade to", default="grafana/grafana:latest")
 @click.option("--output-directory", "-o", help="Path to write output files", type=click.Path(exists=True, path_type=Path), default=".")
-def upgrade_alerting(grafana_db_path, grafana_container_image, output_directory):
+@click.option("--grafana-extra-envvars", help="Environment variables to pass to the Grafana container used to migrate the alerts", default=None)
+def upgrade_alerting(grafana_db_path, grafana_container_image, output_directory, grafana_extra_envvars):
 	"""Migrate from Classic to Unified alerting."""
 	from grafanarmadillo.migrate import migrate
-	migrate(grafana_container_image, grafana_db_path, output_directory, {})
+	if grafana_extra_envvars:
+		grafana_extra_envvars = json.loads(grafana_extra_envvars)
+	else:
+		grafana_extra_envvars = {}
+	migrate(grafana_container_image, grafana_db_path, output_directory, grafana_extra_envvars)
 
 
 @grafanarmadillo.group()
