@@ -95,10 +95,12 @@ def _wait_until_ready(
 
 
 def migrate(
-	grafana_image,
+	cfg: dict,
+	grafana_image: str,
 	grafana_db: Path,
 	output_directory: Path,
 	extra_env_vars: Dict[str, str] = None,
+	timeout: datetime.timedelta = DEFAULT_TIMEOUT,
 ) -> None:
 	"""Migrate from classic to Unified alerting."""
 	extra_env_vars = extra_env_vars or {}
@@ -110,14 +112,13 @@ def migrate(
 		if container.status != "running":
 			raise RuntimeError(f"Could not start Grafana container {container=}")
 
-		_wait_until_ready(container)
+		_wait_until_ready(container, timeout=timeout)
 
 		exporter = BulkExporter(
-			{
+			{**cfg, **{
 				"host": "localhost",
 				"port": container.host_port,
-				"auth": ("admin", "admin"),
-			},
+			}},
 			output_directory,
 		)
 

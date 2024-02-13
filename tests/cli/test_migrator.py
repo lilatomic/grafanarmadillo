@@ -63,7 +63,7 @@ def test_cli__migrator(tmp_path: Path):
 		grafanarmadillo,
 		[
 			"--cfg",
-			"{}",
+			json.dumps({"auth": ["admin", "admin"]}),
 			"migrate",
 			"upgrade-alerting",
 			"--grafana-db-path",
