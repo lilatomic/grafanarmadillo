@@ -1,6 +1,8 @@
 """Migrate from Classic to Unified alerting."""
 import contextlib
 import datetime
+import logging
+import os
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -11,6 +13,9 @@ import requests
 from docker.models.containers import Container
 
 from grafanarmadillo.bulk import BulkExporter
+
+
+l = logging.getLogger(__name__)
 
 
 @dataclass
@@ -100,13 +105,20 @@ def migrate(
 	grafana_db: Path,
 	output_directory: Path,
 	extra_env_vars: Dict[str, str] = None,
+	grafana_uid: int = 472,
 	timeout: datetime.timedelta = DEFAULT_TIMEOUT,
 ) -> None:
 	"""Migrate from classic to Unified alerting."""
 	extra_env_vars = extra_env_vars or {}
 
-	backup_db = grafana_db.with_name("backup.sqlite3").absolute()
-	shutil.copyfile(grafana_db, backup_db)
+	new_db = grafana_db.with_name("backup.sqlite3").absolute()
+	l.debug(f"cloning db from={grafana_image} to={new_db}")
+	shutil.copyfile(grafana_db, new_db)
+	if not new_db.stat().st_uid == grafana_uid:
+		try:
+			os.chown(new_db, uid=grafana_uid, gid=new_db.stat().st_gid)
+		except PermissionError:
+			l.warning(f"Could not change owner of Grafana DB. expected={grafana_uid} actual={new_db.stat().st_uid} permissions={oct(new_db.stat().st_mode)}")
 
 	with with_container(grafana_image, grafana_db, extra_env_vars) as container:
 		if container.status != "running":
