@@ -139,3 +139,16 @@ def load_data(data_str: str):
 			return json.load(data_file)
 	else:
 		return json.loads(data_str)
+
+
+def write_to_file(out_path: Path, obj: dict):
+	"""Write an object to file as JSON."""
+	out_path.parent.mkdir(parents=True, exist_ok=True)
+	with out_path.open(mode="w+", encoding="utf-8") as f:
+		json.dump(obj, f, ensure_ascii=False, indent="\t")
+
+
+def read_from_file(file_path: Path) -> dict:
+	"""Read JSON from a file."""
+	with file_path.open(mode="r", encoding="utf-8") as f:
+		return json.load(f)

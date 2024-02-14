@@ -1,11 +1,14 @@
 """Ready-to-run commands for common Grafana templating scenarios."""
+import datetime
 import json
+from pathlib import Path
 from typing import IO
 
 import click
 from grafana_client import GrafanaApi
 
 from grafanarmadillo.alerter import Alerter
+from grafanarmadillo.bulk import BulkExporter, BulkImporter
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator, make_mapping_templator
@@ -159,6 +162,73 @@ def import_alert(gfn: GrafanaApi, src: IO, dst: str, templator: Templator):
 	alert_info, folder_info = finder.create_or_get_alert(dst)
 	alert = templator.make_dashboard_from_template(alert_info, template)
 	alerter.import_alert(alert, folder_info)
+
+
+@grafanarmadillo.group()
+def migrate():
+	"""Migrate between Grafana instances."""
+
+
+@migrate.command()
+@click.option("--grafana-db-path", help="Path to the Grafana DB", type=click.Path(exists=True, path_type=Path))
+@click.option("--grafana-container-image", help="Grafana image to upgrade to", default="grafana/grafana:latest")
+@click.option("--output-directory", "-o", help="Path to write output files", type=click.Path(exists=True, path_type=Path), default=".")
+@click.option("--grafana-extra-envvars", help=f"Environment variables to pass to the Grafana container used to migrate the alerts. {load_file_help}", default=None)
+@click.option(
+	"--grafana-migration-timeout",
+	help="Timeout in seconds to wait for the Grafana docker container to apply all migrations. A large Grafana instance may take a long time",
+	default=300,
+	type=int,
+)
+@click.option("--clone-db", help="whether to perform migrations on a clone of the DB or the DB itself", type=click.BOOL, default=True)
+@click.pass_context
+def upgrade_alerting(ctx, grafana_db_path, grafana_container_image, output_directory, grafana_extra_envvars, grafana_migration_timeout, clone_db):
+	"""
+	Migrate from Classic to Unified alerting.
+
+	Migrations from Classic to Unified alerting is done as DB migrations.
+	We clone the database and use a docker container to perform the migration.
+	Note that because we use a clone of the DB, we need to supply the config with the auth for the live instance.
+	"""
+	from grafanarmadillo.migrate import migrate
+
+	cfg = ctx.obj["cfg"]
+	if grafana_extra_envvars:
+		grafana_extra_envvars = load_data(grafana_extra_envvars)
+	else:
+		grafana_extra_envvars = {}
+	migrate(
+		cfg,
+		grafana_container_image,
+		grafana_db_path,
+		output_directory,
+		extra_env_vars=grafana_extra_envvars,
+		timeout=datetime.timedelta(seconds=grafana_migration_timeout),
+		clone_db=clone_db,
+	)
+
+
+@grafanarmadillo.group()
+def resources():
+	"""Move many resources to a Grafana."""
+
+
+@resources.command("import")
+@click.option("--root-directory", help="Root directory for all resources", type=click.Path(exists=True, path_type=Path))
+@click.pass_context
+def _import_resources(ctx, root_directory: Path):
+	"""Load exported dashboards and alerts."""
+	operator = BulkImporter(ctx.obj["cfg"], root_directory)
+	operator.run()
+
+
+@resources.command("export")
+@click.option("--root-directory", help="Root directory for all resources", type=click.Path(exists=True, path_type=Path))
+@click.pass_context
+def _export_resources(ctx, root_directory: Path):
+	"""Export dashboards and alerts from a Grafana instance."""
+	operator = BulkExporter(ctx.obj["cfg"], root_directory)
+	operator.run()
 
 
 if __name__ == "__main__":

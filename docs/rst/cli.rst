@@ -2,6 +2,9 @@
 CLI Usage
 =========
 
+Common templating
+=================
+
 Grafanarmadillo includes a CLI to do the most common operation of importing and exporting templates with a find-replace templator. For example: You might have a dashboard for developers to test new alerts and visualisations titled "MySystem TEST". When the devs are happy, they want an instance of the dashboard created for each of 3 deployments with the correct names and deployment_ids. They also want to be able to check the template into git so they can revert to a previous version.
 
 Grafanarmadillo's CLI makes this easy!
@@ -28,3 +31,27 @@ Grafanarmadillo's CLI makes this easy!
 
    .. literalinclude:: ../../tests/usage/cli_import.bash
 	:language: bash
+
+
+Migrations
+==========
+
+Bulk operations
+---------------
+
+Grafanarmadillo also includes some tools from performing some migrations. :code:`grafanarmadillo resources export` and :code:`grafanarmadillo resources import` allow for a bulk export and import of all alerts. These tools map between the Grafana instance and a filesystem::
+
+	dashboards
+		org0
+			folder0
+				dashboard.json
+	alerts
+		org0
+			folder0
+				alert.json
+
+
+Migrating from Classic to Unified alerting
+------------------------------------------
+
+Another migrator included in Grafanarmadillo upgrades from Classic to Unified alerting. This needs to happen as a database migration. Grafanarmadillo clones the DB and uses a docker container to run the migrations. It then uses bulk operations to copy the upgraded dashboards and alerts and save them to disk. You can then inspect and filter the exported alerts, for example to only migrate a single org. The bulk importer can then be used to move these into a new Grafana instance.

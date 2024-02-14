@@ -47,8 +47,11 @@ setup(
 	},
 	keywords=[],
 	python_requires=">=3.8, <4",
-	install_requires=["grafana-client~=3.0", "typing-extensions~=3.0;python_version<'3.8'"],
-	extras_require={'cli': ["click>8"]},
+	install_requires=["grafana-client~=3.0"],
+	extras_require={
+		'cli': ["click>=8"],
+		'migrate': ["docker>=5"]
+	},
 	setup_requires=[
 		#   'pytest-runner',
 		#   'setuptools_scm>=3.3.1',
