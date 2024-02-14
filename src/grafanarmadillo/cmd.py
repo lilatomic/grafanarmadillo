@@ -180,8 +180,9 @@ def migrate():
 	default=300,
 	type=int,
 )
+@click.option("--clone-db", help="whether to perform migrations on a clone of the DB or the DB itself", type=click.BOOL, default=True)
 @click.pass_context
-def upgrade_alerting(ctx, grafana_db_path, grafana_container_image, output_directory, grafana_extra_envvars, grafana_migration_timeout):
+def upgrade_alerting(ctx, grafana_db_path, grafana_container_image, output_directory, grafana_extra_envvars, grafana_migration_timeout, clone_db):
 	"""
 	Migrate from Classic to Unified alerting.
 
@@ -196,7 +197,15 @@ def upgrade_alerting(ctx, grafana_db_path, grafana_container_image, output_direc
 		grafana_extra_envvars = load_data(grafana_extra_envvars)
 	else:
 		grafana_extra_envvars = {}
-	migrate(cfg, grafana_container_image, grafana_db_path, output_directory, extra_env_vars=grafana_extra_envvars, timeout=datetime.timedelta(seconds=grafana_migration_timeout))
+	migrate(
+		cfg,
+		grafana_container_image,
+		grafana_db_path,
+		output_directory,
+		extra_env_vars=grafana_extra_envvars,
+		timeout=datetime.timedelta(seconds=grafana_migration_timeout),
+		clone_db=clone_db,
+	)
 
 
 @grafanarmadillo.group()

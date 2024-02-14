@@ -109,20 +109,24 @@ def migrate(
 	extra_env_vars: Dict[str, str] = None,
 	grafana_uid: int = 472,
 	timeout: datetime.timedelta = DEFAULT_TIMEOUT,
+	clone_db: bool = True
 ) -> None:
 	"""Migrate from classic to Unified alerting."""
 	extra_env_vars = extra_env_vars or {}
 
-	new_db = grafana_db.with_name("migrated").absolute()
-	l.debug(f"cloning db from={grafana_image} to={new_db}")
-	shutil.copyfile(grafana_db, new_db)
-	if not new_db.stat().st_uid == grafana_uid:
-		try:
-			import subprocess
+	if clone_db:
+		new_db = grafana_db.with_name("migrated").absolute()
+		l.debug(f"cloning db from={grafana_image} to={new_db}")
+		shutil.copyfile(grafana_db, new_db)
+		if not new_db.stat().st_uid == grafana_uid:
+			try:
+				import subprocess
 
-			subprocess.run(["sudo", "chown", str(grafana_uid), new_db.as_posix()])
-		except PermissionError:
-			l.warning(f"Could not change owner of Grafana DB. expected={grafana_uid} actual={new_db.stat().st_uid} permissions={oct(new_db.stat().st_mode)}")
+				subprocess.run(["sudo", "chown", str(grafana_uid), new_db.as_posix()])
+			except PermissionError:
+				l.warning(f"Could not change owner of Grafana DB. expected={grafana_uid} actual={new_db.stat().st_uid} permissions={oct(new_db.stat().st_mode)}")
+	else:
+		new_db = grafana_db
 
 	l.debug("begin migrating")
 	with with_container(grafana_image, new_db, extra_env_vars) as container:
