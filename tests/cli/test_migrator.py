@@ -74,9 +74,13 @@ def test_cli__migrator(tmp_path: Path):
 	)
 
 	# Check migrate exported things
-	assert result.exit_code == 0
-	assert len(list((output_path / "dashboards").rglob("*.json"))) == 1
-	assert len(list((output_path / "alerts").rglob("*.json"))) == 1
+	try:
+		assert result.exit_code == 0
+		assert len(list((output_path / "dashboards").rglob("*.json"))) == 1
+		assert len(list((output_path / "alerts").rglob("*.json"))) == 1
+	except AssertionError:
+		print(result.output)
+		raise
 
 	with with_container(
 		"grafana/grafana:10.3.1", unified_db_path, {}
@@ -115,7 +119,11 @@ def test_cli__migrator(tmp_path: Path):
 				output_path,
 			],
 		)
-		assert result2.exit_code == 0
-		finder_unified = Finder(gfn_unified)
-		assert len(finder_unified.list_dashboards()) == 1
-		assert len(finder_unified.list_alerts()) == 1
+		try:
+			assert result2.exit_code == 0
+			finder_unified = Finder(gfn_unified)
+			assert len(finder_unified.list_dashboards()) == 1
+			assert len(finder_unified.list_alerts()) == 1
+		except AssertionError:
+			print(result2.output)
+			raise

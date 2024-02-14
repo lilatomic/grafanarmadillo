@@ -1,4 +1,5 @@
 """Ready-to-run commands for common Grafana templating scenarios."""
+import datetime
 import json
 from pathlib import Path
 from typing import IO
@@ -172,18 +173,30 @@ def migrate():
 @click.option("--grafana-db-path", help="Path to the Grafana DB", type=click.Path(exists=True, path_type=Path))
 @click.option("--grafana-container-image", help="Grafana image to upgrade to", default="grafana/grafana:latest")
 @click.option("--output-directory", "-o", help="Path to write output files", type=click.Path(exists=True, path_type=Path), default=".")
-@click.option("--grafana-extra-envvars", help="Environment variables to pass to the Grafana container used to migrate the alerts", default=None)
+@click.option("--grafana-extra-envvars", help=f"Environment variables to pass to the Grafana container used to migrate the alerts. {load_file_help}", default=None)
+@click.option(
+	"--grafana-migration-timeout",
+	help="Timeout in seconds to wait for the Grafana docker container to apply all migrations. A large Grafana instance may take a long time",
+	default=300,
+	type=int,
+)
 @click.pass_context
-def upgrade_alerting(ctx, grafana_db_path, grafana_container_image, output_directory, grafana_extra_envvars):
-	"""Migrate from Classic to Unified alerting."""
+def upgrade_alerting(ctx, grafana_db_path, grafana_container_image, output_directory, grafana_extra_envvars, grafana_migration_timeout):
+	"""
+	Migrate from Classic to Unified alerting.
+
+	Migrations from Classic to Unified alerting is done as DB migrations.
+	We clone the database and use a docker container to perform the migration.
+	Note that because we use a clone of the DB, we need to supply the config with the auth for the live instance.
+	"""
 	from grafanarmadillo.migrate import migrate
 
 	cfg = ctx.obj["cfg"]
 	if grafana_extra_envvars:
-		grafana_extra_envvars = json.loads(grafana_extra_envvars)
+		grafana_extra_envvars = load_data(grafana_extra_envvars)
 	else:
 		grafana_extra_envvars = {}
-	migrate(cfg, grafana_container_image, grafana_db_path, output_directory, grafana_extra_envvars)
+	migrate(cfg, grafana_container_image, grafana_db_path, output_directory, extra_env_vars=grafana_extra_envvars, timeout=datetime.timedelta(seconds=grafana_migration_timeout))
 
 
 @grafanarmadillo.group()

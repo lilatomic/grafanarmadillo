@@ -9,7 +9,7 @@ For example:
 	BulkGrafanaOperation uses a Grafana instance as its source
 	BulkExporter uses BulkGrafanaOperations to list all objects and write them to disk
 """
-
+import logging
 from abc import ABC, abstractmethod
 from functools import lru_cache
 from pathlib import Path
@@ -22,6 +22,9 @@ from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.types import AlertContent, DashboardContent, OrgMeta
 from grafanarmadillo.util import exactly_one, read_from_file, write_to_file
+
+
+l = logging.getLogger(__name__)
 
 
 @lru_cache
@@ -176,10 +179,12 @@ class BulkExporter(BulkGrafanaOperation):
 
 	def each_dashboard(self, path: Path, dashboard: DashboardContent):
 		"""Write each dashboard to files."""
+		l.info(f"export dashboard path={path}")
 		write_to_file((self.root_directory / "dashboards" / path).with_suffix(".json"), dashboard)
 
 	def each_alert(self, path: Path, alert: AlertContent):
 		"""Write each alert to files."""
+		l.info(f"export alert path={path}")
 		write_to_file((self.root_directory / "alerts" / path).with_suffix(".json"), alert)
 
 
@@ -195,6 +200,7 @@ class BulkImporter(BulkFileOperation):
 
 		finder, dashboarder = Finder(gfn), Dashboarder(gfn)
 		folder = finder.create_or_get_folder(folder_name)
+		l.info(f"import dashboard path={path}")
 		dashboarder.import_dashboard(dashboard, folder)
 
 	def each_alert(self, path: Path, alert: AlertContent):
@@ -206,4 +212,5 @@ class BulkImporter(BulkFileOperation):
 
 		finder, alerter = Finder(gfn), Alerter(gfn)
 		folder = finder.create_or_get_folder(folder_name)
+		l.info(f"import alert path={path}")
 		alerter.import_alert(alert, folder)
