@@ -24,6 +24,9 @@ def test_cli__migrator(tmp_path: Path):
 
 	legacy_db_path = tmp_path / "legacy" / "grafana_legacy.db"
 	init_db_file(legacy_db_path)
+	migrated_db_path = legacy_db_path.with_name("migrated")
+	init_db_file(migrated_db_path)  # shim to change file permissions so later copy works
+
 	unified_db_path = tmp_path / "unified" / "grafana_unified.db"
 	init_db_file(unified_db_path)
 	with with_container(

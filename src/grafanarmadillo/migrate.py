@@ -2,7 +2,6 @@
 import contextlib
 import datetime
 import logging
-import os
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -114,12 +113,14 @@ def migrate(
 	"""Migrate from classic to Unified alerting."""
 	extra_env_vars = extra_env_vars or {}
 
-	new_db = grafana_db.with_name("backup.sqlite3").absolute()
+	new_db = grafana_db.with_name("migrated").absolute()
 	l.debug(f"cloning db from={grafana_image} to={new_db}")
 	shutil.copyfile(grafana_db, new_db)
 	if not new_db.stat().st_uid == grafana_uid:
 		try:
-			os.chown(new_db, uid=grafana_uid, gid=new_db.stat().st_gid)
+			import subprocess
+
+			subprocess.run(["sudo", "chown", str(grafana_uid), new_db.as_posix()])
 		except PermissionError:
 			l.warning(f"Could not change owner of Grafana DB. expected={grafana_uid} actual={new_db.stat().st_uid} permissions={oct(new_db.stat().st_mode)}")
 
