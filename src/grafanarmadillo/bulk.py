@@ -20,6 +20,7 @@ from grafana_client import GrafanaApi
 from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
+from grafanarmadillo.templator import Templator
 from grafanarmadillo.types import AlertContent, DashboardContent, OrgMeta
 from grafanarmadillo.util import exactly_one, read_from_file, write_to_file
 
@@ -173,23 +174,30 @@ class BulkFileOperation(BulkOperation, ABC):
 class BulkExporter(BulkGrafanaOperation):
 	"""Export all resources from Grafana to files."""
 
-	def __init__(self, cfg: dict, root_directory: Path):
+	def __init__(self, cfg: dict, root_directory: Path, templator: Templator):
 		self.root_directory = root_directory
+		self.templator = templator
 		super().__init__(cfg)
 
 	def each_dashboard(self, path: Path, dashboard: DashboardContent):
 		"""Write each dashboard to files."""
+		dashboard_templated = self.templator.make_template_from_dashboard(dashboard)
 		l.info(f"export dashboard path={path}")
-		write_to_file((self.root_directory / "dashboards" / path).with_suffix(".json"), dashboard)
+		write_to_file((self.root_directory / "dashboards" / path).with_suffix(".json"), dashboard_templated)
 
 	def each_alert(self, path: Path, alert: AlertContent):
 		"""Write each alert to files."""
+		alert_templated = self.templator.make_template_from_dashboard(alert)
 		l.info(f"export alert path={path}")
-		write_to_file((self.root_directory / "alerts" / path).with_suffix(".json"), alert)
+		write_to_file((self.root_directory / "alerts" / path).with_suffix(".json"), alert_templated)
 
 
 class BulkImporter(BulkFileOperation):
 	"""Import all resources from files into Grafana."""
+
+	def __init__(self, cfg: dict, root_directory: Path, templator: Templator):
+		self.templator = templator
+		super().__init__(cfg, root_directory)
 
 	def each_dashboard(self, path: Path, dashboard: DashboardContent):
 		"""Import each dashboard into Grafana."""
@@ -200,8 +208,11 @@ class BulkImporter(BulkFileOperation):
 
 		finder, dashboarder = Finder(gfn), Dashboarder(gfn)
 		folder = finder.create_or_get_folder(folder_name)
+		dashboard_templated = self.templator.make_dashboard_from_template(
+			dashboard, dashboard
+		)
 		l.info(f"import dashboard path={path}")
-		dashboarder.import_dashboard(dashboard, folder)
+		dashboarder.import_dashboard(dashboard_templated, folder)
 
 	def each_alert(self, path: Path, alert: AlertContent):
 		"""Import each alert into Grafana."""
@@ -212,5 +223,6 @@ class BulkImporter(BulkFileOperation):
 
 		finder, alerter = Finder(gfn), Alerter(gfn)
 		folder = finder.create_or_get_folder(folder_name)
+		alert_templated = self.templator.make_dashboard_from_template(alert, alert)
 		l.info(f"import alert path={path}")
-		alerter.import_alert(alert, folder)
+		alerter.import_alert(alert_templated, folder)
