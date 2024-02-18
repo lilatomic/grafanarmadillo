@@ -177,19 +177,54 @@ def migrate():
 
 
 @migrate.command()
-@click.option("--grafana-db-path", help="Path to the Grafana DB", type=click.Path(exists=True, path_type=Path))
-@click.option("--grafana-container-image", help="Grafana image to upgrade to", default="grafana/grafana:latest")
-@click.option("--output-directory", "-o", help="Path to write output files", type=click.Path(exists=True, path_type=Path), default=".")
-@click.option("--grafana-extra-envvars", help=f"Environment variables to pass to the Grafana container used to migrate the alerts. {load_file_help}", default=None)
+@click.option(
+	"--grafana-db-path",
+	help="Path to the Grafana DB",
+	type=click.Path(exists=True, path_type=Path),
+)
+@click.option(
+	"--grafana-container-image",
+	help="Grafana image to upgrade to",
+	default="grafana/grafana:latest",
+)
+@click.option(
+	"--output-directory",
+	"-o",
+	help="Path to write output files",
+	type=click.Path(exists=True, path_type=Path),
+	default=".",
+)
+@click.option(
+	"--grafana-extra-envvars",
+	help=f"Environment variables to pass to the Grafana container used to migrate the alerts. {load_file_help}",
+	default=None,
+)
 @click.option(
 	"--grafana-migration-timeout",
 	help="Timeout in seconds to wait for the Grafana docker container to apply all migrations. A large Grafana instance may take a long time",
 	default=300,
 	type=int,
 )
-@click.option("--clone-db", help="whether to perform migrations on a clone of the DB or the DB itself", type=click.BOOL, default=True)
+@click.option(
+	"--clone-db",
+	help="whether to perform migrations on a clone of the DB or the DB itself",
+	type=click.BOOL,
+	default=True,
+)
+@with_template_options
 @click.pass_context
-def upgrade_alerting(ctx, grafana_db_path, grafana_container_image, output_directory, grafana_extra_envvars, grafana_migration_timeout, clone_db):
+def upgrade_alerting(
+	ctx,
+	grafana_db_path,
+	grafana_container_image,
+	output_directory,
+	grafana_extra_envvars,
+	grafana_migration_timeout,
+	clone_db,
+	mapping,
+	env_grafana,
+	env_template,
+):
 	"""
 	Migrate from Classic to Unified alerting.
 
@@ -198,6 +233,9 @@ def upgrade_alerting(ctx, grafana_db_path, grafana_container_image, output_direc
 	Note that because we use a clone of the DB, we need to supply the config with the auth for the live instance.
 	"""
 	from grafanarmadillo.migrate import migrate
+
+	mapping = load_data(mapping)
+	templator = make_mapping_templator(mapping, env_grafana, env_template)
 
 	cfg = ctx.obj["cfg"]
 	if grafana_extra_envvars:
@@ -209,6 +247,7 @@ def upgrade_alerting(ctx, grafana_db_path, grafana_container_image, output_direc
 		grafana_container_image,
 		grafana_db_path,
 		output_directory,
+		templator,
 		extra_env_vars=grafana_extra_envvars,
 		timeout=datetime.timedelta(seconds=grafana_migration_timeout),
 		clone_db=clone_db,
@@ -221,20 +260,48 @@ def resources():
 
 
 @resources.command("import")
-@click.option("--root-directory", help="Root directory for all resources", type=click.Path(exists=True, path_type=Path))
+@click.option(
+	"--root-directory",
+	help="Root directory for all resources",
+	type=click.Path(exists=True, path_type=Path),
+)
+@with_template_options
 @click.pass_context
-def _import_resources(ctx, root_directory: Path):
+def _import_resources(
+	ctx,
+	root_directory: Path,
+	mapping,
+	env_grafana,
+	env_template,
+):
 	"""Load exported dashboards and alerts."""
-	operator = BulkImporter(ctx.obj["cfg"], root_directory)
+	mapping = load_data(mapping)
+	templator = make_mapping_templator(mapping, env_grafana, env_template)
+
+	operator = BulkImporter(ctx.obj["cfg"], root_directory, templator=templator)
 	operator.run()
 
 
 @resources.command("export")
-@click.option("--root-directory", help="Root directory for all resources", type=click.Path(exists=True, path_type=Path))
+@click.option(
+	"--root-directory",
+	help="Root directory for all resources",
+	type=click.Path(exists=True, path_type=Path),
+)
+@with_template_options
 @click.pass_context
-def _export_resources(ctx, root_directory: Path):
+def _export_resources(
+	ctx,
+	root_directory: Path,
+	mapping,
+	env_grafana,
+	env_template,
+):
 	"""Export dashboards and alerts from a Grafana instance."""
-	operator = BulkExporter(ctx.obj["cfg"], root_directory)
+	mapping = load_data(mapping)
+	templator = make_mapping_templator(mapping, env_grafana, env_template)
+
+	operator = BulkExporter(ctx.obj["cfg"], root_directory, templator=templator)
 	operator.run()
 
 

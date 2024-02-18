@@ -27,6 +27,13 @@ def test_cli__migrator(tmp_path: Path):
 	migrated_db_path = legacy_db_path.with_name("migrated")
 	init_db_file(migrated_db_path)  # shim to change file permissions so later copy works
 
+	mapping_args = [
+		"--mapping",
+		json.dumps({"e": {"ds_url": "http://mydatasource.com"}}),
+		"--env-grafana=e",
+		"--env-template=$auto"
+	]
+
 	unified_db_path = tmp_path / "unified" / "grafana_unified.db"
 	init_db_file(unified_db_path)
 	with with_container(
@@ -73,6 +80,7 @@ def test_cli__migrator(tmp_path: Path):
 			legacy_db_path,
 			"-o",
 			output_path,
+			*mapping_args
 		],
 	)
 
@@ -82,8 +90,12 @@ def test_cli__migrator(tmp_path: Path):
 		assert len(list((output_path / "dashboards").rglob("*.json"))) == 1
 		assert len(list((output_path / "alerts").rglob("*.json"))) == 1
 	except AssertionError:
-		print(result.output)
-		raise
+		print(f"{result.output=}")
+		if result.exception:
+			print(f"{result.exception=}")
+			raise result.exception
+		else:
+			raise
 
 	with with_container(
 		"grafana/grafana:10.3.1", unified_db_path, {}
@@ -120,6 +132,7 @@ def test_cli__migrator(tmp_path: Path):
 				"import",
 				"--root-directory",
 				output_path,
+				*mapping_args
 			],
 		)
 		try:
@@ -129,4 +142,8 @@ def test_cli__migrator(tmp_path: Path):
 			assert len(finder_unified.list_alerts()) == 1
 		except AssertionError:
 			print(result2.output)
-			raise
+			if result2.exception:
+				print(f"{result2.exception=}")
+				raise result2.exception
+			else:
+				raise
