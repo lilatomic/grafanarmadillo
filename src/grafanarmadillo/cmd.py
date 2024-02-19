@@ -39,6 +39,7 @@ def make_grafana(config) -> GrafanaApi:
 
 
 def with_template_options(f):
+	"""Add template options to a command."""
 	return click.option("--mapping", help=mapping_help)(
 		click.option("--env-grafana", help=env_grafana_help)(
 			click.option("--env-template", help=env_template_help)(f)

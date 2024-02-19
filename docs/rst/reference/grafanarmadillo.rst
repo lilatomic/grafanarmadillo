@@ -1,31 +1,27 @@
-grafanarmadillo
-===============
+Resource operations
+===================
 
-.. automodule:: grafanarmadillo
-    :members:
-
-
-Find
-----
+grafanarmadillo.find
+--------------------
 
 .. automodule:: grafanarmadillo.find
     :members:
 
-Dashboarder
------------
+grafanarmadillo.dashboarder
+---------------------------
 
 .. automodule:: grafanarmadillo.dashboarder
     :members:
 
-Alerter
--------
+grafanarmadillo.alerter
+-----------------------
 
 .. automodule:: grafanarmadillo.alerter
     :members:
 
 
-Templator
----------
+grafanarmadillo.templator
+-------------------------
 
 .. automodule:: grafanarmadillo.templator
     :members:
