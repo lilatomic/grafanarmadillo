@@ -27,9 +27,10 @@ def test_cli__migrator(tmp_path: Path):
 	migrated_db_path = legacy_db_path.with_name("migrated")
 	init_db_file(migrated_db_path)  # shim to change file permissions so later copy works
 
+	ds_uid = "nfke3J2Sz"
 	mapping_args = [
 		"--mapping",
-		json.dumps({"e": {"ds_url": "http://mydatasource.com"}}),
+		json.dumps({"e": {"ds_uid": ds_uid}}),
 		"--env-grafana=e",
 		"--env-template=$auto"
 	]
@@ -59,7 +60,7 @@ def test_cli__migrator(tmp_path: Path):
 				"url": "http://mydatasource.com",
 				"access": "proxy",
 				"basicAuth": False,
-				"uid": "nfke3J2Sz",
+				"uid": ds_uid,
 			}
 		)
 
@@ -89,6 +90,8 @@ def test_cli__migrator(tmp_path: Path):
 		assert result.exit_code == 0
 		assert len(list((output_path / "dashboards").rglob("*.json"))) == 1
 		assert len(list((output_path / "alerts").rglob("*.json"))) == 1
+		with (output_path / "dashboards" / "Main Org." / "General" / "New dashboard.json").open() as f:
+			assert "${ds_uid}" in f.read(), "templating didn't happen in export"
 	except AssertionError:
 		print(f"{result.output=}")
 		if result.exception:
@@ -113,7 +116,7 @@ def test_cli__migrator(tmp_path: Path):
 				"url": "http://mydatasource.com",
 				"access": "proxy",
 				"basicAuth": False,
-				"uid": "nfke3J2Sz",
+				"uid": ds_uid,
 			}
 		)
 
