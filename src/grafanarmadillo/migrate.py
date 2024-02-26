@@ -12,6 +12,7 @@ import requests
 from docker.models.containers import Container
 
 from grafanarmadillo.bulk import BulkExporter
+from grafanarmadillo.templator import Templator
 
 
 l = logging.getLogger(__name__)
@@ -106,6 +107,7 @@ def migrate(
 	grafana_image: str,
 	grafana_db: Path,
 	output_directory: Path,
+	templator: Templator,
 	extra_env_vars: Dict[str, str] = None,
 	grafana_uid: int = 472,
 	timeout: datetime.timedelta = DEFAULT_TIMEOUT,
@@ -144,6 +146,7 @@ def migrate(
 				"port": container.host_port,
 			}},
 			output_directory,
+			templator=templator,
 		)
 
 		exporter.run()
