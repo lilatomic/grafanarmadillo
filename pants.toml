@@ -12,3 +12,5 @@ enable_resolves = true
 
 [python.resolves]
 python-default = "cicd/python-default.lock"
+
+[isort]
