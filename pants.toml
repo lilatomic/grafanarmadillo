@@ -1,0 +1,14 @@
+[GLOBAL]
+pants_version = "2.19.0"
+
+backend_packages = [
+	"pants.backend.python",
+	"pants.backend.python.lint.isort",
+]
+
+[python]
+interpreter_constraints = ["CPython>=3.8"]
+enable_resolves = true
+
+[python.resolves]
+python-default = "cicd/python-default.lock"
