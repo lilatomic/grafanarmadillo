@@ -114,3 +114,8 @@ venv.bak/
 # IDE
 .vscode/
 .idea/
+
+# Pants workspace files
+/.pants.*
+/dist/
+/.pids
