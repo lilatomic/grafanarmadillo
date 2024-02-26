@@ -4,6 +4,8 @@ pants_version = "2.19.0"
 backend_packages = [
 	"pants.backend.python",
 	"pants.backend.python.lint.isort",
+	"pants.backend.python.lint.flake8",
+	"pants.backend.python.lint.autoflake",
 ]
 
 [python]
@@ -11,6 +13,10 @@ interpreter_constraints = ["CPython>=3.8"]
 enable_resolves = true
 
 [python.resolves]
-python-default = "cicd/python-default.lock"
+python-default = "devtools/python-default.lock"
+flake8 = "devtools/flake8.lock"
 
 [isort]
+
+[flake8]
+install_from_resolve = "flake8"

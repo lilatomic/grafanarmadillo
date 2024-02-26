@@ -8,3 +8,9 @@ python_requirements(
 python_requirements(
     name="reqs0",
 )
+
+python_requirements(
+    name="flake8",
+    source="flake8_requirements.txt",
+    resolve="flake8",
+)
