@@ -11,6 +11,7 @@ backend_packages = [
 	"pants.backend.experimental.adhoc",
 	"radon.cc",
 	"radon.mi",
+	"prreqs",
 ]
 
 [python]

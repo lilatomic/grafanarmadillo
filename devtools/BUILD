@@ -1,12 +1,21 @@
+# <region name="prreqs">
 python_sources()
+
+pex_binary(
+    name="prreqs_tool",
+    entry_point="check_changelog.py",
+)
+
+code_quality_tool(
+    name="prreqs",
+    runnable=":prreqs_tool",
+    file_glob_include=["docs/**/*.rst", "docs/*.rst"],
+)
+# </region>
 
 python_requirements(
     name="reqs",
     source="docs_requirements.txt",
-)
-
-python_requirements(
-    name="reqs0",
 )
 
 python_requirements(
