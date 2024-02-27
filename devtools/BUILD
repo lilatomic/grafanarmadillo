@@ -19,9 +19,16 @@ python_requirements(
 python_requirement(name="radon", requirements=["radon"], resolve="radon")
 
 code_quality_tool(
-	name="radon_cc",
-	runnable=":radon",
-	args=["cc", "-s", "--total-average", "--no-assert", "-nb", "src/"],
-	file_glob_include=["src/**/*.py"],
+    name="radon_cc",
+    runnable=":radon",
+    args=["cc", "-s", "--total-average", "--no-assert", "-nb", "src/"],
+    file_glob_include=["src/**/*.py"],
+)
+
+code_quality_tool(
+    name="radon_mi",
+    runnable=":radon",
+    args=["mi", "-m", "-s", "src/"],
+    file_glob_include=["src/**/*.py"],
 )
 # </region>

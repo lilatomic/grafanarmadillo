@@ -10,6 +10,7 @@ backend_packages = [
 	"pants.backend.python.lint.autoflake",
 	"pants.backend.experimental.adhoc",
 	"radon.cc",
+	"radon.mi",
 ]
 
 [python]
