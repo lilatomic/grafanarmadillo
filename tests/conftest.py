@@ -248,3 +248,18 @@ def pytest_collection_modifyitems(items):
 @pytest.fixture(scope="function")
 def unique():
 	yield str(uuid.uuid4())
+
+
+def set_cli_cfg(rw_shared_grafana):
+	grafanarmadillo_cfg = read_json_file("usage/grafana_cfg.json")
+	# change to settings from our ephemeral container
+	grafana_container_config = rw_shared_grafana[0].conf
+	grafanarmadillo_cfg["port"] = grafana_container_config["server"]["http_port"]
+	grafanarmadillo_cfg["auth"] = [
+		grafana_container_config["security"]["admin_user"],
+		grafana_container_config["security"]["admin_password"],
+	]
+	env_cfg = os.environ.copy()
+	env_cfg["grafanarmadillo_cfg"] = json.dumps(grafanarmadillo_cfg)
+	env_cfg["GRAFANARMADILLO_CFG"] = json.dumps(grafanarmadillo_cfg)
+	return env_cfg

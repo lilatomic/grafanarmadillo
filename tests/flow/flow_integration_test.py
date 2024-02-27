@@ -1,9 +1,11 @@
 import os
 import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
 
+from grafanarmadillo.find import Finder
 from grafanarmadillo.flow import (
 	Alert,
 	Dashboard,
@@ -14,7 +16,7 @@ from grafanarmadillo.flow import (
 )
 from grafanarmadillo.templator import make_mapping_templator
 from grafanarmadillo.util import load_data
-from tests.conftest import requires_alerting
+from tests.conftest import requires_alerting, set_cli_cfg
 
 
 @pytest.fixture
@@ -132,3 +134,27 @@ def _do_flow_test(mapping, mk_flow, rw_shared_grafana, tmpdir):
 	os.remove(dst_a)
 	r1 = flow.obj_to_tmpl()
 	r1.raise_first()
+
+
+def test_usage_flow_cli(rw_shared_grafana, tmpdir):
+	finder = Finder(rw_shared_grafana[1])
+	finder.create_or_get_dashboard("/dev0/MySystem TEST")
+
+	env_cfg = set_cli_cfg(rw_shared_grafana)
+
+	subprocess.run(
+		["python3", "tests/flow/example.py", "my-system", "export", f"--basedir={tmpdir}"],
+		check=True,
+		env=env_cfg,
+		capture_output=True,
+	)
+	subprocess.run(
+		["python3", "tests/flow/example.py", "my-system", "import", f"--basedir={tmpdir}"],
+		check=True,
+		env=env_cfg,
+		capture_output=True,
+	)
+
+	for deployment in ["east", "west", "north"]:
+		dashboard = finder.get_dashboard(f"{deployment}0", "my_system")
+		assert dashboard

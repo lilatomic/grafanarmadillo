@@ -15,7 +15,7 @@ def export_templates(grafana, basedir: Path):
 	filestore = FileStore(basedir)
 	grafanastore = GrafanaStore(grafana)
 
-	mapping = load_data("file://usage/mapping.json")
+	mapping = load_data("file://tests/usage/mapping.json")
 	templator = make_mapping_templator(mapping, "dev", "template")
 
 	# define flows
@@ -42,7 +42,7 @@ def import_templates(grafana, basedir: Path):
 	filestore = FileStore(basedir)
 	grafanastore = GrafanaStore(grafana)
 
-	mapping = load_data("file://usage/mapping.json")
+	mapping = load_data("file://tests/usage/mapping.json")
 	deployments = {"east", "west", "north"}
 
 	# define flows

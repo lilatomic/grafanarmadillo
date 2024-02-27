@@ -1,3 +1,11 @@
+[project.dependencies]
+grafana-client = { version = "~=3.0" }
+
+[project.optional-dependencies]
+cli = ["click>=8"]
+migrate = ["docker>=5"]
+
+
 [tool.isort]
 skip = "__init__.py"
 line_length = 88
@@ -16,3 +24,4 @@ known_first_party = [
 known_third_party = [
     "hypothesis",
 ]
+
