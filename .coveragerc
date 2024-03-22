@@ -8,6 +8,12 @@ branch = true
 source =
     grafanarmadillo
 parallel = true
+concurrency = multiprocessing
+# we omit these because they show up as duplicates when we chdir into tests/usage for running the bash scripts
+omit =
+    alerting.py
+    dashboarding.py
+    templating.py
 
 [report]
 show_missing = true
