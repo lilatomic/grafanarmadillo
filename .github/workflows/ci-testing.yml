@@ -37,7 +37,7 @@ jobs:
 
       - name: Test
         run: |
-          pants test :: -- -m "not integration"
+          pants test ::
         if: success() || failure()
 
       - name: Upload test coverage to Codecov
