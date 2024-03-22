@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.20.0a0"
+pants_version = "2.20.0rc1"
 
 # needed to make in-repo plugins work
 pythonpath = ["%(buildroot)s/devtools"]

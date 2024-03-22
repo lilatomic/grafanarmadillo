@@ -1726,8 +1726,8 @@
   "only_builds": [],
   "only_wheels": [],
   "path_mappings": {},
-  "pex_version": "2.1.163",
-  "pip_version": "23.1.2",
+  "pex_version": "2.2.1",
+  "pip_version": "23.2",
   "prefer_older_binary": false,
   "requirements": [
     "CommonMark",
