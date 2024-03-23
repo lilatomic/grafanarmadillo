@@ -19,50 +19,11 @@ Next, clone your fork to your local machine, keep it `up to date with the upstre
 Install for developers
 ----------------------
 
-Create a dedicated Python environment where to develop the project.
+`Install Pants`_.
 
-If you are using :code:`pip` follow the official instructions on `Installing packages using pip and virtual environments`_, most likely what you want is:
+Run lints and formatters with `pants fix lint ::`.
 
-::
-
-    python3 -m venv .venv
-    source .venv/bin/activate
-
-Install the package in :code:`develop` mode, and also :ref:`tox<Uniformed Tests with tox>`.
-
-::
-
-    python setup.py develop
-    pip install dev_requirements.txt
-
-Make a new branch
------------------
-
-From the ``main`` branch create a new branch where to develop the new code.
-
-::
-
-    git checkout main
-    git checkout -b new_branch
-
-
-Develop the feature and keep regular pushes to your fork with comprehensible commit messages.
-
-::
-
-    git status
-    git add (the files you want)
-    git commit (add a nice commit message)
-    git push origin new_branch
-
-While you are developing, you can execute ``tox`` as needed to run your unittests or inspect lint, etc. See the last section of this page. If you want things to build a bit faster, you can set the pythonpath and run pytest directly.
-
-::
-
-    export PYTHONPATH=./src
-    python3 -m pytest tests
-
-Many of the tests will rely on a test Docker container to integrate with a Grafana instance. By default this only runs on Linux, but can be forced by setting "do_containertest" to "True"
+Run tests with `pants test ::` . Many of the tests will rely on a test Docker container to integrate with a Grafana instance. By default this only runs on Linux, but can be forced by setting "do_containertest" to "True"
 
 Update CHANGELOG
 ~~~~~~~~~~~~~~~~
@@ -87,40 +48,7 @@ Once you are finished, you can Pull Request you additions to the main repository
 
 **Before submitting a Pull Request, verify your development branch passes all tests as** :ref:`described bellow<Uniformed Tests with tox>` **. If you are developing new code you should also implement new test cases.**
 
-
-Uniformed Tests with tox
-------------------------
-
-Thanks to `Tox`_ we can have a unified testing platform where all developers are forced to follow the same rules and, above all, all tests occur in a controlled Python environment.
-
-With *Tox*, the testing setup can be defined in a configuration file, the `tox.ini`_, which contains all the operations that are performed during the test phase. Therefore, to run the unified test suite, developers just need to execute ``tox``, provided `tox is installed`_ in the Python environment in use.
-
-::
-
-    pip install tox
-
-Before creating a Pull Request from your branch, certify that all the tests pass correctly by running:
-
-::
-
-    tox
-
-These are exactly the same tests that will be performed online in the Github Actions.
-
-Also, you can run individual environments if you wish to test only specific functionalities, for example:
-
-::
-
-    tox -e lint  # code style
-    tox -e build  # packaging
-    tox -e docs  # only builds the documentation
-    tox -e prreqs  # special requirements before Pull Request
-    tox -e py38
-
-
-.. _tox.ini: https://github.com/lilatomic/grafanarmadillo/blob/latest/tox.ini
-.. _Tox: https://tox.readthedocs.io/en/latest/
-.. _tox is installed: https://tox.readthedocs.io/en/latest/install.html
+.. _Install Pants: https://www.pantsbuild.org/2.18/docs/getting-started/installing-pants
 .. _MANIFEST.in: https://github.com/lilatomic/grafanarmadillo/blob/main/MANIFEST.in
 .. _Fork this repository before contributing: https://github.com/lilatomic/grafanarmadillo/network/members
 .. _up to date with the upstream: https://gist.github.com/CristinaSolana/1885435
