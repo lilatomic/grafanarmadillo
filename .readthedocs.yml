@@ -21,9 +21,5 @@ build:
 python:
   install:
     - requirements: devtools/docs_requirements.txt
-    - method: pip
-      path: .
-      extra_requirements:
-        - docs
     - method: setuptools
       path: .
