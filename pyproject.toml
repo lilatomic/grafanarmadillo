@@ -1,10 +1,49 @@
-[project.dependencies]
-grafana-client = { version = "~=3.0" }
+[project]
+name = "grafanarmadillo"
+version = "0.6.0"
+description = "Simplify interacting with Grafana, with a focus on templating dashboards and alerts"
+readme = "README.rst"
+
+
+license = { file = "LICENSE" }
+classifiers = [
+	"Development Status :: 4 - Beta",
+	"Programming Language :: Python :: 3.8",
+	"Programming Language :: Python :: 3.9",
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
+]
+
+authors = [
+	{ name = "lilatomic" }
+]
+maintainers = [
+	{ name = "lilatomic" }
+]
+
+requires-python = ">=3.8, <4"
+dependencies = [
+	"grafana-client~=3.0"
+]
 
 [project.optional-dependencies]
 cli = ["click>=8"]
 migrate = ["docker>=5"]
 
+[project.urls]
+Homepage = "https://github.com/lilatomic/grafanarmadillo"
+Repository = "https://github.com/lilatomic/grafanarmadillo.git"
+Documentation = "https://grafanarmadillo.readthedocs.io/en/latest/"
+Changelog= "https://github.com/lilatomic/grafanarmadillo/blob/main/docs/CHANGELOG.rst"
+Issues= "https://github.com/lilatomic/grafanarmadillo/issues"
+
+[project.scripts]
+grafanarmadillo= "grafanarmadillo.cmd:grafanarmadillo"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.isort]
 skip = "__init__.py"
@@ -13,15 +52,14 @@ indent = "tab"
 multi_line_output = 3
 include_trailing_comma = true
 lines_after_imports = 2
-sections=["FUTURE","STDLIB","THIRDPARTY","FIRSTPARTY","LOCALFOLDER"]
-extra_standard_library="typing_extensions"
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+extra_standard_library = "typing_extensions"
 known_first_party = [
-    "grafanarmadillo",
-    "usage",
-    "conftest",
-    "tests",
+	"grafanarmadillo",
+	"usage",
+	"conftest",
+	"tests",
 ]
 known_third_party = [
-    "hypothesis",
+	"hypothesis",
 ]
-
