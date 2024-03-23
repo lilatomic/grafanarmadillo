@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from pathlib import Path
 
@@ -9,10 +10,13 @@ from grafanarmadillo.cmd import grafanarmadillo
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.migrate import _wait_until_ready, with_container
+from grafanarmadillo.paths import PathCodec
 from tests.conftest import read_json_file
 
 
-def test_cli__migrator(tmp_path: Path):
+def test_cli__migrator(tmp_path: Path, caplog):
+	caplog.set_level(logging.DEBUG)
+
 	def init_db_file(path: Path) -> None:
 		path.parent.mkdir(parents=True, exist_ok=True)
 		path.touch(exist_ok=True)
@@ -90,7 +94,7 @@ def test_cli__migrator(tmp_path: Path):
 		assert result.exit_code == 0
 		assert len(list((output_path / "dashboards").rglob("*.json"))) == 1
 		assert len(list((output_path / "alerts").rglob("*.json"))) == 1
-		with (output_path / "dashboards" / "Main Org." / "General" / "New dashboard.json").open() as f:
+		with (output_path / "dashboards" / PathCodec.encode(["Main Org.", "General", "New dashboard (1/1)"])).with_suffix(".json").open() as f:
 			assert "${ds_uid}" in f.read(), "templating didn't happen in export"
 	except AssertionError:
 		print(f"{result.output=}")
@@ -144,7 +148,7 @@ def test_cli__migrator(tmp_path: Path):
 			assert len(finder_unified.list_dashboards()) == 1
 			assert len(finder_unified.list_alerts()) == 1
 		except AssertionError:
-			print(result2.output)
+			print(f"{result2.output=}")
 			if result2.exception:
 				print(f"{result2.exception=}")
 				raise result2.exception

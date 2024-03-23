@@ -1,6 +1,7 @@
 """Ready-to-run commands for common Grafana templating scenarios."""
 import datetime
 import json
+import logging
 from pathlib import Path
 from typing import IO
 
@@ -307,4 +308,5 @@ def _export_resources(
 
 
 if __name__ == "__main__":
+	logging.basicConfig(level=logging.DEBUG)
 	grafanarmadillo()

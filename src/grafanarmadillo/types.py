@@ -1,5 +1,5 @@
 """Type hints for Grafana interaction."""
-
+from dataclasses import dataclass
 from typing import NewType, Optional, TypedDict, Union
 
 
@@ -41,7 +41,6 @@ AlertContent = NewType("AlertContent", dict)
 AnyContent = Union[DashboardContent, AlertContent]
 DashboardMeta = NewType("DashboardMeta", dict)
 
-
 OrgMeta = NewType("OrgMeta", dict)
 
 
@@ -55,3 +54,12 @@ class Dashboard(TypedDict):
 DashboardPanel = NewType("DashboardPanel", dict)
 
 FolderSearchResult = NewType("Folder", dict)
+
+
+@dataclass
+class GrafanaPath:
+	"""Path of an object in Grafana."""
+
+	name: str
+	folder: str
+	org: Optional[str] = None
