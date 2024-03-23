@@ -3,7 +3,6 @@
 import json
 from pathlib import Path
 from typing import Callable, Dict, List, TypeVar, Union
-from urllib.parse import quote_plus, unquote_plus
 
 from grafanarmadillo.types import DashboardContent, DashboardSearchResult
 
@@ -153,29 +152,3 @@ def read_from_file(file_path: Path) -> dict:
 	"""Read JSON from a file."""
 	with file_path.open(mode="r", encoding="utf-8") as f:
 		return json.load(f)
-
-
-class PathCodec:
-	"""Safely encode paths which may contain invalid characters, such as forward slashes."""
-
-	@staticmethod
-	def encode(segments: List[str]) -> Path:
-		"""Encode segments to a path."""
-		encoded_segments = [quote_plus(segment) for segment in segments]
-		return Path(*encoded_segments)
-
-	@staticmethod
-	def encode_segment(segment: str) -> str:
-		"""Encode a single segment."""
-		return quote_plus(segment)
-
-	@staticmethod
-	def decode(path: Path) -> List[str]:
-		"""Decode a path to segments."""
-		decoded_segments = [unquote_plus(segment) for segment in path.parts]
-		return decoded_segments
-
-	@staticmethod
-	def decode_segment(segment: str) -> str:
-		"""Decode a single segment."""
-		return unquote_plus(segment)

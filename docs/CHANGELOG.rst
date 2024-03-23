@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* feature : expose functions to resolve path-like objects into their Grafana references
 * fix : handle folders and dashboards with non-path-safe elements
 * task : migrate from tox to Pants for build system
 

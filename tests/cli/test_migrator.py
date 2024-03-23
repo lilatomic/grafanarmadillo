@@ -10,7 +10,7 @@ from grafanarmadillo.cmd import grafanarmadillo
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.migrate import _wait_until_ready, with_container
-from grafanarmadillo.util import PathCodec
+from grafanarmadillo.paths import PathCodec
 from tests.conftest import read_json_file
 
 
