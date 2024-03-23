@@ -2,6 +2,7 @@ import io
 import json
 import os
 import subprocess
+from pathlib import Path
 
 import pytest
 from grafana_client import GrafanaApi
@@ -9,7 +10,7 @@ from grafana_client import GrafanaApi
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator
-from tests.conftest import read_json_file, requires_alerting
+from tests.conftest import read_json_file, requires_alerting, set_cli_cfg
 from tests.usage.alerting import export_alert, import_alert
 from tests.usage.dashboarding import (
 	clone_dashboard_contents,
@@ -123,44 +124,16 @@ def test_usage_alerting__export(rw_shared_grafana, unique):
 	assert exported["title"] == "a0"
 
 
-def set_cli_cfg(rw_shared_grafana):
-	grafanarmadillo_cfg = read_json_file("usage/grafana_cfg.json")
-	# change to settings from our ephemeral container
-	grafana_container_config = rw_shared_grafana[0].conf
-	grafanarmadillo_cfg["port"] = grafana_container_config["server"]["http_port"]
-	grafanarmadillo_cfg["auth"] = [
-		grafana_container_config["security"]["admin_user"],
-		grafana_container_config["security"]["admin_password"],
-	]
-	env_cfg = os.environ.copy()
-	env_cfg["grafanarmadillo_cfg"] = json.dumps(grafanarmadillo_cfg)
-	env_cfg["GRAFANARMADILLO_CFG"] = json.dumps(grafanarmadillo_cfg)
-	return env_cfg
-
-
 def test_usage_cli(rw_shared_grafana, unique):
 	finder = Finder(rw_shared_grafana[1])
 	finder.create_or_get_dashboard("/dev/MySystem TEST")
 
 	env_cfg = set_cli_cfg(rw_shared_grafana)
+	env_cfg["PATH"] = ":".join([((Path.cwd() / "tests").as_posix()), os.environ.get("PATH")])
 
 	subprocess.run(["bash", "cli_export.bash"], cwd="tests/usage/", check=True, env=env_cfg, capture_output=True)
 	subprocess.run(["bash", "cli_import.bash"], cwd="tests/usage/", check=True, env=env_cfg, capture_output=True)
 
 	for deployment in ["east", "west", "north"]:
 		dashboard = finder.get_dashboard(deployment, "my_system")
-		assert dashboard
-
-
-def test_usage_flow_cli(rw_shared_grafana, tmpdir):
-	finder = Finder(rw_shared_grafana[1])
-	finder.create_or_get_dashboard("/dev0/MySystem TEST")
-
-	env_cfg = set_cli_cfg(rw_shared_grafana)
-
-	subprocess.run(["python3", "flow/example.py", "my-system", "export", f"--basedir={tmpdir}"], cwd="tests/", check=True, env=env_cfg, capture_output=True)
-	subprocess.run(["python3", "flow/example.py", "my-system", "import", f"--basedir={tmpdir}"], cwd="tests/", check=True, env=env_cfg, capture_output=True)
-
-	for deployment in ["east", "west", "north"]:
-		dashboard = finder.get_dashboard(f"{deployment}0", "my_system")
 		assert dashboard

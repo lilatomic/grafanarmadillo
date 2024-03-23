@@ -1,0 +1,27 @@
+[project.dependencies]
+grafana-client = { version = "~=3.0" }
+
+[project.optional-dependencies]
+cli = ["click>=8"]
+migrate = ["docker>=5"]
+
+
+[tool.isort]
+skip = "__init__.py"
+line_length = 88
+indent = "tab"
+multi_line_output = 3
+include_trailing_comma = true
+lines_after_imports = 2
+sections=["FUTURE","STDLIB","THIRDPARTY","FIRSTPARTY","LOCALFOLDER"]
+extra_standard_library="typing_extensions"
+known_first_party = [
+    "grafanarmadillo",
+    "usage",
+    "conftest",
+    "tests",
+]
+known_third_party = [
+    "hypothesis",
+]
+

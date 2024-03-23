@@ -7,16 +7,17 @@ Situations tested:
 """
 from pathlib import Path
 
-folder = Path(__file__).resolve().parents[1]
-changelog = Path(folder, 'docs', 'CHANGELOG.rst')
+
+changelog = Path('docs', 'CHANGELOG.rst')
 
 with open(changelog, 'r') as fin:
     for line in fin:
         if line.startswith('v'):
-            raise ValueError(
+            print(
                 'Please add a summary of your additions to docs/CHANGELOG.rst. '
                 'As described in: https://grafanarmadillo.readthedocs.io'
                 '/en/latest/contributing.html#update-changelog.'
-                )
+            )
+            exit(1)
         elif line.startswith('*'):
-            break
+            exit(0)

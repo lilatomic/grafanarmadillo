@@ -18,30 +18,39 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - name: Setup Python for Pants
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      - uses: pantsbuild/actions/init-pants@v5-scie-pants
+        with:
+          # v0 makes it easy to bust the cache if needed
+          # just increase the integer to start with a fresh cache
+          gha-cache-key: v0
+          named-caches-hash: ${{ hashFiles('devtools/python-default.lock') }}
+          cache-lmdb-store: 'true'
 
-      - name: Install dependencies
+      - name: Test
         run: |
-          python -m pip install --upgrade pip setuptools wheel
-          pip install coverage[toml] virtualenv tox tox-gh-actions
-          # if you use tox-conda you can also add
-          # tox-conda to the above list of dependencies
+          pants test ::
+        if: success() || failure()
 
-      - name: Test with tox
-        run: tox
-        #env:
-        #  PLATFORM: ${{ matrix.platform }}
-
-      # from https://github.com/codecov/codecov-action
-      - name: Upload coverage to Codecov
+      - name: Upload test coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: ./coverage.xml
-          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: dist/coverage/python/coverage.xml
+          fail_ci_if_error: true
           verbose: true
+
+      - name: Upload pants log
+        uses: actions/upload-artifact@v3
+        with:
+          name: pants-log
+          path: .pants.d/pants.log
+        if: always() # We want the log even on failures.

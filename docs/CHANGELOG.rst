@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* task : migrate from tox to Pants for build system
+
 v0.5.0 (2024-02-25)
 ------------------------------------------------------------
 

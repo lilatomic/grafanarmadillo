@@ -1,0 +1,45 @@
+[GLOBAL]
+pants_version = "2.20.0rc1"
+
+# needed to make in-repo plugins work
+pythonpath = ["%(buildroot)s/devtools"]
+
+backend_packages = [
+	"pants.backend.python",
+	"pants.backend.python.lint.isort",
+	"pants.backend.python.lint.flake8",
+	"pants.backend.python.lint.autoflake",
+	"pants.backend.experimental.adhoc",
+	"radon.cc",
+	"radon.mi",
+	"prreqs",
+]
+
+[source]
+root_patterns = [
+	"src/",
+	"/",
+]
+
+[python]
+interpreter_constraints = ["CPython>=3.8"]
+enable_resolves = true
+
+[python.resolves]
+python-default = "devtools/python-default.lock"
+flake8 = "devtools/flake8.lock"
+radon = "devtools/radon.lock"
+
+[isort]
+
+[flake8]
+install_from_resolve = "flake8"
+
+[test]
+extra_env_vars = [
+	"DOCKER_HOST",
+]
+use_coverage=true
+
+[coverage-py]
+report = ["xml", "html", "console"]
