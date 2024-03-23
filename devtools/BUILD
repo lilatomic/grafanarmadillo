@@ -14,8 +14,39 @@ code_quality_tool(
 # </region>
 
 python_requirements(
-    name="reqs",
+    name="docs_requirements",
     source="docs_requirements.txt",
+)
+
+pex_binary(
+	name="sphinx_bin",
+	dependencies=[
+		":docs_requirements",
+		"//:grafanarmadillo",  # the package, which sphinx will install
+
+	],
+	entry_point="sphinx",
+)
+
+adhoc_tool(
+	name="sphinx",
+	runnable=":sphinx_bin",
+	args=["-b", "html", "../docs/rst", "../dist/docs"],
+	execution_dependencies=[
+		":docs_requirements",  # sphinx requirements
+		"//:docs",  # the actual docs
+        	"//src/grafanarmadillo:grafanarmadillo",  # source, so sphinx can autodoc it
+	],
+	output_directories=["dist/docs"],
+	workdir="/src"
+)
+
+archive(
+	name="docs",
+	format="tar",
+	files=[
+		":sphinx",
+	]
 )
 
 python_requirements(
