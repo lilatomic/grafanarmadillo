@@ -2,6 +2,9 @@
 Changelog
 =========
 
+v0.6.0 (2024-03-23)
+------------------------------------------------------------
+
 * feature : expose functions to resolve path-like objects into their Grafana references
 * fix : handle folders and dashboards with non-path-safe elements
 * task : migrate from tox to Pants for build system
