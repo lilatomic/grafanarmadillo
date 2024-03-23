@@ -94,7 +94,7 @@ def test_cli__migrator(tmp_path: Path, caplog):
 		assert result.exit_code == 0
 		assert len(list((output_path / "dashboards").rglob("*.json"))) == 1
 		assert len(list((output_path / "alerts").rglob("*.json"))) == 1
-		with (output_path / "dashboards" / PathCodec.encode(["Main Org.", "General", "New dashboard.json"])).open() as f:
+		with (output_path / "dashboards" / PathCodec.encode(["Main Org.", "General", "New dashboard (1/1)"])).with_suffix(".json").open() as f:
 			assert "${ds_uid}" in f.read(), "templating didn't happen in export"
 	except AssertionError:
 		print(f"{result.output=}")
