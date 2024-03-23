@@ -22,4 +22,4 @@ python:
   install:
     - requirements: devtools/docs_requirements.txt
     - method: pip
-      path: .
+      path: .[cli,migrate]

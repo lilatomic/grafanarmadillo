@@ -46,7 +46,7 @@ Pull Request
 
 Once you are finished, you can Pull Request you additions to the main repository, and engage with the community. Please read the ``PULLREQUEST.rst`` guidelines first, you will see them when you open a PR.
 
-**Before submitting a Pull Request, verify your development branch passes all tests as** :ref:`described bellow<Uniformed Tests with tox>` **. If you are developing new code you should also implement new test cases.**
+**Before submitting a Pull Request, verify your development branch passes all tests **. If you are developing new code you should also implement new test cases.**
 
 .. _Install Pants: https://www.pantsbuild.org/2.18/docs/getting-started/installing-pants
 .. _MANIFEST.in: https://github.com/lilatomic/grafanarmadillo/blob/main/MANIFEST.in
