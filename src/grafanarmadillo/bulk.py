@@ -22,7 +22,7 @@ from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator
 from grafanarmadillo.types import AlertContent, DashboardContent, OrgMeta
-from grafanarmadillo.util import exactly_one, read_from_file, write_to_file
+from grafanarmadillo.util import PathCodec, exactly_one, read_from_file, write_to_file
 
 
 l = logging.getLogger(__name__)
@@ -121,7 +121,7 @@ class BulkGrafanaOperation(BulkOperation, ABC):
 			else:
 				folder_name = folder["name"]
 
-			out_path = Path(org["name"], folder_name, dashboard_content["title"])
+			out_path = PathCodec.encode([org["name"], folder_name, dashboard_content["title"]])
 
 			yield out_path, dashboard_content
 
@@ -133,7 +133,7 @@ class BulkGrafanaOperation(BulkOperation, ABC):
 			alert_content, folder = alerter.export_alert(alert)
 
 			folder_name = folder["title"]
-			out_path = Path(org["name"], folder_name, alert_content["title"])
+			out_path = PathCodec.encode([org["name"], folder_name, alert_content["title"]])
 
 			yield out_path, alert_content
 
@@ -147,7 +147,7 @@ class BulkFileOperation(BulkOperation, ABC):
 
 	def all_orgs(self) -> Generator[Tuple[OrgMeta, GrafanaApi], None, None]:
 		"""Iterate over all organisations in Grafana."""
-		orgs = {o.name for o in self.root_directory.glob("*/*")}
+		orgs = {PathCodec.decode_segment(o.name) for o in self.root_directory.glob("*/*")}
 		for org_name in orgs:
 			org = self.gfn_multiorg.organization.find_organization(org_name)
 			gfn = GrafanaApi(**{**self.cfg, "organization_id": org["id"]})
@@ -156,19 +156,19 @@ class BulkFileOperation(BulkOperation, ABC):
 
 	def get_all_dashboards(self, org: OrgMeta, gfn: GrafanaApi) -> Generator[Tuple[Path, DashboardContent], None, None]:
 		"""Get all dashboards."""
-		folders = (self.root_directory / "dashboards" / org["name"]).glob("*")
+		folders = (self.root_directory / "dashboards" / PathCodec.encode_segment(org["name"])).glob("*")
 		for folder_path in folders:
 			for dashboard_path in folder_path.glob("*.json"):
 				content = read_from_file(dashboard_path)
-				yield Path(org["name"], folder_path.name, dashboard_path.name), content
+				yield Path(org["name"], PathCodec.decode_segment(folder_path.name), PathCodec.decode_segment(dashboard_path.name)), content
 
 	def get_all_alerts(self, org: OrgMeta, gfn: GrafanaApi) -> Generator[Tuple[Path, AlertContent], None, None]:
 		"""Get all alerts."""
-		folders = (self.root_directory / "alerts" / org["name"]).glob("*")
+		folders = (self.root_directory / "alerts" / PathCodec.encode_segment(org["name"])).glob("*")
 		for folder_path in folders:
 			for alert_path in folder_path.glob("*.json"):
 				content = read_from_file(alert_path)
-				yield Path(org["name"], folder_path.name, alert_path.name), content
+				yield Path(org["name"], PathCodec.decode_segment(folder_path.name), PathCodec.decode_segment(alert_path.name)), content
 
 
 class BulkExporter(BulkGrafanaOperation):
@@ -201,7 +201,7 @@ class BulkImporter(BulkFileOperation):
 
 	def each_dashboard(self, path: Path, dashboard: DashboardContent):
 		"""Import each dashboard into Grafana."""
-		org_name, folder_name, dashboard_name = path.parts
+		org_name, folder_name, dashboard_name = PathCodec.decode(path)
 
 		org = get_org(self.gfn_multiorg, org_name)
 		gfn = GrafanaApi(**{**self.cfg, "organization_id": org["id"]})
@@ -216,7 +216,7 @@ class BulkImporter(BulkFileOperation):
 
 	def each_alert(self, path: Path, alert: AlertContent):
 		"""Import each alert into Grafana."""
-		org_name, folder_name, dashboard_name = path.parts
+		org_name, folder_name, dashboard_name = PathCodec.decode(path)
 
 		org = get_org(self.gfn_multiorg, org_name)
 		gfn = GrafanaApi(**{**self.cfg, "organization_id": org["id"]})

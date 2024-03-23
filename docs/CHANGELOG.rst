@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* fix : handle folders and dashboards with non-path-safe elements
 * task : migrate from tox to Pants for build system
 
 v0.5.0 (2024-02-25)
