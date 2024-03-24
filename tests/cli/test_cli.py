@@ -106,6 +106,8 @@ def test_cli__import_alert(cli_config, rw_shared_grafana):
 			"prd",
 			"--mapping",
 			"file://tests/cli/mapping.json",
+			"--templator-extra-opts",
+			json.dumps({"remove_edit_metadata": True, "resolve_alert_dashboarduid": True}),
 		]
 	)
 	assert result.exit_code == 0
@@ -115,6 +117,7 @@ def test_cli__import_alert(cli_config, rw_shared_grafana):
 	assert imported, "alert did not end up where we expected"
 	alert = gfn.alertingprovisioning.get_alertrule(imported["uid"])
 	assert "PRD" in alert["labels"].values()
+	assert "$$" not in alert["annotations"]["__dashboardUid__"]
 
 
 def test_cli__export_alert(cli_config, rw_shared_grafana, tmp_path):
@@ -139,10 +142,14 @@ def test_cli__export_alert(cli_config, rw_shared_grafana, tmp_path):
 			"template",
 			"--mapping",
 			"file://tests/cli/mapping.json",
+			"--templator-extra-opts",
+			json.dumps({"remove_edit_metadata": True, "resolve_alert_dashboarduid": True}),
 		]
 	)
 	if result.exit_code != 0:
 		pytest.fail(result.output)
 
 	template = read_json_file(template_path)
-	assert "$tag1" in template["labels"].values()
+	assert "$tag1" in template["labels"].values(), "templating did not replace value with template"
+	assert "version" not in template, "templating did not remove edit metadata"
+	assert "$$" in template["annotations"]["__dashboardUid__"]

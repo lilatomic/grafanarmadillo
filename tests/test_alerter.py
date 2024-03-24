@@ -84,7 +84,7 @@ def test_importexport__roundtrip(rw_shared_grafana, unique):
 
 	def coerce_comparable(a):
 		if not rw_shared_grafana[0].major_version >= 10:
-			a.pop("notification_settings", None) # data model changed in 10.4 to have this extra key
+			a.pop("notification_settings", None)  # data model changed in 10.4 to have this extra key
 
 		noncomparables = {"id", "provenance", "folderUID", "updated"}
 		return project_dict(a, noncomparables, inverse=True)

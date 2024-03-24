@@ -13,7 +13,7 @@ def export_dashboard(gfn, dashboard_path, destination_file):
 	# export a dashboard. You could save this into a file and commit that to git
 	exported_dashboard, _exported_folder = dashboarder.export_dashboard(dashboard_info)
 
-	destination_file.write(json.dumps(exported_dashboard))
+	return destination_file.write(json.dumps(exported_dashboard))
 
 
 def import_dashboard(gfn, folder, source_file):
@@ -22,7 +22,7 @@ def import_dashboard(gfn, folder, source_file):
 	dashboard = json.loads(source_file.read())
 
 	# you could then load that dashboard from a file and import it into Grafana
-	dashboarder.import_dashboard(dashboard, folder)
+	return dashboarder.import_dashboard(dashboard, folder)
 
 
 def clone_dashboard_contents(gfn, source_path, dest_path):
@@ -34,4 +34,4 @@ def clone_dashboard_contents(gfn, source_path, dest_path):
 	content = dashboarder.get_dashboard_content(template_info)
 
 	prod_dashboard_info = finder.get_from_path(dest_path)
-	dashboarder.set_dashboard_content(prod_dashboard_info, content)
+	return dashboarder.set_dashboard_content(prod_dashboard_info, content)

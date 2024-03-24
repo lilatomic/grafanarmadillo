@@ -1,14 +1,80 @@
 {
 	"id": 1,
-	"uid": "b0ae00ed-45c7-4c86-83b6-800f63a2b021",
+	"uid": "edgngtznq2y9sa",
 	"orgID": 1,
-	"folderUID": "ef01bb1e-3fea-40c2-85e9-53e39502c3a3",
+	"folderUID": "cdgngrepd3y0wc",
 	"ruleGroup": "e0",
 	"title": "a0",
-	"condition": "A",
+	"condition": "C",
 	"data": [
 		{
 			"refId": "A",
+			"queryType": "",
+			"relativeTimeRange": {
+				"from": 21600,
+				"to": 0
+			},
+			"datasourceUid": "cdgngjl71kao0d",
+			"model": {
+				"datasource": {
+					"type": "prometheus",
+					"uid": "cdgngjl71kao0d"
+				},
+				"editorMode": "code",
+				"expr": "rate()",
+				"instant": false,
+				"interval": "",
+				"intervalMs": 15000,
+				"legendFormat": "__auto",
+				"maxDataPoints": 43200,
+				"range": true,
+				"refId": "A"
+			}
+		},
+		{
+			"refId": "B",
+			"queryType": "",
+			"relativeTimeRange": {
+				"from": 0,
+				"to": 0
+			},
+			"datasourceUid": "__expr__",
+			"model": {
+				"conditions": [
+					{
+						"evaluator": {
+							"params": [],
+							"type": "gt"
+						},
+						"operator": {
+							"type": "and"
+						},
+						"query": {
+							"params": [
+								"B"
+							]
+						},
+						"reducer": {
+							"params": [],
+							"type": "last"
+						},
+						"type": "query"
+					}
+				],
+				"datasource": {
+					"type": "__expr__",
+					"uid": "__expr__"
+				},
+				"expression": "A",
+				"intervalMs": 1000,
+				"maxDataPoints": 43200,
+				"reducer": "last",
+				"refId": "B",
+				"type": "reduce"
+			}
+		},
+		{
+			"refId": "C",
 			"queryType": "",
 			"relativeTimeRange": {
 				"from": 0,
@@ -20,7 +86,6 @@
 					{
 						"evaluator": {
 							"params": [
-								0,
 								0
 							],
 							"type": "gt"
@@ -29,36 +94,41 @@
 							"type": "and"
 						},
 						"query": {
-							"params": []
+							"params": [
+								"C"
+							]
 						},
 						"reducer": {
 							"params": [],
-							"type": "avg"
+							"type": "last"
 						},
 						"type": "query"
 					}
 				],
 				"datasource": {
-					"name": "Expression",
 					"type": "__expr__",
 					"uid": "__expr__"
 				},
-				"expression": "0",
+				"expression": "B",
 				"intervalMs": 1000,
 				"maxDataPoints": 43200,
-				"refId": "A",
-				"type": "math"
+				"refId": "C",
+				"type": "threshold"
 			}
 		}
 	],
-	"updated": "2023-10-23T01:53:53Z",
+	"updated": "2024-03-24T18:20:34Z",
 	"noDataState": "NoData",
-  "notification_settings": null,
 	"execErrState": "Error",
 	"for": "5m",
+	"annotations": {
+		"__dashboardUid__": "ddgngrxsn670gf",
+		"__panelId__": "1"
+	},
 	"labels": {
 		"l0": "$tag0",
 		"l1": "Deployed"
 	},
-	"isPaused": false
+	"isPaused": false,
+	"notification_settings": null
 }

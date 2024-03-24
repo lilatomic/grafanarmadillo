@@ -5,93 +5,169 @@
 		"canEdit": true,
 		"canAdmin": true,
 		"canStar": true,
+		"canDelete": true,
 		"slug": "f0-0",
-		"url": "/d/t8r73INnk/f0-0",
+		"url": "/d/ddgngrxsn670gf/f0-0",
 		"expires": "0001-01-01T00:00:00Z",
-		"created": "2021-09-21T21:59:18Z",
-		"updated": "2021-09-21T22:05:21Z",
+		"created": "2024-03-24T18:14:47Z",
+		"updated": "2024-03-24T18:14:47Z",
 		"updatedBy": "admin",
 		"createdBy": "admin",
-		"version": 2,
+		"version": 1,
 		"hasAcl": false,
 		"isFolder": false,
 		"folderId": 1,
-		"folderUid": "U2b7qIH7k",
+		"folderUid": "cdgngrepd3y0wc",
 		"folderTitle": "f0",
-		"folderUrl": "/dashboards/f/U2b7qIH7k/f0",
+		"folderUrl": "/dashboards/f/cdgngrepd3y0wc/f0",
 		"provisioned": false,
-		"provisionedExternalId": ""
+		"provisionedExternalId": "",
+		"annotationsPermissions": {
+			"dashboard": {
+				"canAdd": true,
+				"canEdit": true,
+				"canDelete": true
+			},
+			"organization": {
+				"canAdd": true,
+				"canEdit": true,
+				"canDelete": true
+			}
+		}
 	},
 	"dashboard": {
 		"annotations": {
 			"list": [
 				{
 					"builtIn": 1,
-					"datasource": "-- Grafana --",
+					"datasource": {
+						"type": "grafana",
+						"uid": "-- Grafana --"
+					},
 					"enable": true,
 					"hide": true,
 					"iconColor": "rgba(0, 211, 255, 1)",
-					"name": "Annotations \u0026 Alerts",
-					"target": { "limit": 100, "matchAny": false, "tags": [], "type": "dashboard" },
+					"name": "Annotations & Alerts",
 					"type": "dashboard"
 				}
 			]
 		},
 		"editable": true,
-		"gnetId": null,
+		"fiscalYearStartMonth": 0,
 		"graphTooltip": 0,
 		"id": 2,
 		"links": [],
 		"panels": [
 			{
-				"datasource": null,
+				"datasource": {
+					"type": "prometheus",
+					"uid": "cdgngjl71kao0d"
+				},
 				"fieldConfig": {
 					"defaults": {
-						"color": { "mode": "palette-classic" },
+						"color": {
+							"mode": "palette-classic"
+						},
 						"custom": {
+							"axisBorderShow": false,
+							"axisCenteredZero": false,
+							"axisColorMode": "text",
 							"axisLabel": "",
 							"axisPlacement": "auto",
 							"barAlignment": 0,
 							"drawStyle": "line",
 							"fillOpacity": 0,
 							"gradientMode": "none",
-							"hideFrom": { "legend": false, "tooltip": false, "viz": false },
+							"hideFrom": {
+								"legend": false,
+								"tooltip": false,
+								"viz": false
+							},
+							"insertNulls": false,
 							"lineInterpolation": "linear",
 							"lineWidth": 1,
 							"pointSize": 5,
-							"scaleDistribution": { "type": "linear" },
+							"scaleDistribution": {
+								"type": "linear"
+							},
 							"showPoints": "auto",
 							"spanNulls": false,
-							"stacking": { "group": "A", "mode": "none" },
-							"thresholdsStyle": { "mode": "off" }
+							"stacking": {
+								"group": "A",
+								"mode": "none"
+							},
+							"thresholdsStyle": {
+								"mode": "off"
+							}
 						},
 						"mappings": [],
 						"thresholds": {
 							"mode": "absolute",
 							"steps": [
-								{ "color": "green", "value": null },
-								{ "color": "red", "value": 80 }
+								{
+									"color": "green",
+									"value": null
+								},
+								{
+									"color": "red",
+									"value": 80
+								}
 							]
 						}
 					},
 					"overrides": []
 				},
-				"gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
-				"id": 2,
-				"options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
-				"title": "Panel Title",
+				"gridPos": {
+					"h": 8,
+					"w": 12,
+					"x": 0,
+					"y": 0
+				},
+				"id": 1,
+				"options": {
+					"legend": {
+						"calcs": [],
+						"displayMode": "list",
+						"placement": "bottom",
+						"showLegend": true
+					},
+					"tooltip": {
+						"mode": "single",
+						"sort": "none"
+					}
+				},
+				"targets": [
+					{
+						"datasource": {
+							"type": "prometheus",
+							"uid": "cdgngjl71kao0d"
+						},
+						"editorMode": "code",
+						"expr": "rate()",
+						"instant": false,
+						"legendFormat": "__auto",
+						"range": true,
+						"refId": "A"
+					}
+				],
+				"title": "p0",
 				"type": "timeseries"
 			}
 		],
-		"schemaVersion": 30,
-		"style": "dark",
-		"tags": [],
-		"templating": { "list": [] },
-		"time": { "from": "now-6h", "to": "now" },
+		"schemaVersion": 39,
+		"tags": ["$tag0", "Deployed"],
+		"templating": {
+			"list": []
+		},
+		"time": {
+			"from": "now-6h",
+			"to": "now"
+		},
 		"timepicker": {},
-		"timezone": "",
+		"timezone": "browser",
 		"title": "f0-0",
-		"uid": "t8r73INnk",
-		"version": 2
+		"uid": "ddgngrxsn670gf",
+		"version": 1,
+		"weekStart": ""
 	}
 }

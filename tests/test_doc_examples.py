@@ -38,9 +38,11 @@ def test_usage_dashboard_import(rw_shared_grafana, unique):
 
 	folder = finder.get_folder(unique)
 	with open(os.path.join("tests", "dashboard.json"), "r") as template:
-		import_dashboard(gfn, folder, template)
+		dashboard = import_dashboard(gfn, folder, template)
 
-	assert finder.get_from_path(f"/{unique}/New dashboard Copy")
+	dashboard = finder.get_dashboard_by_uid(dashboard["uid"])
+
+	assert finder.get_from_path(f"/{unique}/{dashboard.name}")
 
 
 def test_usage_dashboard_clone(rw_shared_grafana, unique):
