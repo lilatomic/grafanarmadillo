@@ -13,8 +13,12 @@ from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.bulk import BulkExporter, BulkImporter
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
-from grafanarmadillo.templator import Templator, make_mapping_templator, combine_transformers, \
-	remove_edit_metadata_transformer
+from grafanarmadillo.templator import (
+	Templator,
+	alert_dashboarduid_templator,
+	make_mapping_templator,
+	remove_edit_metadata_transformer,
+)
 from grafanarmadillo.util import load_data
 
 
@@ -43,25 +47,27 @@ def make_grafana(config) -> GrafanaApi:
 
 @dataclass(frozen=True)
 class TemplatorOpts:
-	"""Extra options for the templator"""
+	"""Extra options for the templator."""
+
 	remove_edit_metadata: bool = False
+	resolve_alert_dashboarduid: bool = False
 
 
-def apply_template_opts(opts: TemplatorOpts, templator: Templator) -> Templator:
+def apply_template_opts(gfn: GrafanaApi, opts: TemplatorOpts, templator: Templator) -> Templator:
+	"""Apply the extra templator options."""
 	if opts.remove_edit_metadata:
-		templator = Templator(
-			combine_transformers(templator.make_template, remove_edit_metadata_transformer),
-			templator.fill_template,
-		)
-
+		templator = templator.chain(Templator(make_template=remove_edit_metadata_transformer))
+	if opts.resolve_alert_dashboarduid:
+		templator = templator.chain(alert_dashboarduid_templator(Finder(gfn)))
 	return templator
 
 
-def make_templator(mapping, env_grafana, env_template, templator_extra_opts):
+def make_templator(gfn: GrafanaApi, mapping, env_grafana, env_template, templator_extra_opts) -> Templator:
+	"""Assemble the templator."""
 	mapping = load_data(mapping)
 	templator = make_mapping_templator(mapping, env_grafana, env_template)
 	extra_opts = TemplatorOpts(**load_data(templator_extra_opts))
-	templator = apply_template_opts(extra_opts, templator)
+	templator = apply_template_opts(gfn, extra_opts, templator)
 	return templator
 
 
@@ -104,7 +110,7 @@ def dashboard():
 def _export_dashboard(ctx, src, dst, mapping, env_grafana, env_template, templator_extra_opts):
 	"""Capture a dashboard from Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
-	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
+	templator = make_templator(gfn, mapping, env_grafana, env_template, templator_extra_opts)
 	return export_dashboard(gfn, src, dst, templator)
 
 
@@ -127,7 +133,7 @@ def export_dashboard(gfn: GrafanaApi, src: str, dst: IO, templator: Templator):
 def _import_dashboard(ctx, src, dst, mapping, env_grafana, env_template, templator_extra_opts):
 	"""Deploy a template to Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
-	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
+	templator = make_templator(gfn, mapping, env_grafana, env_template, templator_extra_opts)
 	return import_dashboard(gfn, src, dst, templator)
 
 
@@ -155,7 +161,7 @@ def alert():
 def _export_alert(ctx, src, dst, mapping, env_grafana, env_template, templator_extra_opts):
 	"""Capture an alert from Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
-	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
+	templator = make_templator(gfn, mapping, env_grafana, env_template, templator_extra_opts)
 	return export_alert(gfn, src, dst, templator)
 
 
@@ -178,7 +184,7 @@ def export_alert(gfn: GrafanaApi, src: str, dst: IO, templator: Templator):
 def _import_alert(ctx, src, dst, mapping, env_grafana, env_template, templator_extra_opts):
 	"""Deploy an alert from a template."""
 	gfn = make_grafana(ctx.obj["cfg"])
-	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
+	templator = make_templator(gfn, mapping, env_grafana, env_template, templator_extra_opts)
 	return import_alert(gfn, src, dst, templator)
 
 
@@ -257,7 +263,8 @@ def upgrade_alerting(
 	"""
 	from grafanarmadillo.migrate import migrate
 
-	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
+	gfn = make_grafana(ctx.obj["cfg"])
+	templator = make_templator(gfn, mapping, env_grafana, env_template, templator_extra_opts)
 
 	cfg = ctx.obj["cfg"]
 	if grafana_extra_envvars:
@@ -298,7 +305,8 @@ def _import_resources(
 	templator_extra_opts,
 ):
 	"""Load exported dashboards and alerts."""
-	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
+	gfn = make_grafana(ctx.obj["cfg"])
+	templator = make_templator(gfn, mapping, env_grafana, env_template, templator_extra_opts)
 	operator = BulkImporter(ctx.obj["cfg"], root_directory, templator=templator)
 	operator.run()
 
@@ -320,7 +328,8 @@ def _export_resources(
 	templator_extra_opts,
 ):
 	"""Export dashboards and alerts from a Grafana instance."""
-	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
+	gfn = make_grafana(ctx.obj["cfg"])
+	templator = make_templator(gfn, mapping, env_grafana, env_template, templator_extra_opts)
 	operator = BulkExporter(ctx.obj["cfg"], root_directory, templator=templator)
 	operator.run()
 

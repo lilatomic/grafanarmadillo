@@ -21,6 +21,9 @@ from grafanarmadillo.util import (
 )
 
 
+l = logging.getLogger(__name__)
+
+
 DashboardTransformer = Callable[[DashboardContent], DashboardContent]
 
 
@@ -82,7 +85,7 @@ def remove_edit_metadata_transformer(d: DashboardContent) -> DashboardContent:
 	return d
 
 
-class Templator(object):
+class Templator:
 	"""Collection of methods for filling and making templates."""
 
 	def __init__(
@@ -113,6 +116,13 @@ class Templator(object):
 		new.update(project_dashboard_identity(dashboard_info))
 
 		return self.fill_template(DashboardContent(new))
+
+	def chain(self, other) -> Templator:
+		"""Chain two templators."""
+		return Templator(
+			make_template=combine_transformers(self.make_template, other.make_template),
+			fill_template=combine_transformers(self.fill_template, other.fill_template)
+		)
 
 
 EnvMapping = NewType("EnvMapping", Dict[str, Dict[str, str]])
