@@ -1,9 +1,10 @@
 import json
+from dataclasses import asdict
 
 import pytest
 from click.testing import CliRunner
 
-from grafanarmadillo.cmd import grafanarmadillo
+from grafanarmadillo.cmd import TemplatorOpts, grafanarmadillo
 from grafanarmadillo.find import Finder
 from tests.conftest import read_json_file, requires_alerting
 
@@ -107,7 +108,7 @@ def test_cli__import_alert(cli_config, rw_shared_grafana):
 			"--mapping",
 			"file://tests/cli/mapping.json",
 			"--templator-extra-opts",
-			json.dumps({"remove_edit_metadata": True, "resolve_alert_dashboarduid": True}),
+			json.dumps(asdict(TemplatorOpts(remove_edit_metadata=True, resolve_alert_dashboarduid=True))),
 		]
 	)
 	assert result.exit_code == 0
@@ -143,7 +144,7 @@ def test_cli__export_alert(cli_config, rw_shared_grafana, tmp_path):
 			"--mapping",
 			"file://tests/cli/mapping.json",
 			"--templator-extra-opts",
-			json.dumps({"remove_edit_metadata": True, "resolve_alert_dashboarduid": True}),
+			json.dumps(asdict(TemplatorOpts(remove_edit_metadata=True, resolve_alert_dashboarduid=True))),
 		]
 	)
 	if result.exit_code != 0:
