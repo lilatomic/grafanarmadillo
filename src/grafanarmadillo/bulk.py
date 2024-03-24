@@ -120,7 +120,7 @@ class BulkGrafanaOperation(BulkOperation, ABC):
 			if folder is None:
 				folder_name = "General"
 			else:
-				folder_name = folder["name"]
+				folder_name = folder["title"]
 
 			out_path = GrafanaPath(dashboard_content["title"], folder_name, org["name"])
 

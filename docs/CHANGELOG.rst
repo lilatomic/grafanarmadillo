@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* fix : fix bulk export using wrong key for folders
 * task : increase tested Grafana versions
 * task : fix docs
 * task : migrate to use pyproject.toml

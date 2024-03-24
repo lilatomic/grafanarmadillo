@@ -16,6 +16,7 @@ from tests.conftest import read_json_file
 
 def test_cli__migrator(tmp_path: Path, caplog):
 	caplog.set_level(logging.DEBUG)
+	folder_name = "f0"
 
 	def init_db_file(path: Path) -> None:
 		path.parent.mkdir(parents=True, exist_ok=True)
@@ -56,7 +57,7 @@ def test_cli__migrator(tmp_path: Path, caplog):
 		)
 		dashboarder_legacy, finder_legacy = Dashboarder(gfn_legacy), Finder(gfn_legacy)
 		legacy_dashboard = read_json_file("legacy_alert_dashboard.json")
-		folder = finder_legacy.get_folder("General")
+		folder = finder_legacy.create_or_get_folder(folder_name)
 		gfn_legacy.datasource.create_datasource(
 			{
 				"name": "test_datasource",
@@ -94,7 +95,7 @@ def test_cli__migrator(tmp_path: Path, caplog):
 		assert result.exit_code == 0
 		assert len(list((output_path / "dashboards").rglob("*.json"))) == 1
 		assert len(list((output_path / "alerts").rglob("*.json"))) == 1
-		with (output_path / "dashboards" / PathCodec.encode(["Main Org.", "General", "New dashboard (1/1)"])).with_suffix(".json").open() as f:
+		with (output_path / "dashboards" / PathCodec.encode(["Main Org.", folder_name, "New dashboard (1/1)"])).with_suffix(".json").open() as f:
 			assert "${ds_uid}" in f.read(), "templating didn't happen in export"
 	except AssertionError:
 		print(f"{result.output=}")
