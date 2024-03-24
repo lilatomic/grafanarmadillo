@@ -31,9 +31,9 @@ jobs:
         with:
           # v0 makes it easy to bust the cache if needed
           # just increase the integer to start with a fresh cache
-          gha-cache-key: v0
+          gha-cache-key: v1
           named-caches-hash: ${{ hashFiles('devtools/python-default.lock') }}
-          cache-lmdb-store: 'true'
+#          cache-lmdb-store: 'true'
 
       - name: Test
         run: |

@@ -1,6 +1,5 @@
 """Find Grafana dashboards and folders."""
 
-from pathlib import Path
 from typing import List, Optional, Tuple, Union
 
 from grafana_client import GrafanaApi
@@ -10,6 +9,8 @@ from grafanarmadillo.types import (
 	AlertSearchResult,
 	DashboardSearchResult,
 	FolderSearchResult,
+	GrafanaPath,
+	PathLike,
 )
 from grafanarmadillo.util import exactly_one
 
@@ -97,6 +98,13 @@ class Finder:
 			_query_message("dashboard", f"/{folder_name}/{dashboard_name}"),
 		)
 
+	def get_dashboard_by_uid(self, uid: str) -> GrafanaPath:
+		"""Get a dashboard by its uid."""
+		d = self.api.dashboard.get_dashboard(uid)
+		dashboard_title = d["dashboard"]["title"]
+		folder_title = d["meta"].get("folderTitle", None)
+		return GrafanaPath(folder=folder_title, name=dashboard_title)
+
 	def get_alert(self, folder_name, alert_name) -> AlertSearchResult:
 		"""Get an alert by its parent folder and alert name."""
 		folder_uid = self.get_folder(folder_name)["uid"]
@@ -109,23 +117,23 @@ class Finder:
 			_query_message("alert", f"/{folder_name}/{alert_name}")
 		)
 
-	def get_from_path(self, path) -> Union[DashboardSearchResult, AlertSearchResult]:
+	def get_from_path(self, path: PathLike) -> Union[DashboardSearchResult, AlertSearchResult]:
 		"""Get a dashboard from a string path like `/folder0/dashboard0`."""
-		address = PathCodec.decode_grafana(Path(path))
+		address = PathCodec.try_parse(path)
 		return self.get_dashboard(address.folder, address.name)
 
-	def get_alert_from_path(self, path) -> AlertSearchResult:
+	def get_alert_from_path(self, path: PathLike) -> AlertSearchResult:
 		"""Get an alert from a string path like `/folder0/alert0`."""
-		address = PathCodec.decode_grafana(Path(path))
+		address = PathCodec.try_parse(path)
 		return self.get_alert(address.folder, address.name)
 
-	def create_or_get_dashboard(self, path: str) -> Tuple[DashboardSearchResult, Optional[FolderSearchResult]]:
+	def create_or_get_dashboard(self, path: PathLike) -> Tuple[DashboardSearchResult, Optional[FolderSearchResult]]:
 		"""
 		Create a new empty dashboard if it does not exist.
 		
 		Returns the search information if it does
 		"""
-		address = PathCodec.decode_grafana(Path(path))
+		address = PathCodec.try_parse(path)
 		folder = self.create_or_get_folder(address.folder)
 
 		try:
@@ -142,14 +150,14 @@ class Finder:
 
 		return dashboard, folder
 
-	def create_or_get_alert(self, path: str) -> Tuple[AlertSearchResult, FolderSearchResult]:
+	def create_or_get_alert(self, path: PathLike) -> Tuple[AlertSearchResult, FolderSearchResult]:
 		"""
 		Get the information about an alert or create a new "empty" alert if it does not exist.
 
 		Creating an "empty" alert in Grafana requires filling in a rule.
 		We can fake that with a `math` rule that always returns 0.
 		"""
-		address = PathCodec.decode_grafana(Path(path))
+		address = PathCodec.try_parse(path)
 		folder = self.create_or_get_folder(address.folder)
 
 		try:

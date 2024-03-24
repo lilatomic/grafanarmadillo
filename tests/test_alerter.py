@@ -57,11 +57,15 @@ def test_import__update(rw_shared_grafana, unique):
 	new_alert = uniquify_alert(read_json_file("alert_rule.json"), unique)
 	alerter.import_alert(new_alert, folder)
 
-	new_alert["isPaused"] = not new_alert["isPaused"]  # modify the alert
-	alerter.import_alert(new_alert, folder)
+	def attempt():
+		new_alert["isPaused"] = not new_alert["isPaused"]  # modify the alert
+		alerter.import_alert(new_alert, folder)
 
-	result = finder.get_alert("f0", "title " + unique)
-	assert result["isPaused"] == new_alert["isPaused"]
+		result = finder.get_alert("f0", "title " + unique)
+		assert result["isPaused"] == new_alert["isPaused"]
+
+	attempt()
+	attempt()
 
 
 def test_importexport__roundtrip(rw_shared_grafana, unique):
@@ -83,6 +87,9 @@ def test_importexport__roundtrip(rw_shared_grafana, unique):
 	exported_alert, exported_folder = alerter.export_alert(alert_search_result)
 
 	def coerce_comparable(a):
+		if not rw_shared_grafana[0].major_version >= 10:
+			a.pop("notification_settings", None)  # data model changed in 10.4 to have this extra key
+
 		noncomparables = {"id", "provenance", "folderUID", "updated"}
 		return project_dict(a, noncomparables, inverse=True)
 

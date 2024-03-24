@@ -3,35 +3,38 @@
 		"list": [
 			{
 				"builtIn": 1,
-				"datasource": "-- Grafana --",
+				"datasource": {
+					"type": "grafana",
+					"uid": "-- Grafana --"
+				},
 				"enable": true,
 				"hide": true,
 				"iconColor": "rgba(0, 211, 255, 1)",
 				"name": "Annotations & Alerts",
-				"target": {
-					"limit": 100,
-					"matchAny": false,
-					"tags": [],
-					"type": "dashboard"
-				},
 				"type": "dashboard"
 			}
 		]
 	},
 	"editable": true,
-	"gnetId": null,
+	"fiscalYearStartMonth": 0,
 	"graphTooltip": 0,
-	"id": null,
+	"id": 2,
 	"links": [],
 	"panels": [
 		{
-			"datasource": null,
+			"datasource": {
+				"type": "prometheus",
+				"uid": "cdgngjl71kao0d"
+			},
 			"fieldConfig": {
 				"defaults": {
 					"color": {
 						"mode": "palette-classic"
 					},
 					"custom": {
+						"axisBorderShow": false,
+						"axisCenteredZero": false,
+						"axisColorMode": "text",
 						"axisLabel": "",
 						"axisPlacement": "auto",
 						"barAlignment": 0,
@@ -43,6 +46,7 @@
 							"tooltip": false,
 							"viz": false
 						},
+						"insertNulls": false,
 						"lineInterpolation": "linear",
 						"lineWidth": 1,
 						"pointSize": 5,
@@ -77,34 +81,43 @@
 				"overrides": []
 			},
 			"gridPos": {
-				"h": 9,
+				"h": 8,
 				"w": 12,
 				"x": 0,
 				"y": 0
 			},
-			"id": 2,
+			"id": 1,
 			"options": {
 				"legend": {
 					"calcs": [],
 					"displayMode": "list",
-					"placement": "bottom"
+					"placement": "bottom",
+					"showLegend": true
 				},
 				"tooltip": {
-					"mode": "single"
+					"mode": "single",
+					"sort": "none"
 				}
 			},
 			"targets": [
 				{
-					"refId": "A",
-					"target": ""
+					"datasource": {
+						"type": "prometheus",
+						"uid": "cdgngjl71kao0d"
+					},
+					"editorMode": "code",
+					"expr": "rate()",
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A"
 				}
 			],
-			"title": "Panel Title",
+			"title": "p0",
 			"type": "timeseries"
 		}
 	],
-	"schemaVersion": 30,
-	"style": "dark",
+	"schemaVersion": 39,
 	"tags": ["$tag0", "Deployed"],
 	"templating": {
 		"list": []
@@ -114,8 +127,9 @@
 		"to": "now"
 	},
 	"timepicker": {},
-	"timezone": "",
-	"title": "New dashboard Copy",
-	"uid": "nErXDvCkzz",
-	"version": 1
+	"timezone": "browser",
+	"title": "f0-0",
+	"uid": "ddgngrxsn670gf",
+	"version": 1,
+	"weekStart": ""
 }

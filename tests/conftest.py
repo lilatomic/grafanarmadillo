@@ -124,7 +124,7 @@ def create_folder(gfn: GrafanaApi, name: str, uid=None):
 	return gfn.folder.create_folder(name, uid)
 
 
-@pytest.fixture(scope="module", params=["8.5.27", "9.5.13", "10.1.5"])
+@pytest.fixture(scope="module", params=["8.5.27", "9.5.17", "10.4.1"])
 def grafana_image(request):
 	yield f"grafana/grafana:{request.param}"
 
@@ -199,7 +199,7 @@ def mk_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaApi]:
 
 		gfn.datasource.create_datasource(read_json_file("datasource.json"))
 
-		create_dashboard(gfn, "0", 0)
+		dashboard = create_dashboard(gfn, "0", 0)
 		f0 = create_folder(gfn, "f0")
 		create_dashboard(gfn, "f0-0", f0["id"])
 
@@ -210,7 +210,8 @@ def mk_demo_grafana(grafana_image) -> Tuple[GrafanaContainer, GrafanaApi]:
 			assert f0["title"] == "f0"
 			alert = read_json_file("alert_rule.json")
 			alert["folderUID"] = f0["uid"]
-			alert["uid"] = str(uuid.uuid4())  # make this instance of the dashboard unique
+			alert["uid"] = str(uuid.uuid4())  # make this instance of the alert unique
+			alert["annotations"]["__dashboardUid__"] = dashboard["uid"]  # make the alert point to the real dashboard
 			gfn.alertingprovisioning.create_alertrule(alert, True)
 
 		yield gfn_ctn, gfn

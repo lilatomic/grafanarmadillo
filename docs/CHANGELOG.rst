@@ -2,6 +2,13 @@
 Changelog
 =========
 
+* feature : add templator for resolving dashboard uids on alerts
+* fix : idempotency of bulk ops importing alerts
+* fix : do not double-decode path (mostly affects bulk ops)
+* feature : cli supports extra option to remove edit metadata from dashboards
+* fix : fix bulk export using wrong key for folders
+* task : increase tested Grafana versions
+* task : fix docs
 * task : migrate to use pyproject.toml
 
 v0.6.0 (2024-03-23)
