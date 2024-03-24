@@ -2,6 +2,7 @@
 import datetime
 import json
 import logging
+import textwrap
 from dataclasses import dataclass
 from pathlib import Path
 from typing import IO
@@ -35,6 +36,18 @@ env_grafana_help = "Name of the environment in the mapping file for Grafana, fou
 env_template_help = (
 	"Name of the environment in the mapping file for the template, found in the `--mapping` argument. "
 	+ auto_template_env_help
+)
+templator_extra_opts_help = (
+	textwrap.dedent(
+		"""\
+		Extra options for the templator
+		
+		- remove_edit_metadata : remove metadata related to edits on the dashboard, such as the version and last modified times
+		
+		- resolve_alert_dashboarduid : resolve the dashboard referenced by an alert to a reference.
+		
+		"""
+	) + load_file_help
 )
 
 
@@ -73,7 +86,7 @@ def make_templator(gfn: GrafanaApi, mapping, env_grafana, env_template, templato
 
 def with_template_options(f):
 	"""Add template options to a command."""
-	return click.option("--templator-extra-opts", default="{}", help="Extra options for the templator")(
+	return click.option("--templator-extra-opts", default="{}", help=templator_extra_opts_help)(
 		click.option("--mapping", help=mapping_help)(
 			click.option("--env-grafana", help=env_grafana_help)(
 				click.option("--env-template", help=env_template_help)(f)
