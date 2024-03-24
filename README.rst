@@ -26,12 +26,12 @@ Grafanarmadillo simplifies interacting with Grafana, with a focus on templating 
 Library
 -------
 
-Grafanarmadillo is a library that navigates the Grafana API. It has helpers to find dashboards and alerts; make and fill templates; and provision those filled templates. See :doc:`usage` for samples.
+Grafanarmadillo is a library that navigates the Grafana API. It has helpers to find dashboards and alerts; make and fill templates; and provision those filled templates. See `usage <https://github.com/lilatomic/grafanarmadillo/tree/main/docs/rst/usage.rst>`_ for samples.
 
 Tools
 -----
 
-Grafanarmadillo is a tool that helps turn dashboards and alerts into templates and to turn templates into dashboards and alerts. See :doc:`cli`
+Grafanarmadillo is a tool that helps turn dashboards and alerts into templates and to turn templates into dashboards and alerts. See `cli <https://github.com/lilatomic/grafanarmadillo/tree/main/docs/rst/cli.rst>`_
 
 Acknowledgments
 ===============
