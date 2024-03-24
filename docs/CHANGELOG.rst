@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* task : increase tested Grafana versions
+* task : fix docs
 * task : migrate to use pyproject.toml
 
 v0.6.0 (2024-03-23)
