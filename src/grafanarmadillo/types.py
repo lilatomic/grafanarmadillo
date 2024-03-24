@@ -1,6 +1,7 @@
 """Type hints for Grafana interaction."""
 from dataclasses import dataclass
-from typing import NewType, Optional, TypedDict, Union
+from pathlib import Path
+from typing import List, NewType, Optional, TypedDict, Union
 
 
 UID = NewType("UID", str)
@@ -63,3 +64,6 @@ class GrafanaPath:
 	name: str
 	folder: str
 	org: Optional[str] = None
+
+
+PathLike = Union[GrafanaPath, str, Path, List[str]]

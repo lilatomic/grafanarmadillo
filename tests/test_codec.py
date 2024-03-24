@@ -53,25 +53,25 @@ def test_absolute():
 
 
 def test_resolve_path__general():
-	assert PathCodec.decode_grafana(Path("/folder/dashboard")) == GrafanaPath(folder="folder", name="dashboard")
+	assert PathCodec.try_parse(Path("/folder/dashboard")) == GrafanaPath(folder="folder", name="dashboard")
 
 
 def test_resolve_path__no_absolute_slash():
-	assert PathCodec.decode_grafana(Path("folder/dashboard")) == GrafanaPath(folder="folder", name="dashboard")
+	assert PathCodec.try_parse(Path("folder/dashboard")) == GrafanaPath(folder="folder", name="dashboard")
 
 
 def test_resolve_path__implicit_general():
-	assert PathCodec.decode_grafana(Path("/dashboard")) == GrafanaPath(folder="General", name="dashboard")
+	assert PathCodec.try_parse(Path("/dashboard")) == GrafanaPath(folder="General", name="dashboard")
 
 
 def test_resolve_path__bare_dashboard():
-	assert PathCodec.decode_grafana(Path("dashboard")) == GrafanaPath(folder="General", name="dashboard")
+	assert PathCodec.try_parse(Path("dashboard")) == GrafanaPath(folder="General", name="dashboard")
 
 
 def test_resolve_path__too_many_parts():
 	with pytest.raises(ValueError):
-		PathCodec.decode_grafana(Path("/org/folder/dashboard/invalidpart"))
+		PathCodec.try_parse(Path("/org/folder/dashboard/invalidpart"))
 
 
 def test_resolve_path__with_org():
-	assert PathCodec.decode_grafana(Path("/org/folder/name")) == GrafanaPath(org="org", folder="folder", name="name")
+	assert PathCodec.try_parse(Path("/org/folder/name")) == GrafanaPath(org="org", folder="folder", name="name")

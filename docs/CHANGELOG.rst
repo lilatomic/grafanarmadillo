@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* fix : do not double-decode path (mostly affects bulk ops)
 * feature : cli supports extra option to remove edit metadata from dashboards
 * fix : fix bulk export using wrong key for folders
 * task : increase tested Grafana versions
