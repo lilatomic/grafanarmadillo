@@ -2,6 +2,7 @@
 import datetime
 import json
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 from typing import IO
 
@@ -12,7 +13,8 @@ from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.bulk import BulkExporter, BulkImporter
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
-from grafanarmadillo.templator import Templator, make_mapping_templator
+from grafanarmadillo.templator import Templator, make_mapping_templator, combine_transformers, \
+	remove_edit_metadata_transformer
 from grafanarmadillo.util import load_data
 
 
@@ -39,11 +41,37 @@ def make_grafana(config) -> GrafanaApi:
 	return GrafanaApi(**config)
 
 
+@dataclass(frozen=True)
+class TemplatorOpts:
+	"""Extra options for the templator"""
+	remove_edit_metadata: bool = False
+
+
+def apply_template_opts(opts: TemplatorOpts, templator: Templator) -> Templator:
+	if opts.remove_edit_metadata:
+		templator = Templator(
+			combine_transformers(templator.make_template, remove_edit_metadata_transformer),
+			templator.fill_template,
+		)
+
+	return templator
+
+
+def make_templator(mapping, env_grafana, env_template, templator_extra_opts):
+	mapping = load_data(mapping)
+	templator = make_mapping_templator(mapping, env_grafana, env_template)
+	extra_opts = TemplatorOpts(**load_data(templator_extra_opts))
+	templator = apply_template_opts(extra_opts, templator)
+	return templator
+
+
 def with_template_options(f):
 	"""Add template options to a command."""
-	return click.option("--mapping", help=mapping_help)(
-		click.option("--env-grafana", help=env_grafana_help)(
-			click.option("--env-template", help=env_template_help)(f)
+	return click.option("--templator-extra-opts", default="{}", help="Extra options for the templator")(
+		click.option("--mapping", help=mapping_help)(
+			click.option("--env-grafana", help=env_grafana_help)(
+				click.option("--env-template", help=env_template_help)(f)
+			)
 		)
 	)
 
@@ -73,12 +101,10 @@ def dashboard():
 @click.option("--dst", help="Path to write the dashboard to", type=click.File("w"))
 @with_template_options
 @click.pass_context
-def _export_dashboard(ctx, src, dst, mapping, env_grafana, env_template):
+def _export_dashboard(ctx, src, dst, mapping, env_grafana, env_template, templator_extra_opts):
 	"""Capture a dashboard from Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
-
-	mapping = load_data(mapping)
-	templator = make_mapping_templator(mapping, env_grafana, env_template)
+	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
 	return export_dashboard(gfn, src, dst, templator)
 
 
@@ -98,12 +124,10 @@ def export_dashboard(gfn: GrafanaApi, src: str, dst: IO, templator: Templator):
 @click.option("--dst", help="Path to write the dashboard to")
 @with_template_options
 @click.pass_context
-def _import_dashboard(ctx, src, dst, mapping, env_grafana, env_template):
+def _import_dashboard(ctx, src, dst, mapping, env_grafana, env_template, templator_extra_opts):
 	"""Deploy a template to Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
-
-	mapping = load_data(mapping)
-	templator = make_mapping_templator(mapping, env_grafana, env_template)
+	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
 	return import_dashboard(gfn, src, dst, templator)
 
 
@@ -128,12 +152,10 @@ def alert():
 @click.option("--dst", help="Path to write the alert to", type=click.File("w"))
 @with_template_options
 @click.pass_context
-def _export_alert(ctx, src, dst, mapping, env_grafana, env_template):
+def _export_alert(ctx, src, dst, mapping, env_grafana, env_template, templator_extra_opts):
 	"""Capture an alert from Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
-
-	mapping = load_data(mapping)
-	templator = make_mapping_templator(mapping, env_grafana, env_template)
+	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
 	return export_alert(gfn, src, dst, templator)
 
 
@@ -153,12 +175,10 @@ def export_alert(gfn: GrafanaApi, src: str, dst: IO, templator: Templator):
 @click.option("--dst", help="Path to write the dashboard to")
 @with_template_options
 @click.pass_context
-def _import_alert(ctx, src, dst, mapping, env_grafana, env_template):
+def _import_alert(ctx, src, dst, mapping, env_grafana, env_template, templator_extra_opts):
 	"""Deploy an alert from a template."""
 	gfn = make_grafana(ctx.obj["cfg"])
-
-	mapping = load_data(mapping)
-	templator = make_mapping_templator(mapping, env_grafana, env_template)
+	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
 	return import_alert(gfn, src, dst, templator)
 
 
@@ -226,6 +246,7 @@ def upgrade_alerting(
 	mapping,
 	env_grafana,
 	env_template,
+	templator_extra_opts,
 ):
 	"""
 	Migrate from Classic to Unified alerting.
@@ -236,8 +257,7 @@ def upgrade_alerting(
 	"""
 	from grafanarmadillo.migrate import migrate
 
-	mapping = load_data(mapping)
-	templator = make_mapping_templator(mapping, env_grafana, env_template)
+	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
 
 	cfg = ctx.obj["cfg"]
 	if grafana_extra_envvars:
@@ -275,11 +295,10 @@ def _import_resources(
 	mapping,
 	env_grafana,
 	env_template,
+	templator_extra_opts,
 ):
 	"""Load exported dashboards and alerts."""
-	mapping = load_data(mapping)
-	templator = make_mapping_templator(mapping, env_grafana, env_template)
-
+	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
 	operator = BulkImporter(ctx.obj["cfg"], root_directory, templator=templator)
 	operator.run()
 
@@ -298,11 +317,10 @@ def _export_resources(
 	mapping,
 	env_grafana,
 	env_template,
+	templator_extra_opts,
 ):
 	"""Export dashboards and alerts from a Grafana instance."""
-	mapping = load_data(mapping)
-	templator = make_mapping_templator(mapping, env_grafana, env_template)
-
+	templator = make_templator(mapping, env_grafana, env_template, templator_extra_opts)
 	operator = BulkExporter(ctx.obj["cfg"], root_directory, templator=templator)
 	operator.run()
 

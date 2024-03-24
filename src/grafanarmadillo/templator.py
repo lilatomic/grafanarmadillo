@@ -66,6 +66,14 @@ def panel_transformer(f: Callable[[DashboardPanel], DashboardPanel]) -> Dashboar
 	return _panel_transformer
 
 
+def remove_edit_metadata_transformer(d: DashboardContent) -> DashboardContent:
+	"""Remove frequently-changing edit metadata, such as "updated", "version", and "provenance"."""
+	d.pop("updated", None)
+	d.pop("version", None)
+	d.pop("provenance", None)
+	return d
+
+
 class Templator(object):
 	"""Collection of methods for filling and making templates."""
 

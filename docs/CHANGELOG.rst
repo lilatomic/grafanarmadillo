@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* feature : cli supports extra option to remove edit metadata from dashboards
 * fix : fix bulk export using wrong key for folders
 * task : increase tested Grafana versions
 * task : fix docs
