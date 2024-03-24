@@ -2,6 +2,9 @@
 Changelog
 =========
 
+v0.7.0 (2024-03-24)
+------------------------------------------------------------
+
 * feature : add templator for resolving dashboard uids on alerts
 * fix : idempotency of bulk ops importing alerts
 * fix : do not double-decode path (mostly affects bulk ops)
