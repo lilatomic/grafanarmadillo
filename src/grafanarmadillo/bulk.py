@@ -161,7 +161,7 @@ class BulkFileOperation(BulkOperation, ABC):
 		for folder_path in folders:
 			for dashboard_path in folder_path.glob("*.json"):
 				content = read_from_file(dashboard_path)
-				yield GrafanaPath(PathCodec.decode_segment(dashboard_path.name), PathCodec.decode_segment(folder_path.name), org["name"]), content
+				yield GrafanaPath(PathCodec.decode_segment(dashboard_path.stem), PathCodec.decode_segment(folder_path.name), org["name"]), content
 
 	def get_all_alerts(self, org: OrgMeta, gfn: GrafanaApi) -> Generator[Tuple[GrafanaPath, AlertContent], None, None]:
 		"""Get all alerts."""
@@ -169,7 +169,7 @@ class BulkFileOperation(BulkOperation, ABC):
 		for folder_path in folders:
 			for alert_path in folder_path.glob("*.json"):
 				content = read_from_file(alert_path)
-				yield GrafanaPath(PathCodec.decode_segment(alert_path.name), PathCodec.decode_segment(folder_path.name), org["name"]), content
+				yield GrafanaPath(PathCodec.decode_segment(alert_path.stem), PathCodec.decode_segment(folder_path.name), org["name"]), content
 
 
 class BulkExporter(BulkGrafanaOperation):
@@ -219,7 +219,7 @@ class BulkImporter(BulkFileOperation):
 		gfn = GrafanaApi(**{**self.cfg, "organization_id": org["id"]})
 
 		finder, alerter = Finder(gfn), Alerter(gfn)
-		folder = finder.create_or_get_folder(path.folder)
-		alert_templated = self.templator.make_dashboard_from_template(alert, alert)
+		alert_info, folder_info = finder.create_or_get_alert(path)
+		alert_templated = self.templator.make_dashboard_from_template(alert_info, alert)
 		l.info(f"import alert path={path}")
-		alerter.import_alert(alert_templated, folder)
+		alerter.import_alert(alert_templated, folder_info)
