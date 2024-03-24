@@ -98,6 +98,13 @@ class Finder:
 			_query_message("dashboard", f"/{folder_name}/{dashboard_name}"),
 		)
 
+	def get_dashboard_by_uid(self, uid: str) -> GrafanaPath:
+		"""Get a dashboard by its uid."""
+		d = self.api.dashboard.get_dashboard(uid)
+		dashboard_title = d["dashboard"]["title"]
+		folder_title = d["meta"].get("folderTitle", None)
+		return GrafanaPath(folder=folder_title, name=dashboard_title)
+
 	def get_alert(self, folder_name, alert_name) -> AlertSearchResult:
 		"""Get an alert by its parent folder and alert name."""
 		folder_uid = self.get_folder(folder_name)["uid"]

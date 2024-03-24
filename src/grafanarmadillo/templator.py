@@ -1,6 +1,14 @@
 """Make and fill templates for dashboards."""
-from typing import Callable, Dict, NewType
+from __future__ import annotations
 
+import logging
+from pathlib import Path
+from typing import Callable, Dict, NewType, Optional
+
+from grafana_client.client import GrafanaClientError
+
+from grafanarmadillo.find import Finder
+from grafanarmadillo.paths import PathCodec
 from grafanarmadillo.types import (
 	DashboardContent,
 	DashboardPanel,
@@ -128,3 +136,40 @@ def make_mapping_templator(mapping: EnvMapping, env_grafana: str, env_template: 
 	template_to_grafana = {v: k for k, v in grafana_to_template.items()}
 
 	return Templator(make_template=findreplace(grafana_to_template), fill_template=findreplace(template_to_grafana))
+
+
+def alert_dashboarduid_templator(finder: Finder) -> Templator:
+	"""Resolve the dashboard uid associated with an alert."""
+
+	def uid2ref(d: DashboardContent) -> DashboardContent:
+		dashboard_uid = d.get("annotations", {}).get("__dashboardUid__", None)
+		if dashboard_uid is None:
+			return d
+
+		try:
+			address = finder.get_dashboard_by_uid(dashboard_uid)
+		except GrafanaClientError as e:
+			if e.status_code == 404:
+				l.error(f"Could not find dashboard with uid uid={dashboard_uid}")
+				return d
+			else:
+				raise
+
+		d["annotations"]["__dashboardUid__"] = "$$%s" % PathCodec.encode_grafana(address)
+		return d
+
+	def ref2uid(d: DashboardContent) -> DashboardContent:
+		dashboard_ref_raw: Optional[str] = d.get("annotations", {}).get("__dashboardUid__", None)
+		if dashboard_ref_raw is None or not dashboard_ref_raw.startswith("$$"):
+			return d
+
+		dashboard_ref = PathCodec.try_parse(PathCodec.decode(Path(dashboard_ref_raw[2:])))
+
+		dashboard, folder = finder.create_or_get_dashboard(dashboard_ref)
+		d["annotations"]["__dashboardUid__"] = dashboard["uid"]
+		return d
+
+	return Templator(
+		make_template=uid2ref,
+		fill_template=ref2uid,
+	)
