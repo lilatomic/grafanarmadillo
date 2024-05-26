@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* task : bump transitive dependencies
 * task : upgrade Pants
 
 v0.7.0 (2024-03-24)
