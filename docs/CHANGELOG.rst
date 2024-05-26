@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* task : commit requests and pytest as test dependencies
 * task : bump transitive dependencies
 * task : upgrade Pants
 
