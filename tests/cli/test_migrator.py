@@ -106,7 +106,7 @@ def test_cli__migrator(tmp_path: Path, caplog):
 			raise
 
 	with with_container(
-		"grafana/grafana:10.3.1", unified_db_path, {}
+		"grafana/grafana:10.4.3", unified_db_path, {}
 	) as grafana_unified:
 		# Import into new Grafana
 		_wait_until_ready(grafana_unified)

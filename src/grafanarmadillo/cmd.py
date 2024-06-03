@@ -226,7 +226,7 @@ def migrate():
 @click.option(
 	"--grafana-container-image",
 	help="Grafana image to upgrade to",
-	default="grafana/grafana:latest",
+	default="grafana/grafana:10.4.3",
 )
 @click.option(
 	"--output-directory",

@@ -5,6 +5,7 @@ Changelog
 * task : commit requests and pytest as test dependencies
 * task : bump transitive dependencies
 * task : upgrade Pants
+* fix : pin migrator to use latest Grafana 10 image (Grafana 11 drops legacy alerting)
 
 v0.7.0 (2024-03-24)
 ------------------------------------------------------------
