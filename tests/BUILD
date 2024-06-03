@@ -1,5 +1,8 @@
 python_requirements(
     name="reqs",
+    module_mapping={
+    	"urllib3-future": ["urllib3", "urllib3.future"],
+	}
 )
 
 python_test_utils(
