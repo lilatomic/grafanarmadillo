@@ -2,6 +2,9 @@
 Changelog
 =========
 
+v0.7.1 (2024-06-03)
+------------------------------------------------------------
+
 * task : commit requests and pytest as test dependencies
 * task : bump transitive dependencies
 * task : upgrade Pants

@@ -8,7 +8,7 @@ python_distribution(
     ],
     provides=python_artifact(
         name="grafanarmadillo",
-        version="0.7.0",
+        version="0.7.1",
     ),
     generate_setup=False,
 )
