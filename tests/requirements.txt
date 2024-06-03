@@ -1,2 +1,5 @@
 testcontainers
 hypothesis
+requests>=2.0
+pytest>=8.0
+urllib3-future>=2.7.913
