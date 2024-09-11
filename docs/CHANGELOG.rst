@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* feature : add DashboardTransformer to help fill Grafana templates
 * feature : flow: add URLStore to import dashboards and alerts from remote sources
 * feature : flow: allow all PathLike instead of just str
 * feature : flow: easier to change filename convention

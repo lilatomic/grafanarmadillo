@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.flow import (
 	Alert,
@@ -14,7 +15,7 @@ from grafanarmadillo.flow import (
 	FlowException,
 	GrafanaStore, URLStore,
 )
-from grafanarmadillo.templator import make_mapping_templator, Templator
+from grafanarmadillo.templator import make_mapping_templator, Templator, fill_grafana_templating_options
 from grafanarmadillo.util import load_data
 from tests.conftest import requires_alerting, set_cli_cfg
 
@@ -171,7 +172,7 @@ def test_flow__remote(rw_shared_grafana, unique, tmpdir):
 			Dashboard(
 				name_obj=f"/{unique}/MySystem TEST",
 				name_tmpl="https://grafana.com/api/dashboards/14900/revisions/2/download",
-				templator=Templator(),
+				templator=Templator(fill_template=fill_grafana_templating_options({"datasource": "my_datasource"})),
 			),
 		]
 	)
@@ -179,5 +180,10 @@ def test_flow__remote(rw_shared_grafana, unique, tmpdir):
 	r0 = flow.tmpl_to_obj()
 	r0.raise_first()
 
-	finder = Finder(rw_shared_grafana[1])
-	assert finder.get_dashboard(unique,"MySystem TEST")
+	finder, dashboarder = Finder(rw_shared_grafana[1]), Dashboarder(rw_shared_grafana[1])
+	d = finder.get_dashboard(unique,"MySystem TEST")
+	assert d, "did not find dashboard in grafana"
+
+	d_content = dashboarder.get_dashboard_content(d)
+	indexed_options = {e["name"]: e for e in d_content["templating"]["list"]}
+	assert indexed_options["datasource"]["current"] == "my_datasource", "did not set templating option"
