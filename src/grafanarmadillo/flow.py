@@ -42,6 +42,9 @@ class FileStore(Store):
 	Objects will be stored under the same path as in Grafana.
 	For example, a dashboard titled "MyDashboard" in a folder titled "MyFolder"
 	will appear at `{root}/MyFolder/MyDashboard.json`.
+
+	You can customise the path these files will be stored under.
+	Override the method `resolve_object_to_filepath`.
 	"""
 
 	root: Path
@@ -57,21 +60,25 @@ class FileStore(Store):
 		with file.with_suffix(".json").open(mode="w", encoding="utf-8") as f:
 			json.dump(content, f)
 
+	def resolve_object_to_filepath(self, name: str):
+		"""Find the file on disk that contains the object"""
+		return resolve_object_to_filepath(self.root, name)
+
 	def read_alert(self, name):
 		"""Read an alert from this store."""
-		return self._read(resolve_object_to_filepath(self.root, name))
+		return self._read(self.resolve_object_to_filepath(name))
 
 	def read_dashboard(self, name):
 		"""Read a dashboard from this store."""
-		return self._read(resolve_object_to_filepath(self.root, name))
+		return self._read(self.resolve_object_to_filepath(name))
 
 	def write_alert(self, name, alert):
 		"""Write an alert to this store."""
-		return self._write(resolve_object_to_filepath(self.root, name), alert)
+		return self._write(self.resolve_object_to_filepath(name), alert)
 
 	def write_dashboard(self, name, dashboard):
 		"""Write an alert to this store."""
-		return self._write(resolve_object_to_filepath(self.root, name), dashboard)
+		return self._write(self.resolve_object_to_filepath(name), dashboard)
 
 
 @dataclass
