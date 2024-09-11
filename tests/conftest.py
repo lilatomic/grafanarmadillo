@@ -94,7 +94,10 @@ def read_json_file(filename: Union[str, Path]):
 		filename = Path(filename)
 
 	if not filename.is_absolute():
-		filename = Path.cwd() / "tests" / filename
+		base = Path.cwd()
+		if base.name != "tests":
+			base = base / "tests"
+		filename = base / filename
 	with filename.open("r") as f:
 		return json.load(f)
 
