@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* fix : searching for multiple folders doesn't fail and return all of them
 * feature : add DashboardTransformer to help fill Grafana templates
 * feature : flow: add URLStore to import dashboards and alerts from remote sources
 * feature : flow: allow all PathLike instead of just str

@@ -45,9 +45,8 @@ class Finder:
 		)
 
 	def _enumerate_dashboards_in_folders(self, folder_ids: List[str]):
-		folder_param = ",".join(folder_ids)
 		return self.api.search.search_dashboards(
-			query=None, type_="dash-db", folder_ids=folder_param
+			query=None, type_="dash-db", folder_ids=tuple(folder_ids)
 		)
 
 	def get_dashboards_in_folders(self, folder_names: List[str]) -> List[DashboardSearchResult]:

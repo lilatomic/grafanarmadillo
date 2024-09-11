@@ -32,6 +32,11 @@ def test_get_dashboards_in_folders__smoke(ro_demo_grafana):
 	assert len(r) == 1
 	assert r[0]["title"] == "f0-0"
 
+def test_get_dashboards_in_folders__multiple(ro_demo_grafana):
+	f = Finder(ro_demo_grafana[1])
+	r = f.get_dashboards_in_folders(["f0", "f0_similar"])
+	assert len(r) == 1
+
 
 def test_get_dashboards_in_folders__only_in_target_folder(ro_demo_grafana):
 	f = Finder(ro_demo_grafana[1])
