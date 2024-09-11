@@ -12,9 +12,9 @@ from grafanarmadillo.flow import (
 	FileStore,
 	Flow,
 	FlowException,
-	GrafanaStore,
+	GrafanaStore, URLStore,
 )
-from grafanarmadillo.templator import make_mapping_templator
+from grafanarmadillo.templator import make_mapping_templator, Templator
 from grafanarmadillo.util import load_data
 from tests.conftest import requires_alerting, set_cli_cfg
 
@@ -158,3 +158,26 @@ def test_usage_flow_cli(rw_shared_grafana, tmpdir):
 	for deployment in ["east", "west", "north"]:
 		dashboard = finder.get_dashboard(f"{deployment}0", "my_system")
 		assert dashboard
+
+
+def test_flow__remote(rw_shared_grafana, unique, tmpdir):
+	grafanastore = GrafanaStore(rw_shared_grafana[1])
+	urlstore = URLStore()
+
+	flow = Flow(
+		store_obj=grafanastore,
+		store_tmpl=urlstore,
+		flows=[
+			Dashboard(
+				name_obj=f"/{unique}/MySystem TEST",
+				name_tmpl="https://grafana.com/api/dashboards/14900/revisions/2/download",
+				templator=Templator(),
+			),
+		]
+	)
+
+	r0 = flow.tmpl_to_obj()
+	r0.raise_first()
+
+	finder = Finder(rw_shared_grafana[1])
+	assert finder.get_dashboard(unique,"MySystem TEST")

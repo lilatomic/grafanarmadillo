@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional, Union
 
+import urllib3
 from grafana_client import GrafanaApi
 
 from grafanarmadillo.alerter import Alerter
@@ -113,6 +114,31 @@ class GrafanaStore(Store):
 		finder, dashboarder = Finder(self.gfn), Dashboarder(self.gfn)
 		dashboard_info, folder = finder.create_or_get_dashboard(name)
 		dashboarder.import_dashboard(dashboard, folder)
+
+
+@dataclass
+class URLStore(Store):
+	"""Store and retrieve objects from remote URLs, such as https://grafana.com/grafana/dashboards/ or GitHub"""
+
+	def read_url(self, url: str):
+		resp = urllib3.request("GET", url)
+		return resp.json()
+
+	def read_alert(self, name):
+		if not isinstance(name, str):
+			raise TypeError(f"URLStore can only read remote URLs, not {type(name)}")
+		return self.read_url(name)
+
+	def read_dashboard(self, name):
+		if not isinstance(name, str):
+			raise TypeError(f"URLStore can only read remote URLs, not {type(name)}")
+		return self.read_url(name)
+
+	def write_alert(self, name, alert):
+		raise NotImplementedError(f"URLStore cannot write")
+
+	def write_dashboard(self, name, dashboard):
+		raise NotImplementedError(f"URLStore cannot write")
 
 
 @dataclass
