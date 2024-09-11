@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* fix : fix typo in `grafanarmadillo.flow.Store` : `write_dasbaord` -> `write_dasboard`
+
 v0.7.1 (2024-06-03)
 ------------------------------------------------------------
 

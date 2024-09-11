@@ -30,7 +30,7 @@ class Store(ABC):
 		"""Write an alert to this store."""
 
 	@abstractmethod
-	def write_dashbaord(self, name, dashboard):
+	def write_dashboard(self, name, dashboard):
 		"""Write an alert to this store."""
 
 
@@ -69,7 +69,7 @@ class FileStore(Store):
 		"""Write an alert to this store."""
 		return self._write(resolve_object_to_filepath(self.root, name), alert)
 
-	def write_dashbaord(self, name, dashboard):
+	def write_dashboard(self, name, dashboard):
 		"""Write an alert to this store."""
 		return self._write(resolve_object_to_filepath(self.root, name), dashboard)
 
@@ -100,7 +100,7 @@ class GrafanaStore(Store):
 		alert_info, folder_info = finder.create_or_get_alert(name)
 		alerter.import_alert(alert, folder_info)
 
-	def write_dashbaord(self, name, dashboard):
+	def write_dashboard(self, name, dashboard):
 		"""Write an alert to this store."""
 		finder, dashboarder = Finder(self.gfn), Dashboarder(self.gfn)
 		dashboard_info, folder = finder.create_or_get_dashboard(name)
@@ -191,12 +191,12 @@ class Flow:
 					if obj_to_tmpl:
 						obj = self.store_obj.read_dashboard(item.name_obj)
 						tmpl = item.templator.make_template_from_dashboard(obj)
-						self.store_tmpl.write_dashbaord(item.name_tmpl, tmpl)
+						self.store_tmpl.write_dashboard(item.name_tmpl, tmpl)
 					else:
 						tmpl = self.store_tmpl.read_dashboard(item.name_tmpl)
 						info = self.store_obj.read_dashboard(item.name_obj)
 						obj = item.templator.make_dashboard_from_template(info, tmpl)
-						self.store_obj.write_dashbaord(item.name_obj, obj)
+						self.store_obj.write_dashboard(item.name_obj, obj)
 				else:
 					raise TypeError(
 						f"Invalid flow, expected one of {Alert.__name__}, {Dashboard.__name__}, received {item.__class__.__name__}")
