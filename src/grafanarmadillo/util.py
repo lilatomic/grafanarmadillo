@@ -4,7 +4,8 @@ import json
 from pathlib import Path
 from typing import Callable, Dict, List, TypeVar, Union
 
-from grafanarmadillo.types import DashboardContent, DashboardSearchResult
+from grafanarmadillo.paths import PathCodec
+from grafanarmadillo.types import DashboardContent, DashboardSearchResult, PathLike
 
 
 A = TypeVar("A")
@@ -121,11 +122,9 @@ def map_json_strings(f: Callable[[str], str], obj: JSON) -> JSON:
 		return obj
 
 
-def resolve_object_to_filepath(base_path: Path, name: str):
+def resolve_object_to_filepath(base_path: Path, name: PathLike):
 	"""Transform the "/folder/object" format to the path on disk that contains the template."""
-	path = Path(name)
-	if path.is_absolute():
-		path = path.relative_to("/")
+	path = PathCodec.encode_grafana(PathCodec.try_parse(name))
 	template_path = (base_path / path).with_suffix(".json")
 	return template_path
 

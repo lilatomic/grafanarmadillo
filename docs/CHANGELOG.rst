@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* feature : flow: allow all PathLike instead of just str
 * feature : flow: easier to change filename convention
 * fix : fix typo in grafanarmadillo.flow.Store : write_dasbaord -> write_dasboard
 

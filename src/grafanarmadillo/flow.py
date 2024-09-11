@@ -11,6 +11,7 @@ from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.dashboarder import Dashboarder
 from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator
+from grafanarmadillo.types import PathLike
 from grafanarmadillo.util import resolve_object_to_filepath
 
 
@@ -18,19 +19,19 @@ class Store(ABC):
 	"""A destination or source for items."""
 
 	@abstractmethod
-	def read_alert(self, name):
+	def read_alert(self, name: PathLike):
 		"""Read an alert from this store."""
 
 	@abstractmethod
-	def read_dashboard(self, name):
+	def read_dashboard(self, name: PathLike):
 		"""Read a dashboard from this store."""
 
 	@abstractmethod
-	def write_alert(self, name, alert):
+	def write_alert(self, name: PathLike, alert):
 		"""Write an alert to this store."""
 
 	@abstractmethod
-	def write_dashboard(self, name, dashboard):
+	def write_dashboard(self, name: PathLike, dashboard):
 		"""Write an alert to this store."""
 
 
@@ -60,8 +61,8 @@ class FileStore(Store):
 		with file.with_suffix(".json").open(mode="w", encoding="utf-8") as f:
 			json.dump(content, f)
 
-	def resolve_object_to_filepath(self, name: str):
-		"""Find the file on disk that contains the object"""
+	def resolve_object_to_filepath(self, name: PathLike):
+		"""Find the file on disk that contains the object."""
 		return resolve_object_to_filepath(self.root, name)
 
 	def read_alert(self, name):
@@ -118,8 +119,8 @@ class GrafanaStore(Store):
 class Alert:
 	"""Flowable request for an Alert."""
 
-	name_obj: str
-	name_tmpl: str
+	name_obj: PathLike
+	name_tmpl: PathLike
 	templator: Templator
 
 
@@ -127,8 +128,8 @@ class Alert:
 class Dashboard:
 	"""Flowable request for a Dashboard."""
 
-	name_obj: str
-	name_tmpl: str
+	name_obj: PathLike
+	name_tmpl: PathLike
 	templator: Templator
 
 
