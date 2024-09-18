@@ -56,9 +56,9 @@ class TestGetDashboardsInFolders:
 class TestGetAlertsInFolders:
 
 	def test_smoke(self, ro_demo_grafana):
-		requires_alerting(ro_demo_grafana, ro_demo_grafana[0].major_version)
+		requires_alerting(ro_demo_grafana)
 
-		f = Finder(ro_demo_grafana[1])
+		f = Finder(ro_demo_grafana[1], ro_demo_grafana[0].major_version)
 		r = f.get_alerts_in_folders(["f0"])
 		assert len(r) == 1
 		assert r[0]["title"] == "a0"

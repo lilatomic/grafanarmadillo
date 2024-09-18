@@ -33,7 +33,7 @@ def test_usage_dashboard_export(rw_shared_grafana):
 
 def test_usage_dashboard_import(rw_shared_grafana, unique):
 	gfn: GrafanaApi = rw_shared_grafana[1]
-	finder = Finder(gfn)
+	finder = Finder(gfn, rw_shared_grafana[0].major_version)
 	gfn.folder.create_folder(unique)
 
 	folder = finder.get_folder(unique)
@@ -63,7 +63,7 @@ def test_usage_dashboard_clone(rw_shared_grafana, unique):
 @pytest.mark.integration
 def test_usage_templating(rw_demo_grafana):
 	gfn: GrafanaApi = rw_demo_grafana[1]
-	finder, dashboarder, templator = Finder(gfn), Dashboarder(gfn), Templator()
+	finder, dashboarder, templator = Finder(gfn, rw_demo_grafana[0].major_version), Dashboarder(gfn), Templator()
 	service_name = "Service A"
 	clients = ["Client A", "Client B"]
 
@@ -99,7 +99,7 @@ def test_usage_alerting__import(rw_shared_grafana, unique):
 	requires_alerting(rw_shared_grafana)
 
 	gfn: GrafanaApi = rw_shared_grafana[1]
-	finder = Finder(gfn)
+	finder = Finder(gfn, rw_shared_grafana[0].major_version)
 	gfn.folder.create_folder(unique)
 
 	folder = finder.get_folder(unique)
@@ -126,16 +126,26 @@ def test_usage_alerting__export(rw_shared_grafana, unique):
 	assert exported["title"] == "a0"
 
 
+def _runproc(argv, env):
+	try:
+		subprocess.run(argv, cwd="tests/usage/", check=True, env=env, capture_output=True)
+	except subprocess.CalledProcessError as e:
+		print(f"{e.stdout=}")
+		print(f"{e.stderr=}")
+
+
 def test_usage_cli(rw_shared_grafana, unique):
-	finder = Finder(rw_shared_grafana[1])
+	finder = Finder(rw_shared_grafana[1], rw_shared_grafana[0].major_version)
 	finder.create_or_get_dashboard("/dev/MySystem TEST")
 
 	env_cfg = set_cli_cfg(rw_shared_grafana)
 	env_cfg["PATH"] = ":".join([((Path.cwd() / "tests").as_posix()), os.environ.get("PATH")])
+	env_cfg["GRAFANARMADILLO_API_VERSION"] = str(rw_shared_grafana[0].major_version)
 
-	subprocess.run(["bash", "cli_export.bash"], cwd="tests/usage/", check=True, env=env_cfg, capture_output=True)
-	subprocess.run(["bash", "cli_import.bash"], cwd="tests/usage/", check=True, env=env_cfg, capture_output=True)
+	_runproc(["bash", "cli_export.bash"], env=env_cfg)
+	_runproc(["bash", "cli_import.bash"], env=env_cfg)
 
 	for deployment in ["east", "west", "north"]:
+		print(finder.api.search.search_dashboards())
 		dashboard = finder.get_dashboard(deployment, "my_system")
 		assert dashboard

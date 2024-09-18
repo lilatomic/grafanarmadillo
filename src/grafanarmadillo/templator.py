@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Callable, Dict, NewType, Optional, Any
+from typing import Any, Callable, Dict, NewType, Optional
 
 from grafana_client.client import GrafanaClientError
 
@@ -149,9 +149,9 @@ def make_mapping_templator(mapping: EnvMapping, env_grafana: str, env_template: 
 
 
 def fill_grafana_templating_options(options: dict[str, Any]) -> DashboardTransformer:
-	"""Fill the options on a Grafana template (the kind of dashboard available from grafana.com)"""
+	"""Fill the options on a Grafana template (the kind of dashboard available from grafana.com)."""
 	def _fill_remote_options(d: DashboardContent) -> DashboardContent:
-		for k,v in options.items():
+		for k, v in options.items():
 			for e in d["templating"]["list"]:
 				if e["name"] == k:
 					e["current"] = v

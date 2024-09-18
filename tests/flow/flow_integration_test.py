@@ -13,9 +13,14 @@ from grafanarmadillo.flow import (
 	FileStore,
 	Flow,
 	FlowException,
-	GrafanaStore, URLStore,
+	GrafanaStore,
+	URLStore,
 )
-from grafanarmadillo.templator import make_mapping_templator, Templator, fill_grafana_templating_options
+from grafanarmadillo.templator import (
+	Templator,
+	fill_grafana_templating_options,
+	make_mapping_templator,
+)
 from grafanarmadillo.util import load_data
 from tests.conftest import requires_alerting, set_cli_cfg
 
@@ -181,7 +186,7 @@ def test_flow__remote(rw_shared_grafana, unique, tmpdir):
 	r0.raise_first()
 
 	finder, dashboarder = Finder(rw_shared_grafana[1]), Dashboarder(rw_shared_grafana[1])
-	d = finder.get_dashboard(unique,"MySystem TEST")
+	d = finder.get_dashboard(unique, "MySystem TEST")
 	assert d, "did not find dashboard in grafana"
 
 	d_content = dashboarder.get_dashboard_content(d)

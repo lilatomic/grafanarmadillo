@@ -89,7 +89,11 @@ class Finder:
 	def get_folder(self, name) -> FolderSearchResult:
 		"""Get a folder by name. Folders don't nest, so this will return at most 1 folder."""
 		if name == "General":
-			return self.api.folder.get_folder_by_id(0)
+			v = self.api.folder.get_folder_by_id(0)
+			if self.api_v >= 10:
+				# search API uses this for the folderUIDs parameter
+				v["uid"] = "general"
+			return v
 		else:
 			search_result = self.api.search.search_dashboards(query=name, type_="dash-folder")
 			return exactly_one(
