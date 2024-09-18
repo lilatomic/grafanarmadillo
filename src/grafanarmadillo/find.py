@@ -25,7 +25,12 @@ default_api_v = GrafanaVersion(11)
 
 
 class Finder:
-	"""Collection of methods for finding Grafana dashboards and folders."""
+	"""
+	Collection of methods for finding Grafana dashboards and folders.
+
+	If not using the latest Grafana version, set the `api_v` parameter to the major version.
+	Some APIs have changed.
+	"""
 
 	def __init__(self, api: GrafanaApi, api_v: GrafanaVersion = default_api_v) -> None:
 		super().__init__()
@@ -71,6 +76,15 @@ class Finder:
 		return self._enumerate_dashboards_in_folders(
 			list(map(lambda f: str(f[self._folder_lookup_param]), folder_objects))
 		)
+
+	def get_alerts_in_folders(self, folder_names: List[str]) -> List[AlertSearchResult]:
+		"""Get all alerts in folders."""
+		folder_objects = list(
+			map(lambda folder_name: self.get_folder(name=folder_name), folder_names)
+		)
+		folder_uids = {e["uid"] for e in folder_objects}
+		all_alerts = self.api.alertingprovisioning.get_alertrules_all()
+		return [e for e in all_alerts if e.get("folderUID") in folder_uids]
 
 	def get_folder(self, name) -> FolderSearchResult:
 		"""Get a folder by name. Folders don't nest, so this will return at most 1 folder."""

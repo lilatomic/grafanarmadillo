@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* feature : `Finder.get_alerts_in_folders`
 * refactor : (breaking) set compatibility for API in Finder
 * refactor : use `folderUIDs` for newer search API
 * feature : FileStore accepts json encoders and decoders
