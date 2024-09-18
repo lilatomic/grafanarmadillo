@@ -2,13 +2,14 @@
 Changelog
 =========
 
+* feature : FileStore accepts json encoders and decoders
 * feature : Flow.extend for adding multiple flows in 1 call
 * fix : searching for multiple folders doesn't fail and return all of them
 * feature : add DashboardTransformer to help fill Grafana templates
 * feature : flow: add URLStore to import dashboards and alerts from remote sources
 * feature : flow: allow all PathLike instead of just str
 * feature : flow: easier to change filename convention
-* fix : fix typo in grafanarmadillo.flow.Store : write_dasbaord -> write_dasboard
+* fix : fix typo in grafanarmadillo.flow.Store : write_dasbaord -> write_dashboard
 
 v0.7.1 (2024-06-03)
 ------------------------------------------------------------

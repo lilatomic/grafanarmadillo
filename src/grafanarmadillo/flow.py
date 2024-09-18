@@ -5,7 +5,7 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Union, Iterable
+from typing import List, Optional, Union, Iterable, Type
 
 import urllib3
 from grafana_client import GrafanaApi
@@ -52,17 +52,19 @@ class FileStore(Store):
 	"""
 
 	root: Path
+	json_encoder: Type[json.JSONEncoder] = json.JSONEncoder
+	json_decoder: Type[json.JSONDecoder] = json.JSONDecoder
 
 	@staticmethod
-	def _read(file: Path) -> dict:
+	def _read(file: Path, codec: Type[json.JSONDecoder]) -> dict:
 		with file.with_suffix(".json").open(mode="r", encoding="utf-8") as f:
-			return json.load(f)
+			return json.load(f, cls=codec)
 
 	@staticmethod
-	def _write(file: Path, content: dict):
+	def _write(file: Path, content: dict, codec: Type[json.JSONEncoder]):
 		file.parent.mkdir(exist_ok=True)
 		with file.with_suffix(".json").open(mode="w", encoding="utf-8") as f:
-			json.dump(content, f)
+			json.dump(content, f, cls=codec)
 
 	def resolve_object_to_filepath(self, name: PathLike):
 		"""Find the file on disk that contains the object."""
@@ -70,19 +72,19 @@ class FileStore(Store):
 
 	def read_alert(self, name):
 		"""Read an alert from this store."""
-		return self._read(self.resolve_object_to_filepath(name))
+		return self._read(self.resolve_object_to_filepath(name), self.json_decoder)
 
 	def read_dashboard(self, name):
 		"""Read a dashboard from this store."""
-		return self._read(self.resolve_object_to_filepath(name))
+		return self._read(self.resolve_object_to_filepath(name), self.json_decoder)
 
 	def write_alert(self, name, alert):
 		"""Write an alert to this store."""
-		return self._write(self.resolve_object_to_filepath(name), alert)
+		return self._write(self.resolve_object_to_filepath(name), alert, self.json_encoder)
 
 	def write_dashboard(self, name, dashboard):
 		"""Write an alert to this store."""
-		return self._write(self.resolve_object_to_filepath(name), dashboard)
+		return self._write(self.resolve_object_to_filepath(name), dashboard, self.json_encoder)
 
 
 @dataclass
