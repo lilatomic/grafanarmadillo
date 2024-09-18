@@ -4,6 +4,7 @@ import pytest
 import requests
 
 from grafanarmadillo.find import Finder
+from tests.conftest import requires_alerting
 
 
 def test_with_testcontainer(ro_demo_grafana):
@@ -26,30 +27,41 @@ def test_find_folder__general_folder(ro_demo_grafana):
 	assert f.get_folder("General")
 
 
-def test_get_dashboards_in_folders__smoke(ro_demo_grafana):
-	f = Finder(ro_demo_grafana[1])
-	r = f.get_dashboards_in_folders(["f0"])
-	assert len(r) == 1
-	assert r[0]["title"] == "f0-0"
+class TestGetDashboardsInFolders:
 
-def test_get_dashboards_in_folders__multiple(ro_demo_grafana):
-	f = Finder(ro_demo_grafana[1])
-	r = f.get_dashboards_in_folders(["f0", "f0_similar"])
-	assert len(r) == 1
+	def test_smoke(self, ro_demo_grafana):
+		f = Finder(ro_demo_grafana[1], ro_demo_grafana[0].major_version)
+		r = f.get_dashboards_in_folders(["f0"])
+		assert len(r) == 1
+		assert r[0]["title"] == "f0-0"
+
+	def test_multiple(self, ro_demo_grafana):
+		f = Finder(ro_demo_grafana[1], ro_demo_grafana[0].major_version)
+		r = f.get_dashboards_in_folders(["f0", "f0_similar"])
+		assert len(r) == 1
+
+	def test_only_in_target_folder(self, ro_demo_grafana):
+		f = Finder(ro_demo_grafana[1], ro_demo_grafana[0].major_version)
+		r = f.get_dashboards_in_folders(["f0"])
+		assert len(r) == 1
+		assert r[0]["title"] == "f0-0"
+
+	def test_general(self, ro_demo_grafana):
+		f = Finder(ro_demo_grafana[1], ro_demo_grafana[0].major_version)
+		r = f.get_dashboards_in_folders(["General"])
+		assert len(r) == 1
+		assert r[0]["title"] == "0"
 
 
-def test_get_dashboards_in_folders__only_in_target_folder(ro_demo_grafana):
-	f = Finder(ro_demo_grafana[1])
-	r = f.get_dashboards_in_folders(["f0"])
-	assert len(r) == 1
-	assert r[0]["title"] == "f0-0"
+class TestGetAlertsInFolders:
 
+	def test_smoke(self, ro_demo_grafana):
+		requires_alerting(ro_demo_grafana, ro_demo_grafana[0].major_version)
 
-def test_get_dashboards_in_folders__general(ro_demo_grafana):
-	f = Finder(ro_demo_grafana[1])
-	r = f.get_dashboards_in_folders(["General"])
-	assert len(r) == 1
-	assert r[0]["title"] == "0"
+		f = Finder(ro_demo_grafana[1])
+		r = f.get_alerts_in_folders(["f0"])
+		assert len(r) == 1
+		assert r[0]["title"] == "a0"
 
 
 def test_get_dashboard__smoke(ro_demo_grafana):

@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List, NewType, Optional, TypedDict, Union
 
 
+GrafanaVersion = NewType("UID", int)
 UID = NewType("UID", str)
 
 

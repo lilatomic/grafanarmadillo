@@ -10,6 +10,7 @@ from grafanarmadillo.types import (
 	DashboardSearchResult,
 	FolderSearchResult,
 	GrafanaPath,
+	GrafanaVersion,
 	PathLike,
 )
 from grafanarmadillo.util import exactly_one
@@ -20,12 +21,16 @@ def _query_message(query_type: str, query: str) -> str:
 	return f"type={query_type}, query={query}"
 
 
+default_api_v = GrafanaVersion(11)
+
+
 class Finder:
 	"""Collection of methods for finding Grafana dashboards and folders."""
 
-	def __init__(self, api: GrafanaApi) -> None:
+	def __init__(self, api: GrafanaApi, api_v: GrafanaVersion = default_api_v) -> None:
 		super().__init__()
 		self.api = api
+		self.api_v = api_v
 
 	def list_dashboards(self) -> List[DashboardSearchResult]:
 		"""List all dashboards."""
@@ -44,9 +49,17 @@ class Finder:
 			)
 		)
 
-	def _enumerate_dashboards_in_folders(self, folder_ids: List[str]):
+	@property
+	def _folder_lookup_param(self) -> str:
+		return "uid" if self.api_v >= 10 else "id"
+
+	def _enumerate_dashboards_in_folders(self, folder_uids: List[str]):
+		if self.api_v >= 10:
+			folder_kwarg = {"folder_uids": tuple(folder_uids)}
+		else:
+			folder_kwarg = {"folder_ids": tuple(folder_uids)}
 		return self.api.search.search_dashboards(
-			query=None, type_="dash-db", folder_ids=tuple(folder_ids)
+			query=None, type_="dash-db", **folder_kwarg
 		)
 
 	def get_dashboards_in_folders(self, folder_names: List[str]) -> List[DashboardSearchResult]:
@@ -54,8 +67,9 @@ class Finder:
 		folder_objects = list(
 			map(lambda folder_name: self.get_folder(name=folder_name), folder_names)
 		)
+
 		return self._enumerate_dashboards_in_folders(
-			list(map(lambda f: str(f["id"]), folder_objects))
+			list(map(lambda f: str(f[self._folder_lookup_param]), folder_objects))
 		)
 
 	def get_folder(self, name) -> FolderSearchResult:
@@ -91,7 +105,7 @@ class Finder:
 		Dashboards without a parent are children of the "General" folder.
 		"""
 		folder_object = self.get_folder(folder_name)
-		dashboards = self._enumerate_dashboards_in_folders([str(folder_object["id"])])
+		dashboards = self._enumerate_dashboards_in_folders([str(folder_object[self._folder_lookup_param])])
 		return exactly_one(
 			list(filter(lambda d: d["title"] == dashboard_name, dashboards)),
 			_query_message("dashboard", f"/{folder_name}/{dashboard_name}"),

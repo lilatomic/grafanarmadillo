@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* refactor : (breaking) set compatibility for API in Finder
+* refactor : use `folderUIDs` for newer search API
 * feature : FileStore accepts json encoders and decoders
 * feature : Flow.extend for adding multiple flows in 1 call
 * fix : searching for multiple folders doesn't fail and return all of them
