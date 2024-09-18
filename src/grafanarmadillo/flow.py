@@ -5,7 +5,7 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Union, Iterable, Type
+from typing import Iterable, List, Optional, Type, Union
 
 import urllib3
 from grafana_client import GrafanaApi
@@ -55,6 +55,9 @@ class FileStore(Store):
 	json_encoder: Type[json.JSONEncoder] = json.JSONEncoder
 	json_decoder: Type[json.JSONDecoder] = json.JSONDecoder
 
+	TOK_DASHBOARD = "dashboard"
+	TOK_ALERT = "alert"
+
 	@staticmethod
 	def _read(file: Path, codec: Type[json.JSONDecoder]) -> dict:
 		with file.with_suffix(".json").open(mode="r", encoding="utf-8") as f:
@@ -66,25 +69,30 @@ class FileStore(Store):
 		with file.with_suffix(".json").open(mode="w", encoding="utf-8") as f:
 			json.dump(content, f, cls=codec)
 
-	def resolve_object_to_filepath(self, name: PathLike):
-		"""Find the file on disk that contains the object."""
+	def resolve_object_to_filepath(self, name: PathLike, type_: str):
+		"""
+		Find the file on disk that contains the object.
+
+		@param name:
+		@param type_: The kind of object to find, one of "dashboard" or "alert".
+		"""
 		return resolve_object_to_filepath(self.root, name)
 
 	def read_alert(self, name):
 		"""Read an alert from this store."""
-		return self._read(self.resolve_object_to_filepath(name), self.json_decoder)
+		return self._read(self.resolve_object_to_filepath(name, self.TOK_ALERT), self.json_decoder)
 
 	def read_dashboard(self, name):
 		"""Read a dashboard from this store."""
-		return self._read(self.resolve_object_to_filepath(name), self.json_decoder)
+		return self._read(self.resolve_object_to_filepath(name, self.TOK_ALERT), self.json_decoder)
 
 	def write_alert(self, name, alert):
 		"""Write an alert to this store."""
-		return self._write(self.resolve_object_to_filepath(name), alert, self.json_encoder)
+		return self._write(self.resolve_object_to_filepath(name, self.TOK_DASHBOARD), alert, self.json_encoder)
 
 	def write_dashboard(self, name, dashboard):
 		"""Write an alert to this store."""
-		return self._write(self.resolve_object_to_filepath(name), dashboard, self.json_encoder)
+		return self._write(self.resolve_object_to_filepath(name, self.TOK_DASHBOARD), dashboard, self.json_encoder)
 
 
 @dataclass
@@ -122,27 +130,32 @@ class GrafanaStore(Store):
 
 @dataclass
 class URLStore(Store):
-	"""Store and retrieve objects from remote URLs, such as https://grafana.com/grafana/dashboards/ or GitHub"""
+	"""Store and retrieve objects from remote URLs, such as https://grafana.com/grafana/dashboards/ or GitHub."""
 
 	def read_url(self, url: str):
+		"""GET a URL."""
 		resp = urllib3.request("GET", url)
 		return resp.json()
 
 	def read_alert(self, name):
+		"""Read an alert from this store."""
 		if not isinstance(name, str):
 			raise TypeError(f"URLStore can only read remote URLs, not {type(name)}")
 		return self.read_url(name)
 
 	def read_dashboard(self, name):
+		"""Read a dashboard from this store."""
 		if not isinstance(name, str):
 			raise TypeError(f"URLStore can only read remote URLs, not {type(name)}")
 		return self.read_url(name)
 
 	def write_alert(self, name, alert):
-		raise NotImplementedError(f"URLStore cannot write")
+		"""Write an alert to this store."""
+		raise NotImplementedError("URLStore cannot write")
 
 	def write_dashboard(self, name, dashboard):
-		raise NotImplementedError(f"URLStore cannot write")
+		"""Write an alert to this store."""
+		raise NotImplementedError("URLStore cannot write")
 
 
 @dataclass
