@@ -1,9 +1,11 @@
 """Pieces for templating multiple dashboards at once."""
+from __future__ import annotations
+
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Iterable
 
 import urllib3
 from grafana_client import GrafanaApi
@@ -195,6 +197,10 @@ class Flow:
 	def append(self, flow: Flowable):
 		"""Add a Flowable request to this Flow."""
 		self.flows.append(flow)
+
+	def extend(self, flows: Iterable[Flowable]):
+		"""Add several Flowable requests to this Flow."""
+		self.flows.extend(flows)
 
 	def obj_to_tmpl(self) -> FlowResult:
 		"""Import from the source to the destination."""
