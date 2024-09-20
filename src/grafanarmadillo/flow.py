@@ -84,11 +84,11 @@ class FileStore(Store):
 
 	def read_dashboard(self, name):
 		"""Read a dashboard from this store."""
-		return self._read(self.resolve_object_to_filepath(name, self.TOK_ALERT), self.json_decoder)
+		return self._read(self.resolve_object_to_filepath(name, self.TOK_DASHBOARD), self.json_decoder)
 
 	def write_alert(self, name, alert):
 		"""Write an alert to this store."""
-		return self._write(self.resolve_object_to_filepath(name, self.TOK_DASHBOARD), alert, self.json_encoder)
+		return self._write(self.resolve_object_to_filepath(name, self.TOK_ALERT), alert, self.json_encoder)
 
 	def write_dashboard(self, name, dashboard):
 		"""Write an alert to this store."""
