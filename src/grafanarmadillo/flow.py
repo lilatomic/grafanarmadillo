@@ -200,6 +200,11 @@ class FlowResult:
 		if self.failures:
 			raise self.failures[0]
 
+	def ensure_success(self) -> FlowResult:
+		"""Inline raise the first exception, if present."""
+		self.raise_first()
+		return self
+
 
 @dataclass
 class Flow:
