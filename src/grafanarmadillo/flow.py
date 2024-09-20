@@ -12,7 +12,7 @@ from grafana_client import GrafanaApi
 
 from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.dashboarder import Dashboarder
-from grafanarmadillo.find import Finder
+from grafanarmadillo.find import Finder, CacheMode
 from grafanarmadillo.templator import Templator
 from grafanarmadillo.types import PathLike
 from grafanarmadillo.util import resolve_object_to_filepath
@@ -95,36 +95,37 @@ class FileStore(Store):
 		return self._write(self.resolve_object_to_filepath(name, self.TOK_DASHBOARD), dashboard, self.json_encoder)
 
 
-@dataclass
 class GrafanaStore(Store):
 	"""Store and retrieve objects from a Grafana instance."""
 
-	gfn: GrafanaApi
+	def __init__(self, gfn: GrafanaApi):
+		self.gfn = gfn
+		self.finder = Finder(gfn, cache_mode=CacheMode.SESSION)
 
 	def read_alert(self, name):
 		"""Read an alert from this store."""
-		finder, alerter = Finder(self.gfn), Alerter(self.gfn)
-		alert_info, _ = finder.create_or_get_alert(name)
+		alerter = Alerter(self.gfn)
+		alert_info, _ = self.finder.create_or_get_alert(name)
 		alert, _ = alerter.export_alert(alert_info)
 		return alert_info
 
 	def read_dashboard(self, name):
 		"""Read a dashboard from this store."""
-		finder, dashboarder = Finder(self.gfn), Dashboarder(self.gfn)
-		dashboard_info, _ = finder.create_or_get_dashboard(name)
+		dashboarder = Dashboarder(self.gfn)
+		dashboard_info, _ = self.finder.create_or_get_dashboard(name)
 		dashboard_content, _ = dashboarder.export_dashboard(dashboard_info)
 		return dashboard_content
 
 	def write_alert(self, name, alert):
 		"""Write an alert to this store."""
-		finder, alerter = Finder(self.gfn), Alerter(self.gfn)
-		alert_info, folder_info = finder.create_or_get_alert(name)
+		alerter = Alerter(self.gfn)
+		alert_info, folder_info = self.finder.create_or_get_alert(name)
 		alerter.import_alert(alert, folder_info)
 
 	def write_dashboard(self, name, dashboard):
 		"""Write an alert to this store."""
-		finder, dashboarder = Finder(self.gfn), Dashboarder(self.gfn)
-		dashboard_info, folder = finder.create_or_get_dashboard(name)
+		dashboarder = Dashboarder(self.gfn)
+		dashboard_info, folder = self.finder.create_or_get_dashboard(name)
 		dashboarder.import_dashboard(dashboard, folder)
 
 
