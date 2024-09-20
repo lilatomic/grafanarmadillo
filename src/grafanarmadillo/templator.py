@@ -103,7 +103,7 @@ class Templator:
 		"""Convert a dashboard into a one ready for templating."""
 		new = dashboard.copy()
 		new = project_dict(
-			new, {"id", "uid"}, inverse=True
+			new, {"id", "uid", "folderUID"}, inverse=True
 		)  # we don't erase the title so that we can template it later
 
 		return self.make_template(DashboardContent(new))

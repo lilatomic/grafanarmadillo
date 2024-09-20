@@ -12,7 +12,7 @@ from grafana_client import GrafanaApi
 
 from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.dashboarder import Dashboarder
-from grafanarmadillo.find import Finder, CacheMode
+from grafanarmadillo.find import CacheMode, Finder
 from grafanarmadillo.templator import Templator
 from grafanarmadillo.types import PathLike
 from grafanarmadillo.util import resolve_object_to_filepath
