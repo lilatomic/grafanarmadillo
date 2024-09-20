@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* feature : caching in finder
 * feature : `FlowResult.ensure_success` for inline raising flow exceptions
 * feature : `FileStore.resolve_object_to_filepath` has the type of object being referenced, allowing separate folders for alerts and dashboards
 * feature : `Finder.get_alerts_in_folders`

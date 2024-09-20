@@ -1,6 +1,6 @@
 """Find Grafana dashboards and folders."""
-
-from typing import List, Optional, Tuple, Union
+from enum import Enum
+from typing import Callable, List, Optional, Tuple, TypeVar, Union
 
 from grafana_client import GrafanaApi
 
@@ -24,6 +24,65 @@ def _query_message(query_type: str, query: str) -> str:
 default_api_v = GrafanaVersion(11)
 
 
+class CacheMode(Enum):
+	"""
+	Caching mode for interacting with Grafana.
+
+	None: no caching
+	Session: lifetime of the Finder object
+	Global: all Finders share the same cache
+	"""
+
+	NONE = "NONE"
+	SESSION = "SESSION"
+	GLOBAL = "GLOBAL"
+
+
+T = TypeVar("T")
+
+
+class Cache:
+	"""Cache values."""
+
+	def __init__(self):
+		self.cache = {}
+
+	def get(self, k):
+		"""Get a cached value, if it exists."""
+		return self.cache.get(k, None)
+
+	def set(self, k, v):
+		"""Set a cached value."""
+		self.cache[k] = v
+
+	def getor(self, k, f: Callable[[], T]) -> T:
+		"""Get a cached item or generate it."""
+		if v := self.get(k):
+			return v
+		v = f()
+		self.set(k, v)
+		return v
+
+
+global_cache = Cache()
+
+
+class NoneCache(Cache):
+	"""A Cache-interface-compatible which never caches."""
+
+	def get(self, k):
+		"""Never caches a value."""
+		return None
+
+	def set(self, k, v):
+		"""Never caches a value."""
+		return
+
+	def getor(self, k, f: Callable[[], T]) -> T:
+		"""Always generate the cached item."""
+		return f()
+
+
 class Finder:
 	"""
 	Collection of methods for finding Grafana dashboards and folders.
@@ -32,18 +91,26 @@ class Finder:
 	Some APIs have changed.
 	"""
 
-	def __init__(self, api: GrafanaApi, api_v: GrafanaVersion = default_api_v) -> None:
+	def __init__(self, api: GrafanaApi, api_v: GrafanaVersion = default_api_v, cache_mode: CacheMode = CacheMode.SESSION) -> None:
 		super().__init__()
 		self.api = api
 		self.api_v = api_v
+		self.cache_mode = cache_mode
+
+		if self.cache_mode == CacheMode.GLOBAL:
+			self._cache = global_cache
+		elif self.cache_mode == CacheMode.SESSION:
+			self._cache = Cache()
+		else:
+			self._cache = NoneCache()
 
 	def list_dashboards(self) -> List[DashboardSearchResult]:
 		"""List all dashboards."""
-		return self.api.search.search_dashboards(type_="dash-db")
+		return self._cache.getor("list_dashboards", lambda: self.api.search.search_dashboards(type_="dash-db"))
 
 	def list_alerts(self) -> List[AlertSearchResult]:
 		"""List all alerts."""
-		return self.api.alertingprovisioning.get_alertrules_all()
+		return self._cache.getor("list_alerts", lambda: self.api.alertingprovisioning.get_alertrules_all())
 
 	def find_dashboards(self, name: str) -> List[DashboardSearchResult]:
 		"""Find all dashboards with a name. Returns exact matches only."""
@@ -88,21 +155,23 @@ class Finder:
 
 	def get_folder(self, name) -> FolderSearchResult:
 		"""Get a folder by name. Folders don't nest, so this will return at most 1 folder."""
-		if name == "General":
-			v = self.api.folder.get_folder_by_id(0)
-			if self.api_v >= 10:
-				# search API uses this for the folderUIDs parameter
-				v["uid"] = "general"
-			return v
-		else:
-			search_result = self.api.search.search_dashboards(query=name, type_="dash-folder")
-			return exactly_one(
-				list(filter(
-					lambda x: x["title"] == name,
-					map(lambda sr: self.api.folder.get_folder(sr["uid"]), search_result),
-				)),
-				_query_message("folder", name),
-			)
+		def _get_folder() -> FolderSearchResult:
+			if name == "General":
+				v = self.api.folder.get_folder_by_id(0)
+				if self.api_v >= 10:
+					# search API uses this for the folderUIDs parameter
+					v["uid"] = "general"
+				return v
+			else:
+				search_result = self.api.search.search_dashboards(query=name, type_="dash-folder")
+				return exactly_one(
+					list(filter(
+						lambda x: x["title"] == name,
+						map(lambda sr: self.api.folder.get_folder(sr["uid"]), search_result),
+					)),
+					_query_message("folder", name),
+				)
+		return self._cache.getor(("get_folder", name), _get_folder)
 
 	def create_or_get_folder(self, name: str) -> FolderSearchResult:
 		"""
