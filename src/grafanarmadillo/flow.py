@@ -12,10 +12,10 @@ from grafana_client import GrafanaApi
 
 from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.dashboarder import Dashboarder
-from grafanarmadillo.find import CacheMode, Finder
+from grafanarmadillo.find import Finder
 from grafanarmadillo.templator import Templator
 from grafanarmadillo.types import PathLike
-from grafanarmadillo.util import resolve_object_to_filepath
+from grafanarmadillo.util import CacheMode, resolve_object_to_filepath
 
 
 class Store(ABC):

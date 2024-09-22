@@ -1,6 +1,7 @@
 """Find Grafana dashboards and folders."""
-from enum import Enum
-from typing import Callable, List, Optional, Tuple, TypeVar, Union
+from __future__ import annotations
+
+from typing import List, Optional, Tuple, Union
 
 from grafana_client import GrafanaApi
 
@@ -13,7 +14,7 @@ from grafanarmadillo.types import (
 	GrafanaVersion,
 	PathLike,
 )
-from grafanarmadillo.util import exactly_one
+from grafanarmadillo.util import Cache, CacheMode, exactly_one
 
 
 def _query_message(query_type: str, query: str) -> str:
@@ -24,65 +25,6 @@ def _query_message(query_type: str, query: str) -> str:
 default_api_v = GrafanaVersion(11)
 
 
-class CacheMode(Enum):
-	"""
-	Caching mode for interacting with Grafana.
-
-	None: no caching
-	Session: lifetime of the Finder object
-	Global: all Finders share the same cache
-	"""
-
-	NONE = "NONE"
-	SESSION = "SESSION"
-	GLOBAL = "GLOBAL"
-
-
-T = TypeVar("T")
-
-
-class Cache:
-	"""Cache values."""
-
-	def __init__(self):
-		self.cache = {}
-
-	def get(self, k):
-		"""Get a cached value, if it exists."""
-		return self.cache.get(k, None)
-
-	def set(self, k, v):
-		"""Set a cached value."""
-		self.cache[k] = v
-
-	def getor(self, k, f: Callable[[], T]) -> T:
-		"""Get a cached item or generate it."""
-		if v := self.get(k):
-			return v
-		v = f()
-		self.set(k, v)
-		return v
-
-
-global_cache = Cache()
-
-
-class NoneCache(Cache):
-	"""A Cache-interface-compatible which never caches."""
-
-	def get(self, k):
-		"""Never caches a value."""
-		return None
-
-	def set(self, k, v):
-		"""Never caches a value."""
-		return
-
-	def getor(self, k, f: Callable[[], T]) -> T:
-		"""Always generate the cached item."""
-		return f()
-
-
 class Finder:
 	"""
 	Collection of methods for finding Grafana dashboards and folders.
@@ -91,18 +33,11 @@ class Finder:
 	Some APIs have changed.
 	"""
 
-	def __init__(self, api: GrafanaApi, api_v: GrafanaVersion = default_api_v, cache_mode: CacheMode = CacheMode.SESSION) -> None:
+	def __init__(self, api: GrafanaApi, api_v: GrafanaVersion = default_api_v, cache_mode: Union[CacheMode, Cache] = CacheMode.SESSION) -> None:
 		super().__init__()
 		self.api = api
 		self.api_v = api_v
-		self.cache_mode = cache_mode
-
-		if self.cache_mode == CacheMode.GLOBAL:
-			self._cache = global_cache
-		elif self.cache_mode == CacheMode.SESSION:
-			self._cache = Cache()
-		else:
-			self._cache = NoneCache()
+		self._cache = CacheMode.select(cache_mode)
 
 	def list_dashboards(self) -> List[DashboardSearchResult]:
 		"""List all dashboards."""
@@ -126,13 +61,17 @@ class Finder:
 		return "uid" if self.api_v >= 10 else "id"
 
 	def _enumerate_dashboards_in_folders(self, folder_uids: List[str]):
-		if self.api_v >= 10:
-			folder_kwarg = {"folder_uids": tuple(folder_uids)}
-		else:
-			folder_kwarg = {"folder_ids": tuple(folder_uids)}
-		return self.api.search.search_dashboards(
-			query=None, type_="dash-db", **folder_kwarg
-		)
+		folder_uids = tuple(folder_uids)
+
+		def do_enumerate_dashboards():
+			if self.api_v >= 10:
+				folder_kwarg = {"folder_uids": folder_uids}
+			else:
+				folder_kwarg = {"folder_ids": folder_uids}
+			return self.api.search.search_dashboards(
+				query=None, type_="dash-db", **folder_kwarg
+			)
+		return self._cache.getor(("_enumerate_dashboards_in_folders", folder_uids), do_enumerate_dashboards)
 
 	def get_dashboards_in_folders(self, folder_names: List[str]) -> List[DashboardSearchResult]:
 		"""Get all dashboards in folders."""
@@ -150,7 +89,7 @@ class Finder:
 			map(lambda folder_name: self.get_folder(name=folder_name), folder_names)
 		)
 		folder_uids = {e["uid"] for e in folder_objects}
-		all_alerts = self.api.alertingprovisioning.get_alertrules_all()
+		all_alerts = self.list_alerts()
 		return [e for e in all_alerts if e.get("folderUID") in folder_uids]
 
 	def get_folder(self, name) -> FolderSearchResult:
@@ -212,7 +151,7 @@ class Finder:
 		return exactly_one(
 			list(filter(
 				lambda a: a["title"] == alert_name and a["folderUID"] == folder_uid,
-				self.api.alertingprovisioning.get_alertrules_all()
+				self.list_alerts()
 			)),
 			_query_message("alert", f"/{folder_name}/{alert_name}")
 		)
@@ -246,6 +185,12 @@ class Finder:
 					"folderUid": folder["uid"],
 				}
 			)
+			# we reset all enumerate search results rather than finding only those that apply
+			# since a search might have `(otherfolder, ourfolder)` as a key.
+			# sorting through that sounds difficult to get right
+			self._cache.unset_method("_enumerate_dashboards_in_folders")
+			self._cache.unset("list_dashboards")
+
 			dashboard = self.get_dashboard(address.folder, address.name)
 
 		return dashboard, folder
@@ -267,6 +212,8 @@ class Finder:
 				self._mk_null_alert(folder["uid"], address.name),
 				disable_provenance=True
 			)
+			self._cache.unset("list_alerts")
+
 			alert = self.get_alert(address.folder, address.name)
 
 		return alert, folder
