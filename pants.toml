@@ -39,6 +39,7 @@ install_from_resolve = "flake8"
 [test]
 extra_env_vars = [
 	"DOCKER_HOST",
+	"TESTCONTAINERS_RYUK_DISABLED=true",
 ]
 use_coverage=true
 attempts_default = 3
