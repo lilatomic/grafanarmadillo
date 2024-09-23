@@ -8,7 +8,13 @@ from pathlib import Path
 from typing import Callable, Dict, List, TypeVar, Union
 
 from grafanarmadillo.paths import PathCodec
-from grafanarmadillo.types import DashboardContent, DashboardSearchResult, PathLike
+from grafanarmadillo.types import (
+	DashboardContent,
+	DashboardSearchResult,
+	GrafanaPath,
+	PathLike,
+)
+
 
 T = TypeVar("T")
 A = TypeVar("A")
@@ -132,6 +138,13 @@ def resolve_object_to_filepath(base_path: Path, name: PathLike):
 	return template_path
 
 
+def resolve_filepath_to_object(base_path: Path, path: Path) -> GrafanaPath:
+	"""Extract the "/folder/object" format from the file on disk that contains the template."""
+	template_path = path.relative_to(base_path).with_suffix("")
+	name = PathCodec.try_parse(PathCodec.decode(template_path))
+	return name
+
+
 def load_data(data_str: str):
 	"""Attempt to load data."""
 	_file_uri_prefix = "file://"
@@ -207,7 +220,7 @@ class Cache:
 		self.cache.pop(k, None)
 
 	def unset_method(self, k_start):
-		"""Unset all keys whose first subkey (the method name) matches"""
+		"""Unset all keys whose first subkey (the method name) matches."""
 		cull = set()
 
 		for k in self.cache.keys():
@@ -242,7 +255,7 @@ class NoneCache(Cache):
 		return
 
 	def unset(self, k):
-		"""No keys are ever set"""
+		"""No keys are ever set."""
 		return
 
 	def getor(self, k, f: Callable[[], T]) -> T:
