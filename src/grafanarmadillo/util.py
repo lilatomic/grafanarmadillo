@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from enum import Enum
 from pathlib import Path
 from typing import Callable, Dict, List, TypeVar, Union
@@ -9,7 +10,7 @@ from typing import Callable, Dict, List, TypeVar, Union
 from grafanarmadillo.paths import PathCodec
 from grafanarmadillo.types import DashboardContent, DashboardSearchResult, PathLike
 
-
+T = TypeVar("T")
 A = TypeVar("A")
 JSON = TypeVar("JSON", bound=Union[dict, list, str, int, float, bool, None])
 
@@ -184,7 +185,7 @@ class CacheMode(Enum):
 			return NoneCache()
 
 
-T = TypeVar("T")
+l_c = logging.getLogger(f"{__name__}.cache")
 
 
 class Cache:
@@ -218,9 +219,9 @@ class Cache:
 	def getor(self, k, f: Callable[[], T]) -> T:
 		"""Get a cached item or generate it."""
 		if v := self.get(k):
-			print(f"cache hit {k}")
+			l_c.debug(f"cache hit {k}")
 			return v
-		print(f"cache miss {k}")
+		l_c.debug(f"cache miss {k}")
 		v = f()
 		self.set(k, v)
 		return v
