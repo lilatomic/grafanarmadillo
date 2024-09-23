@@ -2,7 +2,7 @@ import pytest
 
 from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.find import Finder
-from grafanarmadillo.util import CacheMode, project_dict
+from grafanarmadillo.util import Cache, project_dict
 from tests.conftest import read_json_file, requires_alerting
 
 
@@ -52,7 +52,8 @@ def test_import__update(rw_shared_grafana, unique):
 	"""Test that importing for an existing dashboard overwrite."""
 	requires_alerting(rw_shared_grafana)
 
-	finder, alerter = (Finder(rw_shared_grafana[1], cache_mode=CacheMode.NONE), Alerter(rw_shared_grafana[1]))
+	c = Cache()
+	finder, alerter = (Finder(rw_shared_grafana[1], cache_mode=c), Alerter(rw_shared_grafana[1], cache_mode=c))
 	folder = finder.get_folder("f0")
 	new_alert = uniquify_alert(read_json_file("alert_rule.json"), unique)
 	alerter.import_alert(new_alert, folder)
@@ -73,7 +74,8 @@ def test_importexport__roundtrip(rw_shared_grafana, unique):
 	if rw_shared_grafana[0].major_version < 9:
 		pytest.skip("Grafana does not support provisioning in version 8")
 
-	finder, alerter = (Finder(rw_shared_grafana[1], cache_mode=CacheMode.NONE), Alerter(rw_shared_grafana[1]))
+	c = Cache()
+	finder, alerter = (Finder(rw_shared_grafana[1], cache_mode=c), Alerter(rw_shared_grafana[1], cache_mode=c))
 
 	folder_name = "f0"
 	target_folder = finder.get_folder(folder_name)
