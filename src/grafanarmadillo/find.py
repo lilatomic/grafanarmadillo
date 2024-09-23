@@ -1,4 +1,5 @@
 """Find Grafana dashboards and folders."""
+from __future__ import annotations
 
 from typing import List, Optional, Tuple, Union
 
@@ -10,9 +11,10 @@ from grafanarmadillo.types import (
 	DashboardSearchResult,
 	FolderSearchResult,
 	GrafanaPath,
+	GrafanaVersion,
 	PathLike,
 )
-from grafanarmadillo.util import exactly_one
+from grafanarmadillo.util import Cache, CacheMode, exactly_one
 
 
 def _query_message(query_type: str, query: str) -> str:
@@ -20,20 +22,30 @@ def _query_message(query_type: str, query: str) -> str:
 	return f"type={query_type}, query={query}"
 
 
-class Finder:
-	"""Collection of methods for finding Grafana dashboards and folders."""
+default_api_v = GrafanaVersion(11)
 
-	def __init__(self, api: GrafanaApi) -> None:
+
+class Finder:
+	"""
+	Collection of methods for finding Grafana dashboards and folders.
+
+	If not using the latest Grafana version, set the `api_v` parameter to the major version.
+	Some APIs have changed.
+	"""
+
+	def __init__(self, api: GrafanaApi, api_v: GrafanaVersion = default_api_v, cache_mode: Union[CacheMode, Cache] = CacheMode.SESSION) -> None:
 		super().__init__()
 		self.api = api
+		self.api_v = api_v
+		self._cache = CacheMode.select(cache_mode)
 
 	def list_dashboards(self) -> List[DashboardSearchResult]:
 		"""List all dashboards."""
-		return self.api.search.search_dashboards(type_="dash-db")
+		return self._cache.getor("list_dashboards", lambda: self.api.search.search_dashboards(type_="dash-db"))
 
 	def list_alerts(self) -> List[AlertSearchResult]:
 		"""List all alerts."""
-		return self.api.alertingprovisioning.get_alertrules_all()
+		return self._cache.getor("list_alerts", lambda: self.api.alertingprovisioning.get_alertrules_all())
 
 	def find_dashboards(self, name: str) -> List[DashboardSearchResult]:
 		"""Find all dashboards with a name. Returns exact matches only."""
@@ -44,34 +56,61 @@ class Finder:
 			)
 		)
 
-	def _enumerate_dashboards_in_folders(self, folder_ids: List[str]):
-		folder_param = ",".join(folder_ids)
-		return self.api.search.search_dashboards(
-			query=None, type_="dash-db", folder_ids=folder_param
-		)
+	@property
+	def _folder_lookup_param(self) -> str:
+		return "uid" if self.api_v >= 10 else "id"
+
+	def _enumerate_dashboards_in_folders(self, folder_uids: List[str]):
+		folder_uids = tuple(folder_uids)
+
+		def do_enumerate_dashboards():
+			if self.api_v >= 10:
+				folder_kwarg = {"folder_uids": folder_uids}
+			else:
+				folder_kwarg = {"folder_ids": folder_uids}
+			return self.api.search.search_dashboards(
+				query=None, type_="dash-db", **folder_kwarg
+			)
+		return self._cache.getor(("_enumerate_dashboards_in_folders", folder_uids), do_enumerate_dashboards)
 
 	def get_dashboards_in_folders(self, folder_names: List[str]) -> List[DashboardSearchResult]:
 		"""Get all dashboards in folders."""
 		folder_objects = list(
 			map(lambda folder_name: self.get_folder(name=folder_name), folder_names)
 		)
+
 		return self._enumerate_dashboards_in_folders(
-			list(map(lambda f: str(f["id"]), folder_objects))
+			list(map(lambda f: str(f[self._folder_lookup_param]), folder_objects))
 		)
+
+	def get_alerts_in_folders(self, folder_names: List[str]) -> List[AlertSearchResult]:
+		"""Get all alerts in folders."""
+		folder_objects = list(
+			map(lambda folder_name: self.get_folder(name=folder_name), folder_names)
+		)
+		folder_uids = {e["uid"] for e in folder_objects}
+		all_alerts = self.list_alerts()
+		return [e for e in all_alerts if e.get("folderUID") in folder_uids]
 
 	def get_folder(self, name) -> FolderSearchResult:
 		"""Get a folder by name. Folders don't nest, so this will return at most 1 folder."""
-		if name == "General":
-			return self.api.folder.get_folder_by_id(0)
-		else:
-			search_result = self.api.search.search_dashboards(query=name, type_="dash-folder")
-			return exactly_one(
-				list(filter(
-					lambda x: x["title"] == name,
-					map(lambda sr: self.api.folder.get_folder(sr["uid"]), search_result),
-				)),
-				_query_message("folder", name),
-			)
+		def _get_folder() -> FolderSearchResult:
+			if name == "General":
+				v = self.api.folder.get_folder_by_id(0)
+				if self.api_v >= 10:
+					# search API uses this for the folderUIDs parameter
+					v["uid"] = "general"
+				return v
+			else:
+				search_result = self.api.search.search_dashboards(query=name, type_="dash-folder")
+				return exactly_one(
+					list(filter(
+						lambda x: x["title"] == name,
+						map(lambda sr: self.api.folder.get_folder(sr["uid"]), search_result),
+					)),
+					_query_message("folder", name),
+				)
+		return self._cache.getor(("get_folder", name), _get_folder)
 
 	def create_or_get_folder(self, name: str) -> FolderSearchResult:
 		"""
@@ -92,7 +131,7 @@ class Finder:
 		Dashboards without a parent are children of the "General" folder.
 		"""
 		folder_object = self.get_folder(folder_name)
-		dashboards = self._enumerate_dashboards_in_folders([str(folder_object["id"])])
+		dashboards = self._enumerate_dashboards_in_folders([str(folder_object[self._folder_lookup_param])])
 		return exactly_one(
 			list(filter(lambda d: d["title"] == dashboard_name, dashboards)),
 			_query_message("dashboard", f"/{folder_name}/{dashboard_name}"),
@@ -112,7 +151,7 @@ class Finder:
 		return exactly_one(
 			list(filter(
 				lambda a: a["title"] == alert_name and a["folderUID"] == folder_uid,
-				self.api.alertingprovisioning.get_alertrules_all()
+				self.list_alerts()
 			)),
 			_query_message("alert", f"/{folder_name}/{alert_name}")
 		)
@@ -146,6 +185,12 @@ class Finder:
 					"folderUid": folder["uid"],
 				}
 			)
+			# we reset all enumerate search results rather than finding only those that apply
+			# since a search might have `(otherfolder, ourfolder)` as a key.
+			# sorting through that sounds difficult to get right
+			self._cache.unset_method("_enumerate_dashboards_in_folders")
+			self._cache.unset("list_dashboards")
+
 			dashboard = self.get_dashboard(address.folder, address.name)
 
 		return dashboard, folder
@@ -167,6 +212,8 @@ class Finder:
 				self._mk_null_alert(folder["uid"], address.name),
 				disable_provenance=True
 			)
+			self._cache.unset("list_alerts")
+
 			alert = self.get_alert(address.folder, address.name)
 
 		return alert, folder

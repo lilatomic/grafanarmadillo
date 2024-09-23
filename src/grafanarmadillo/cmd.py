@@ -13,13 +13,14 @@ from grafana_client import GrafanaApi
 from grafanarmadillo.alerter import Alerter
 from grafanarmadillo.bulk import BulkExporter, BulkImporter
 from grafanarmadillo.dashboarder import Dashboarder
-from grafanarmadillo.find import Finder
+from grafanarmadillo.find import Finder, default_api_v
 from grafanarmadillo.templator import (
 	Templator,
 	alert_dashboarduid_templator,
 	make_mapping_templator,
 	remove_edit_metadata_transformer,
 )
+from grafanarmadillo.types import GrafanaVersion
 from grafanarmadillo.util import load_data
 
 
@@ -97,8 +98,9 @@ def with_template_options(f):
 
 @click.group()
 @click.option("--cfg", "-c", help=f"Config for connecting to Grafana. {load_file_help}")
+@click.option("--api-version", help="Major Grafana API version", default=default_api_v)
 @click.pass_context
-def grafanarmadillo(ctx, cfg):
+def grafanarmadillo(ctx, cfg, api_version):
 	"""Template Grafana things."""
 	ctx.ensure_object(dict)
 	if cfg:
@@ -108,6 +110,7 @@ def grafanarmadillo(ctx, cfg):
 	else:
 		config = {}
 	ctx.obj["cfg"] = config
+	ctx.obj["api_v"] = api_version
 
 
 @grafanarmadillo.group()
@@ -124,12 +127,12 @@ def _export_dashboard(ctx, src, dst, mapping, env_grafana, env_template, templat
 	"""Capture a dashboard from Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
 	templator = make_templator(gfn, mapping, env_grafana, env_template, templator_extra_opts)
-	return export_dashboard(gfn, src, dst, templator)
+	return export_dashboard(gfn, src, dst, templator, ctx.obj["api_v"])
 
 
-def export_dashboard(gfn: GrafanaApi, src: str, dst: IO, templator: Templator):
+def export_dashboard(gfn: GrafanaApi, src: str, dst: IO, templator: Templator, api_v: GrafanaVersion = default_api_v):
 	"""Capture a dashboard from Grafana."""
-	finder, dashboarder = Finder(gfn), Dashboarder(gfn)
+	finder, dashboarder = Finder(gfn, api_v), Dashboarder(gfn)
 
 	dashboard_info = finder.get_from_path(src)
 	dashboard_content, _ = dashboarder.export_dashboard(dashboard_info)
@@ -147,12 +150,12 @@ def _import_dashboard(ctx, src, dst, mapping, env_grafana, env_template, templat
 	"""Deploy a template to Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
 	templator = make_templator(gfn, mapping, env_grafana, env_template, templator_extra_opts)
-	return import_dashboard(gfn, src, dst, templator)
+	return import_dashboard(gfn, src, dst, templator, ctx.obj["api_v"])
 
 
-def import_dashboard(gfn: GrafanaApi, src: IO, dst: str, templator: Templator):
+def import_dashboard(gfn: GrafanaApi, src: IO, dst: str, templator: Templator, api_v: GrafanaVersion = default_api_v):
 	"""Deploy a template to Grafana."""
-	finder, dashboarder = Finder(gfn), Dashboarder(gfn)
+	finder, dashboarder = Finder(gfn, api_v), Dashboarder(gfn)
 
 	template = load_data(src.read())
 
@@ -175,12 +178,12 @@ def _export_alert(ctx, src, dst, mapping, env_grafana, env_template, templator_e
 	"""Capture an alert from Grafana."""
 	gfn = make_grafana(ctx.obj["cfg"])
 	templator = make_templator(gfn, mapping, env_grafana, env_template, templator_extra_opts)
-	return export_alert(gfn, src, dst, templator)
+	return export_alert(gfn, src, dst, templator, ctx.obj["api_v"])
 
 
-def export_alert(gfn: GrafanaApi, src: str, dst: IO, templator: Templator):
+def export_alert(gfn: GrafanaApi, src: str, dst: IO, templator: Templator, api_v: GrafanaVersion = default_api_v):
 	"""Capture an alert from Grafana."""
-	finder, alerter = Finder(gfn), Alerter(gfn)
+	finder, alerter = Finder(gfn, api_v), Alerter(gfn)
 
 	alert_info = finder.get_alert_from_path(src)
 	alert, _ = alerter.export_alert(alert_info)
@@ -198,12 +201,12 @@ def _import_alert(ctx, src, dst, mapping, env_grafana, env_template, templator_e
 	"""Deploy an alert from a template."""
 	gfn = make_grafana(ctx.obj["cfg"])
 	templator = make_templator(gfn, mapping, env_grafana, env_template, templator_extra_opts)
-	return import_alert(gfn, src, dst, templator)
+	return import_alert(gfn, src, dst, templator, ctx.obj["api_v"])
 
 
-def import_alert(gfn: GrafanaApi, src: IO, dst: str, templator: Templator):
+def import_alert(gfn: GrafanaApi, src: IO, dst: str, templator: Templator, api_v: GrafanaVersion = default_api_v):
 	"""Deploy an alert from a template."""
-	finder, alerter = Finder(gfn), Alerter(gfn)
+	finder, alerter = Finder(gfn, api_v), Alerter(gfn)
 
 	template = load_data(src.read())
 

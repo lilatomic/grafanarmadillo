@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.22.0.dev3"
+pants_version = "2.22.0"
 
 # needed to make in-repo plugins work
 pythonpath = ["%(buildroot)s/devtools"]
@@ -22,7 +22,7 @@ root_patterns = [
 ]
 
 [python]
-interpreter_constraints = ["CPython>=3.8"]
+interpreter_constraints = ["CPython>=3.9"]
 pip_version = "24.0"
 enable_resolves = true
 
@@ -39,6 +39,7 @@ install_from_resolve = "flake8"
 [test]
 extra_env_vars = [
 	"DOCKER_HOST",
+	"TESTCONTAINERS_RYUK_DISABLED=true",
 ]
 use_coverage=true
 attempts_default = 3

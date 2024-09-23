@@ -1,12 +1,22 @@
 """Helpers and generic functions."""
+from __future__ import annotations
 
 import json
+import logging
+from enum import Enum
 from pathlib import Path
 from typing import Callable, Dict, List, TypeVar, Union
 
-from grafanarmadillo.types import DashboardContent, DashboardSearchResult
+from grafanarmadillo.paths import PathCodec
+from grafanarmadillo.types import (
+	DashboardContent,
+	DashboardSearchResult,
+	GrafanaPath,
+	PathLike,
+)
 
 
+T = TypeVar("T")
 A = TypeVar("A")
 JSON = TypeVar("JSON", bound=Union[dict, list, str, int, float, bool, None])
 
@@ -121,13 +131,18 @@ def map_json_strings(f: Callable[[str], str], obj: JSON) -> JSON:
 		return obj
 
 
-def resolve_object_to_filepath(base_path: Path, name: str):
+def resolve_object_to_filepath(base_path: Path, name: PathLike):
 	"""Transform the "/folder/object" format to the path on disk that contains the template."""
-	path = Path(name)
-	if path.is_absolute():
-		path = path.relative_to("/")
+	path = PathCodec.encode_grafana(PathCodec.try_parse(name))
 	template_path = (base_path / path).with_suffix(".json")
 	return template_path
+
+
+def resolve_filepath_to_object(base_path: Path, path: Path) -> GrafanaPath:
+	"""Extract the "/folder/object" format from the file on disk that contains the template."""
+	template_path = path.relative_to(base_path).with_suffix("")
+	name = PathCodec.try_parse(PathCodec.decode(template_path))
+	return name
 
 
 def load_data(data_str: str):
@@ -152,3 +167,97 @@ def read_from_file(file_path: Path) -> dict:
 	"""Read JSON from a file."""
 	with file_path.open(mode="r", encoding="utf-8") as f:
 		return json.load(f)
+
+
+class CacheMode(Enum):
+	"""
+	Caching mode for interacting with Grafana.
+
+	None: no caching
+	Session: lifetime of the Finder object
+	Global: all Finders share the same cache
+
+	You can disable caching globally by setting `grafanarmadillo.util.global_cache = grafanarmadillo.util.NoneCache()`
+	"""
+
+	NONE = "NONE"
+	SESSION = "SESSION"
+	GLOBAL = "GLOBAL"
+
+	@staticmethod
+	def select(cache_mode: Union[CacheMode, Cache]) -> Cache:
+		"""Create or use a cache. Pass a cache to reuse it."""
+		if isinstance(cache_mode, Cache):
+			return cache_mode
+
+		if cache_mode == CacheMode.GLOBAL:
+			return global_cache
+		elif cache_mode == CacheMode.SESSION:
+			return Cache()
+		else:
+			return NoneCache()
+
+
+l_c = logging.getLogger(f"{__name__}.cache")
+
+
+class Cache:
+	"""Cache values."""
+
+	def __init__(self):
+		self.cache = {}
+
+	def get(self, k):
+		"""Get a cached value, if it exists."""
+		return self.cache.get(k, None)
+
+	def set(self, k, v):
+		"""Set a cached value."""
+		self.cache[k] = v
+
+	def unset(self, k):
+		"""Unset a cached value."""
+		self.cache.pop(k, None)
+
+	def unset_method(self, k_start):
+		"""Unset all keys whose first subkey (the method name) matches."""
+		cull = set()
+
+		for k in self.cache.keys():
+			if k[0] == k_start:
+				cull.add(k)
+		for k in cull:
+			self.unset(k)
+
+	def getor(self, k, f: Callable[[], T]) -> T:
+		"""Get a cached item or generate it."""
+		if v := self.get(k):
+			l_c.debug(f"cache hit {k}")
+			return v
+		l_c.debug(f"cache miss {k}")
+		v = f()
+		self.set(k, v)
+		return v
+
+
+global_cache = Cache()
+
+
+class NoneCache(Cache):
+	"""A Cache-interface-compatible which never caches."""
+
+	def get(self, k):
+		"""Never caches a value."""
+		return None
+
+	def set(self, k, v):
+		"""Never caches a value."""
+		return
+
+	def unset(self, k):
+		"""No keys are ever set."""
+		return
+
+	def getor(self, k, f: Callable[[], T]) -> T:
+		"""Always generate the cached item."""
+		return f()

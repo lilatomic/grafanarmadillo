@@ -4,7 +4,7 @@ python_distribution(
         "//src/grafanarmadillo:grafanarmadillo",
         "//:docs",
         "//:pyproject",
-        "//:package_info",
+        # "//:package_info",
     ],
     provides=python_artifact(
         name="grafanarmadillo",
@@ -24,4 +24,4 @@ python_requirements(
 )
 
 resource(name="pyproject", source="pyproject.toml")
-resources(name="package_info", sources=["LICENSE", "README.RST"])
+resources(name="package_info", sources=["LICENSE", "README.rst"])

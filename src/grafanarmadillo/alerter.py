@@ -1,19 +1,21 @@
 """Push and pull Grafana alerts."""
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from grafana_client import GrafanaApi
 from grafana_client.client import GrafanaClientError
 
 from grafanarmadillo.types import AlertContent, AlertSearchResult, FolderSearchResult
+from grafanarmadillo.util import Cache, CacheMode
 
 
 class Alerter:
 	"""Collection of methods for managing alert rules."""
 
-	def __init__(self, api: GrafanaApi, disable_provenance=True) -> None:
+	def __init__(self, api: GrafanaApi, disable_provenance=True, cache_mode: Union[CacheMode, Cache] = CacheMode.SESSION) -> None:
 		super().__init__()
 		self.api = api
 		self.disable_provenance = disable_provenance
+		self._cache = CacheMode.select(cache_mode)
 
 	def import_alert(
 		self, content: AlertContent, folder: FolderSearchResult
@@ -39,6 +41,7 @@ class Alerter:
 			self.api.alertingprovisioning.update_alertrule(content["uid"], content, disable_provenance=self.disable_provenance)
 		else:
 			self.api.alertingprovisioning.create_alertrule(content, disable_provenance=self.disable_provenance)
+		self._cache.unset("list_alerts")
 
 	def export_alert(
 		self, alert: AlertSearchResult

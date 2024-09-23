@@ -1,6 +1,6 @@
 [project]
 name = "grafanarmadillo"
-version = "0.7.1"
+version = "0.8.0"
 description = "Simplify interacting with Grafana, with a focus on templating dashboards and alerts"
 readme = "README.rst"
 

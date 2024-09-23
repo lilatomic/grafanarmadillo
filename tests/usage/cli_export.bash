@@ -1,1 +1,1 @@
-grafanarmadillo --cfg "$grafanarmadillo_cfg" dashboard export --mapping 'file://mapping.json' --src '/dev/MySystem TEST' --dst ./my_system.json --env-grafana dev --env-template template
+grafanarmadillo --cfg "$grafanarmadillo_cfg" --api-version "${GRAFANARMADILLO_API_VERSION}" dashboard export --mapping 'file://mapping.json' --src '/dev/MySystem TEST' --dst ./my_system.json --env-grafana dev --env-template template
