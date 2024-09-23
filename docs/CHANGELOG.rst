@@ -2,6 +2,9 @@
 Changelog
 =========
 
+v0.8.0 (2024-09-23)
+------------------------------------------------------------
+
 * task : upgrade pinned deps
 * task : (breaking) drop support for Python 3.8
 * fix : also remove folderUID when creating templates
