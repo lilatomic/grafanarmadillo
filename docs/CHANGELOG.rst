@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* task : upgrade pinned deps
 * task : (breaking) drop support for Python 3.8
 * fix : also remove folderUID when creating templates
 * feature : caching in finder
