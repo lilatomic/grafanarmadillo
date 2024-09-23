@@ -4,7 +4,7 @@ python_distribution(
         "//src/grafanarmadillo:grafanarmadillo",
         "//:docs",
         "//:pyproject",
-#        "//:package_info",
+        # "//:package_info",
     ],
     provides=python_artifact(
         name="grafanarmadillo",
