@@ -17,10 +17,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Python for Pants
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
       - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
