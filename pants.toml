@@ -23,7 +23,6 @@ root_patterns = [
 
 [python]
 interpreter_constraints = ["CPython>=3.9"]
-pip_version = "24.0"
 enable_resolves = true
 
 [python.resolves]
