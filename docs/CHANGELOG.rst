@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* fix : fix for templating options without a name
+
 v0.8.0 (2024-09-23)
 ------------------------------------------------------------
 

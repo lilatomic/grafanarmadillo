@@ -153,7 +153,7 @@ def fill_grafana_templating_options(options: dict[str, Any]) -> DashboardTransfo
 	def _fill_remote_options(d: DashboardContent) -> DashboardContent:
 		for k, v in options.items():
 			for e in d["templating"]["list"]:
-				if e["name"] == k:
+				if e.get("name", None) == k:
 					e["current"] = v
 		return d
 
