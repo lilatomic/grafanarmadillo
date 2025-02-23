@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.22.0"
+pants_version = "2.24.2"
 
 # needed to make in-repo plugins work
 pythonpath = ["%(buildroot)s/devtools"]
@@ -22,8 +22,7 @@ root_patterns = [
 ]
 
 [python]
-interpreter_constraints = ["CPython>=3.9"]
-pip_version = "24.0"
+interpreter_constraints = ["CPython>=3.10"]
 enable_resolves = true
 
 [python.resolves]

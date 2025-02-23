@@ -15,14 +15,10 @@ jobs:
     strategy:
       matrix:
         platform: [ubuntu-latest]
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Python for Pants
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
       - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -49,8 +45,8 @@ jobs:
           verbose: true
 
       - name: Upload pants log
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: pants-log
+          name: pants-log-${{ matrix.python-version }}
           path: .pants.d/pants.log
         if: always() # We want the log even on failures.
