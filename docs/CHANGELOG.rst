@@ -2,6 +2,9 @@
 Changelog
 =========
 
+v0.9.0 (2025-02-23)
+------------------------------------------------------------
+
 * task : (breaking) drop python 3.9
 * fix : fix for templating options without a name
 

@@ -41,4 +41,4 @@ This repository was built from the `skeleton <https://github.com/joaomcteixeira/
 Version
 =======
 
-v0.8.0
+v0.9.0
